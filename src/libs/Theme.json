@@ -1,0 +1,105 @@
+{
+  "colors": {
+    "primary": "#06a759",
+    "secondary": "#BA4D14",
+    "tertiary": "#4E6F66",
+    "lightSky": "#5688A9",
+    "background": "#fff",
+    "text": "#151515",
+    "link": "#2980b9",
+    "border": "#bdc3c7",
+    "white": "#ffffff",
+    "black": "#000",
+    "error": "#EC495D",
+    "success": "#6CC070",
+    "iconColor": "#555555",
+    "dark": "#505050",
+    "grey": "#D1D6D9"
+  },
+  "typography": {
+    "heading": {
+      "fontFamily": "Poppins-Bold",
+      "fontWeight": "bold"
+    },
+    "subheading": {
+      "fontFamily": "Poppins-SemiBold",
+      "fontWeight": "bold"
+    },
+    "body": {
+      "fontFamily": "Poppins-Regular",
+      "fontWeight": "normal"
+    },
+    "caption": {
+      "fontFamily": "Poppins-Light",
+      "fontWeight": "normal"
+    },
+    "medium": {
+      "fontFamily": "Poppins-Medium",
+      "fontWeight": "normal"
+    }
+  },
+
+  "fontWeight": {
+    "100": {
+      "fontFamily": "Poppins-Thin"
+    },
+    "200": {
+      "fontFamily": "Poppins-ExtraLight"
+    },
+    "300": {
+      "fontFamily": "Poppins-Light"
+    },
+    "400": {
+      "fontFamily": "Poppins-Regular"
+    },
+    "500": {
+      "fontFamily": "Poppins-Medium"
+    },
+    "600": {
+      "fontFamily": "Poppins-SemiBold"
+    },
+    "700": {
+      "fontFamily": "Poppins-Bold"
+    },
+    "800": {
+      "fontFamily": "Poppins-ExtraBold"
+    },
+    "900": {
+      "fontFamily": "Poppins-Black"
+    }
+  },
+
+  "borders": {
+    "miniRadius": 4,
+    "normalRadius": 8,
+    "regularRadius": 5,
+    "fullRadius": 12,
+    "largeRadius": 20,
+    "width": 1
+  },
+  "shadows": {
+    "small": {
+      "shadowColor": "#000",
+      "shadowOffset": { "width": 0, "height": 2 },
+      "shadowOpacity": 0.2,
+      "shadowRadius": 2
+    },
+    "medium": {
+      "shadowColor": "#000",
+      "shadowOffset": { "width": 0, "height": 4 },
+      "shadowOpacity": 0.3,
+      "shadowRadius": 4
+    },
+    "large": {
+      "shadowColor": "#000",
+      "shadowOffset": { "width": 0, "height": 6 },
+      "shadowOpacity": 0.4,
+      "shadowRadius": 6
+    }
+  },
+  "elevation": {
+    "small": 2,
+    "medium": 4,
+    "large": 6
+  }
+}
