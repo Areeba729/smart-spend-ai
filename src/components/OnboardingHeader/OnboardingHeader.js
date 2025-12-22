@@ -1,20 +1,32 @@
+import React from 'react';
 import { Image, View } from 'react-native';
-import NativeText from '../NativeText/NativeText';
+import getStyles from './style';
+import PrimaryButton from '../PrimaryButton/PrimaryButton';
 
-export default function OnboardingHeader({ image, title, desc, styles }) {
+export default function OnboardingHeader({
+  image,
+  handleSkip,
+  currentStep,
+  totalSteps,
+}) {
+  const styles = getStyles();
+
   return (
     <>
-      <View style={styles.halfCircle} />
+      {currentStep < totalSteps - 1 && (
+        <PrimaryButton
+          title={'Skip'}
+          onPress={handleSkip}
+          containerStyle={styles.skipButton}
+          titleStyle={styles.skipText}
+        />
+      )}
       <View style={styles.illustrationWrap}>
         <Image
           source={image}
           style={styles.illustration}
-          resizeMode="contain"
+          accessibilityLabel={`Onboarding illustration`}
         />
-      </View>
-      <View style={styles.textWrap}>
-        <NativeText style={styles.title}>{title}</NativeText>
-        <NativeText style={styles.desc}>{desc}</NativeText>
       </View>
     </>
   );

@@ -1,12 +1,12 @@
-import React from 'react'
-import { Image, StyleSheet, Text, View } from 'react-native'
+import React from 'react';
+import { Image, StyleSheet, Text, View } from 'react-native';
 
-import Modal from 'react-native-modal'
-import images from '../../assets/images'
-import { Responsive, Theme } from '../../libs'
-import NativeButton from '../NativeButton/NativeButton'
+import Modal from 'react-native-modal';
+import images from '../../assets/images';
+import { Responsive, Theme } from '../../libs';
+import NativeButton from '../NativeButton/NativeButton';
 
-const { AppFonts, getHeight, getWidth } = Responsive
+const { AppFonts, getHeight, getWidth } = Responsive;
 
 export default function InternetModal({
   isVisible,
@@ -32,15 +32,14 @@ export default function InternetModal({
         <View style={styles.topWrap}>
           <Text style={styles.titleText}>{title}</Text>
           <Image
-            source={images.signal}
-            resizeMode='contain'
+            // source={images.signal}
+            resizeMode="contain"
             style={styles.signalStyle}
           />
         </View>
         <View style={styles.bottomWrap}>
           <Text style={styles.descTxt}>{description}</Text>
           <Text style={styles.shortDescTxt}>{shortDescription}</Text>
-
 
           <NativeButton
             title={btnTxt}
@@ -53,11 +52,10 @@ export default function InternetModal({
         </View>
       </View>
     </Modal>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
-
   modalStyle: {
     justifyContent: 'center',
   },
@@ -72,7 +70,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: Theme.borders.fullRadius,
     backgroundColor: Theme.colors.accent,
     justifyContent: 'center',
-    paddingVertical: getWidth(4)
+    paddingVertical: getWidth(4),
   },
 
   titleText: {
@@ -86,27 +84,25 @@ const styles = StyleSheet.create({
     height: getWidth(20),
     width: getWidth(20),
     alignSelf: 'center',
-    marginTop: getHeight(2)
+    marginTop: getHeight(2),
   },
-
 
   bottomWrap: {
     paddingHorizontal: getWidth(7),
-    paddingVertical: getWidth(4)
+    paddingVertical: getWidth(4),
   },
-
 
   descTxt: {
     color: Theme.colors.black,
     textAlign: 'center',
-    fontSize: AppFonts.h5
+    fontSize: AppFonts.h5,
   },
 
   shortDescTxt: {
     marginTop: getHeight(1),
     color: Theme.colors.black,
     textAlign: 'center',
-    fontSize: AppFonts.h5
+    fontSize: AppFonts.h5,
   },
 
   btnContainer: {
@@ -116,6 +112,6 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     height: getHeight(4.5),
     backgroundColor: Theme.colors.primary,
-    justifyContent: 'center'
+    justifyContent: 'center',
   },
-})
+});

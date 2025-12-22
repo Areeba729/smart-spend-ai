@@ -1,31 +1,61 @@
-import { TouchableOpacity, View } from 'react-native';
-import { SvgXml } from 'react-native-svg';
-import { cheveron } from '../../assets/icons';
+import React from 'react';
+import { View, Text } from 'react-native';
+import getStyles from './style';
+import NativeButton from '../NativeButton/NativeButton';
+import HeadingText from '../TextDecoration/HeadingText';
+import LabelText from '../TextDecoration/LabelText';
+import PrimaryButton from '../PrimaryButton/PrimaryButton';
 import { Theme } from '../../libs';
 
-const { colors } = Theme;
+export default function OnboardingFooter({
+  step,
+  stepsCount,
+  onNext,
+  title,
+  desc,
+  accentWord,
+}) {
+  const styles = getStyles();
 
-export default function OnboardingFooter({ step, stepsCount, onNext, styles }) {
+  const isLastStep = step === stepsCount - 1;
+
   return (
     <View style={styles.footer}>
-      <View style={styles.stepperWrap}>
-        {Array.from({ length: stepsCount }).map((_, i) => (
-          <View key={i} style={[styles.dot, i === step && styles.dotActive]} />
-        ))}
-      </View>
-      <TouchableOpacity
-        style={styles.nextBtn}
-        onPress={onNext}
-        activeOpacity={0.8}
-      >
-        <SvgXml
-          xml={cheveron}
-          height={20}
-          width={20}
-          color={colors.white}
-          style={styles.nextBtnIcon}
+      <View style={styles.card}>
+        <View style={styles.cardBody}>
+          <View style={{ width: '90%' }}>
+            {accentWord && title?.includes(accentWord) ? (
+              <HeadingText style={styles.cardTitle}>
+                {title.split(accentWord)[0]}
+                <Text style={{ color: Theme.colors.secondary }}>
+                  {accentWord}
+                </Text>
+                {title.split(accentWord)[1]}
+              </HeadingText>
+            ) : (
+              <HeadingText text={title} style={styles.cardTitle} />
+            )}
+          </View>
+          <LabelText text={desc} style={styles.cardDesc} numberOfLines={5} />
+
+          <View style={styles.stepperWrap}>
+            {Array.from({ length: stepsCount }).map((_, i) =>
+              i === step ? (
+                <View key={i} style={[styles.dot, styles.dotActive]} />
+              ) : (
+                <View key={i} style={styles.dot} />
+              ),
+            )}
+          </View>
+        </View>
+
+        <PrimaryButton
+          title={'Next'}
+          onPress={onNext}
+          containerStyle={styles.button}
+          titleStyle={styles.btnTitle}
         />
-      </TouchableOpacity>
+      </View>
     </View>
   );
 }

@@ -24,7 +24,7 @@ const SmartSpendAILogo = ({ width = 300, height = 300 }) => {
       />
 
       {/* Text */}
-      <Text
+      {/* <Text
         x="150"
         y="290"
         fontSize="42"
@@ -34,7 +34,7 @@ const SmartSpendAILogo = ({ width = 300, height = 300 }) => {
       >
         SmartSpend
         <TSpan fill="#FFB347">AI</TSpan>
-      </Text>
+      </Text> */}
     </Svg>
   );
 };

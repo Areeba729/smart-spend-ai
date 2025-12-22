@@ -1,11 +1,11 @@
 {
   "colors": {
-    "primary": "#06a759",
-    "secondary": "#BA4D14",
+    "primary": "#1A1A1A",
+    "secondary": "#86AE12",
     "tertiary": "#4E6F66",
     "lightSky": "#5688A9",
     "background": "#fff",
-    "text": "#151515",
+    "text": "#D6D6D6",
     "link": "#2980b9",
     "border": "#bdc3c7",
     "white": "#ffffff",

@@ -1,7 +1,10 @@
+// custom Status bar
+
 import React from 'react';
-import { StatusBar } from 'react-native';
+import {StatusBar} from 'react-native';
+
 const CustomStatusBar = ({
-  barStyle = 'light-content',
+  barStyle = 'dark-content',
   backgroundColor = 'transparent',
   translucent = true,
 }) => {

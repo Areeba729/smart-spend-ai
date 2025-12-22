@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { moderateScale } from 'react-native-size-matters';
+import { moderateScale, scale } from 'react-native-size-matters';
 import { Theme } from '../../libs';
 
 const styles = colors =>
@@ -20,24 +20,31 @@ const styles = colors =>
       justifyContent: 'space-between',
     },
     header: {
-      alignItems: 'center',
-      marginTop: moderateScale(40),
-      marginBottom: moderateScale(40),
+      marginBottom: moderateScale(24),
+    },
+    backButton: {
+      marginBottom: moderateScale(16),
+      marginTop: scale(10),
+    },
+    backButtonText: {
+      color: colors.white,
+      fontSize: moderateScale(30),
+      fontWeight: 'bold',
     },
     logoContainer: {
-      width: moderateScale(64),
-      height: moderateScale(64),
+      width: moderateScale(48),
+      height: moderateScale(48),
       backgroundColor: '#1E1E1E',
-      borderRadius: moderateScale(16),
+      borderRadius: moderateScale(12),
       justifyContent: 'center',
       alignItems: 'center',
-      marginBottom: moderateScale(24),
+      marginBottom: moderateScale(16),
       borderWidth: 1,
       borderColor: '#333',
     },
     logo: {
-      width: moderateScale(32),
-      height: moderateScale(32),
+      width: moderateScale(24),
+      height: moderateScale(24),
       resizeMode: 'contain',
       tintColor: colors.secondary,
     },
@@ -45,13 +52,11 @@ const styles = colors =>
       fontSize: moderateScale(28),
       color: colors.white,
       marginBottom: moderateScale(8),
-      textAlign: 'center',
       ...Theme.typography.heading,
     },
     subtitle: {
       color: colors.grey,
       fontSize: moderateScale(14),
-      textAlign: 'center',
       ...Theme.typography.body,
     },
     socialSection: {
@@ -105,7 +110,7 @@ const styles = colors =>
       color: '#666',
       fontSize: moderateScale(14),
     },
-    signupText: {
+    loginText: {
       color: colors.secondary,
       fontWeight: 'bold',
       fontSize: moderateScale(14),

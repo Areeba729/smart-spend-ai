@@ -1,6 +1,6 @@
 export const images = {
-  signal: require('./signal.png'),
-  boarding1: require('./onboarding-1.png'),
-  boarding2: require('./onboarding-2.png'),
-  boarding3: require('./onboarding-3.png'),
+  Logo: require('./Logo.png'),
+  onboarding1: require('./onboarding1.png'),
+  onboarding2: require('./onboarding2.png'),
+  onboarding3: require('./onboarding3.png'),
 };

@@ -1,8 +1,8 @@
 // PrimaryButton.js
-import React from "react"
-import { TouchableOpacity, Text } from "react-native"
+import React from 'react';
+import { TouchableOpacity, Text } from 'react-native';
 
-import styles from "./PrimaryButtonStyles"
+import styles from './PrimaryButtonStyles';
 
 const PrimaryButton = ({
   onPress,
@@ -20,7 +20,7 @@ const PrimaryButton = ({
     >
       <Text style={[styles.buttonText, titleStyle]}>{title}</Text>
     </TouchableOpacity>
-  )
-}
+  );
+};
 
-export default PrimaryButton
+export default PrimaryButton;
