@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { ImageBackground, View } from 'react-native';
+import { View } from 'react-native';
 import { images } from '../../assets/images';
+import CustomStatusBar from '../../components/CustomStatusBar/CustomStatusBar';
 import OnboardingFooter from '../../components/OnboardingFooter/OnboardingFooter';
 import OnboardingHeader from '../../components/OnboardingHeader/OnboardingHeader';
 import { useOnboardingStatus } from '../../hooks/useOnboardingStatus';
-import CustomStatusBar from '../../components/CustomStatusBar/CustomStatusBar';
 import { Theme } from '../../libs';
 
 export default function Onboarding({ navigation }) {
@@ -53,7 +53,7 @@ export default function Onboarding({ navigation }) {
 
   return (
     <>
-      <View style={{ backgroundColor: Theme.colors.primary, flex: 1 }}>
+      <View style={{ backgroundColor: Theme.colors.black, flex: 1 }}>
         <CustomStatusBar barStyle="light-content" />
 
         <OnboardingHeader

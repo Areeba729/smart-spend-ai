@@ -6,7 +6,7 @@ const getStyles = colors =>
     container: {
       flex: 1,
       // backgroundColor: Theme.colors.white,
-      backgroundColor: Theme.colors.primary,
+      backgroundColor: Theme.colors.black,
     },
     logoContainer: {
       position: 'absolute',

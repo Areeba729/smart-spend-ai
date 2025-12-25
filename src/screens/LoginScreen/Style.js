@@ -78,9 +78,10 @@ const styles = colors =>
       flexDirection: 'row',
       justifyContent: 'space-between',
       gap: moderateScale(16),
+      alignSelf: 'center',
     },
     socialButton: {
-      flex: 1,
+      width: '47%',
       backgroundColor: '#111',
       borderWidth: 1,
       borderColor: '#333',

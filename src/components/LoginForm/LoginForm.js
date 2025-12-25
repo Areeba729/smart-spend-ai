@@ -51,7 +51,7 @@ const LoginForm = ({ onSubmit, navigation }) => {
           keyboardType="email-address"
           fieldStyle={styles.field}
           labelStyle={styles.label}
-          inputStyle={styles.input}
+          style={styles.input}
           errorStyle={styles.error}
           inputContainerStyle={styles.inputContainer}
           leftIcon={<SvgXml xml={emailIcon} />}
@@ -64,7 +64,7 @@ const LoginForm = ({ onSubmit, navigation }) => {
           secureTextEntry={!showPassword}
           fieldStyle={styles.field}
           labelStyle={styles.label}
-          inputStyle={styles.input}
+          style={styles.input}
           errorStyle={styles.error}
           leftIcon={<SvgXml xml={lockIcon} />}
           inputContainerStyle={styles.inputContainer}

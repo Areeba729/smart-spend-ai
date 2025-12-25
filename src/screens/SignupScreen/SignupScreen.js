@@ -1,18 +1,23 @@
 // SignupScreen.js
 import React from 'react';
 import {
-  Alert,
   Image,
+  Platform,
   StatusBar,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import Toast from 'react-native-toast-message';
 import { images } from '../../assets/images';
 import SignupForm from '../../components/SignupForm/SignupForm';
 import { Theme } from '../../libs';
 import styleGenerator from './style';
+import { SvgXml } from 'react-native-svg';
+import { useDispatch } from 'react-redux';
+import { Apple, Google } from '../../assets/icons';
+import { login } from '../../redux/slices/userSlice';
 
 const SocialButton = ({ icon, text, onPress, styles }) => (
   <TouchableOpacity style={styles.socialButton} onPress={onPress}>
@@ -24,10 +29,26 @@ const SocialButton = ({ icon, text, onPress, styles }) => (
 
 const SignupScreen = ({ navigation }) => {
   const styles = styleGenerator(Theme.colors);
+  const dispatch = useDispatch();
 
   const handleSignup = formValues => {
-    console.log('Signup Data:', formValues);
-    Alert.alert('Success', 'Account created successfully!');
+    // console.log('Signup Data:', formValues);
+
+    // Simulated user data after successful signup
+    const userData = {
+      ...formValues,
+      id: '124', // Unique ID for signup
+      isProfileComplete: false, // Usually profile isn't complete right after basic signup
+    };
+
+    dispatch(login(userData));
+    // console.log('User signed up and logged in:', userData);
+
+    Toast.show({
+      type: 'success',
+      text1: 'Account Created',
+      text2: 'Your account has been created successfully 👋',
+    });
     // Navigate to next screen
     // navigation.navigate('Home');
   };
@@ -73,17 +94,19 @@ const SignupScreen = ({ navigation }) => {
 
           <View style={styles.socialButtons}>
             <SocialButton
-              text="Google"
-              icon="G"
+              // text="Google"
+              icon={<SvgXml xml={Google} width={20} height={20} />}
               onPress={() => {}}
               styles={styles}
             />
-            <SocialButton
-              text="Apple"
-              icon="🍎"
-              onPress={() => {}}
-              styles={styles}
-            />
+            {Platform.OS === 'ios' && (
+              <SocialButton
+                // text="Apple"
+                icon={<SvgXml xml={Apple} width={20} height={20} />}
+                onPress={() => {}}
+                styles={styles}
+              />
+            )}
           </View>
         </View>
 

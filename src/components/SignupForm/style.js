@@ -21,6 +21,7 @@ export const styles = StyleSheet.create({
     backgroundColor: Theme.colors.primary,
     width: scale(325),
     borderColor: '#666',
+    height: scale(50),
   },
   label: {
     fontWeight: '600',
@@ -29,7 +30,7 @@ export const styles = StyleSheet.create({
     fontSize: 14,
   },
   input: {
-    fontSize: 16,
+    fontSize: 12,
     color: '#fff',
     flex: 1,
     padding: 0,

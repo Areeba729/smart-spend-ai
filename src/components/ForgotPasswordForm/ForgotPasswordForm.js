@@ -39,7 +39,7 @@ const ForgotPasswordForm = ({ onSubmit }) => {
           keyboardType="email-address"
           fieldStyle={styles.field}
           labelStyle={styles.label}
-          inputStyle={styles.input}
+          style={styles.input}
           errorStyle={styles.error}
           inputContainerStyle={styles.inputContainer}
           leftIcon={<SvgXml xml={emailIcon} width={20} height={20} />}

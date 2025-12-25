@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import Toast from 'react-native-toast-message';
 
 import NetInfo from '@react-native-community/netinfo';
 import { NavigationContainer } from '@react-navigation/native';
@@ -59,6 +60,7 @@ export default function App() {
           btnTxt={'Retry'}
         />
       )}
+      <Toast />
     </Provider>
   );
 }

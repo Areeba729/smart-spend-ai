@@ -1,5 +1,6 @@
 import { StyleSheet } from 'react-native';
 import { Theme } from '../../libs';
+import { scale } from 'react-native-size-matters';
 
 export const styles = StyleSheet.create({
   container: {
@@ -24,8 +25,9 @@ export const styles = StyleSheet.create({
   },
   inputContainer: {
     backgroundColor: Theme.colors.primary,
+    width: scale(325),
     borderColor: '#666',
-    flex: 1,
+    height: scale(50),
   },
   label: {
     fontWeight: '600',

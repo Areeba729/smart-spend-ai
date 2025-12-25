@@ -76,7 +76,7 @@ const ResetPasswordForm = ({ onSubmit }) => {
           secureTextEntry={!showPassword}
           fieldStyle={styles.field}
           labelStyle={styles.label}
-          inputStyle={styles.input}
+          style={styles.input}
           errorStyle={styles.error}
           leftIcon={
             <View style={styles.inputIcon}>
@@ -127,7 +127,7 @@ const ResetPasswordForm = ({ onSubmit }) => {
           secureTextEntry={!showConfirmPassword}
           fieldStyle={styles.field}
           labelStyle={styles.label}
-          inputStyle={styles.input}
+          style={styles.input}
           errorStyle={styles.error}
           leftIcon={
             <View style={styles.inputIcon}>

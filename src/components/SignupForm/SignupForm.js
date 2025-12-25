@@ -1,6 +1,6 @@
-// SignupForm.js
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, Alert } from 'react-native';
+import Toast from 'react-native-toast-message';
 import {
   useSmartForm,
   FormProvider,
@@ -14,6 +14,8 @@ import {
   profileIcon,
   eyeIcon,
   eyeOffIcon,
+  phoneIcon,
+  termsAndConditions,
 } from '../../assets/icons';
 
 const SignupForm = ({ onSubmit }) => {
@@ -28,11 +30,7 @@ const SignupForm = ({ onSubmit }) => {
         required: true,
         minLength: 2,
       },
-      username: {
-        type: 'text',
-        required: true,
-        validate: value => !value.includes(' '), // No spaces
-      },
+
       email: {
         type: 'email',
         required: true,
@@ -61,15 +59,37 @@ const SignupForm = ({ onSubmit }) => {
   });
 
   const handleSubmit = async () => {
+    console.log('Submit button pressed');
     if (!agreeToTerms) {
-      // Alert.alert('Error', 'Please agree to the Terms & Privacy.');
+      Toast.show({
+        type: 'error',
+        text1: 'Agreement Required',
+        text2: 'Please agree to the Terms & Privacy.',
+      });
       return;
     }
-    await form.submitForm();
-    if (form.isValid) {
-      onSubmit(form.values);
-    } else {
-      // Alert.alert('Error', 'Please fix the errors in the form.');
+    try {
+      console.log('Submitting form...');
+      await form.submitForm();
+      console.log('Form validity:', form.isValid);
+      console.log('Form values:', form.values);
+
+      if (form.isValid) {
+        onSubmit(form.values);
+      } else {
+        Toast.show({
+          type: 'error',
+          text1: 'Form Invalid',
+          text2: 'Please fix the errors in the form.',
+        });
+      }
+    } catch (error) {
+      console.log('Submit Error:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Submission Error',
+        text2: error.message || 'An unexpected error occurred.',
+      });
     }
   };
 
@@ -83,23 +103,23 @@ const SignupForm = ({ onSubmit }) => {
           placeholderTextColor="#666"
           fieldStyle={styles.field}
           labelStyle={styles.label}
-          inputStyle={styles.input}
+          style={styles.input}
           errorStyle={styles.error}
           leftIcon={<SvgXml xml={profileIcon} width={20} height={20} />}
           inputContainerStyle={styles.inputContainer}
         />
-        <SmartFormField
+        {/* <SmartFormField
           name="username"
           label="Username"
           placeholder="Choose a username"
           placeholderTextColor="#666"
           fieldStyle={styles.field}
           labelStyle={styles.label}
-          inputStyle={styles.input}
+          style={styles.input}
           errorStyle={styles.error}
           leftIcon={<SvgXml xml={profileIcon} width={20} height={20} />}
           inputContainerStyle={styles.inputContainer}
-        />
+        /> */}
         <SmartFormField
           name="email"
           label="Email"
@@ -108,7 +128,7 @@ const SignupForm = ({ onSubmit }) => {
           keyboardType="email-address"
           fieldStyle={styles.field}
           labelStyle={styles.label}
-          inputStyle={styles.input}
+          style={styles.input}
           errorStyle={styles.error}
           leftIcon={<SvgXml xml={emailIcon} width={20} height={20} />}
           inputContainerStyle={styles.inputContainer}
@@ -121,9 +141,10 @@ const SignupForm = ({ onSubmit }) => {
           keyboardType="phone-pad"
           fieldStyle={styles.field}
           labelStyle={styles.label}
-          inputStyle={styles.input}
+          style={styles.input}
           errorStyle={styles.error}
           inputContainerStyle={styles.inputContainer}
+          leftIcon={<SvgXml xml={phoneIcon} width={20} height={20} />}
           // No specific phone icon in list, using generic or skipping leftIcon if preferred
         />
         <SmartFormField
@@ -134,9 +155,10 @@ const SignupForm = ({ onSubmit }) => {
           keyboardType="numeric"
           fieldStyle={styles.field}
           labelStyle={styles.label}
-          inputStyle={styles.input}
+          style={styles.input}
           errorStyle={styles.error}
           inputContainerStyle={styles.inputContainer}
+          leftIcon={<SvgXml xml={termsAndConditions} width={20} height={20} />}
         />
         <SmartFormField
           name="password"
@@ -146,7 +168,7 @@ const SignupForm = ({ onSubmit }) => {
           secureTextEntry={!showPassword}
           fieldStyle={styles.field}
           labelStyle={styles.label}
-          inputStyle={styles.input}
+          style={styles.input}
           errorStyle={styles.error}
           leftIcon={<SvgXml xml={lockIcon} width={20} height={20} />}
           rightIcon={
@@ -166,9 +188,9 @@ const SignupForm = ({ onSubmit }) => {
           placeholder="Re-enter password"
           placeholderTextColor="#666"
           secureTextEntry={!showConfirmPassword}
-          fieldStyle={styles.field}
+          // inputContainer={styles.field}
           labelStyle={styles.label}
-          inputStyle={styles.input}
+          style={styles.input}
           errorStyle={styles.error}
           leftIcon={<SvgXml xml={lockIcon} width={20} height={20} />}
           rightIcon={

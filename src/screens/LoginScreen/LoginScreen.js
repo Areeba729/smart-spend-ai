@@ -1,16 +1,21 @@
-import React from 'react';
 import {
   Image,
+  Platform,
   ScrollView,
   StatusBar,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { images } from '../../assets/images';
 import LoginForm from '../../components/LoginForm/LoginForm';
 import { Theme } from '../../libs';
 import styleGenerator from './style';
+import { SvgXml } from 'react-native-svg';
+import { useDispatch } from 'react-redux';
+import { Apple, Google } from '../../assets/icons';
+import { login } from '../../redux/slices/userSlice';
 
 const SocialButton = ({ icon, text, onPress, styles }) => (
   <TouchableOpacity style={styles.socialButton} onPress={onPress}>
@@ -22,10 +27,25 @@ const SocialButton = ({ icon, text, onPress, styles }) => (
 
 const LoginScreen = ({ navigation }) => {
   const styles = styleGenerator(Theme.colors);
+  const dispatch = useDispatch();
 
   const handleLogin = values => {
-    // Here you can call your API or handle login logic
-    // Example: navigate to Home screen after login
+    // Simulated user data after successful login
+    const userData = {
+      ...values,
+      id: '123',
+      name: 'User',
+      isProfileComplete: true,
+    };
+
+    dispatch(login(userData));
+    // console.log('User logged in:', userData);
+
+    Toast.show({
+      type: 'success',
+      text1: 'Login Successful',
+      text2: 'You have successfully logged in 👋',
+    });
     // navigation.replace('Home');
   };
 
@@ -57,19 +77,20 @@ const LoginScreen = ({ navigation }) => {
           </View>
 
           <View style={styles.socialButtons}>
-            {/* Using text for icons for now as verified assets didn't show apple/google icons */}
             <SocialButton
-              text="Apple"
-              icon="🍎"
+              // text="Google"
+              icon={<SvgXml xml={Google} width={20} height={20} />}
               onPress={() => {}}
               styles={styles}
             />
-            <SocialButton
-              text="Google"
-              icon="G"
-              onPress={() => {}}
-              styles={styles}
-            />
+            {Platform.OS === 'ios' && (
+              <SocialButton
+                // text="Apple"
+                icon={<SvgXml xml={Apple} width={20} height={20} />}
+                onPress={() => {}}
+                styles={styles}
+              />
+            )}
           </View>
         </View>
 
