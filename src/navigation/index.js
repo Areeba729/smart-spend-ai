@@ -6,7 +6,7 @@ import { Theme } from '../libs';
 import {
   selectIsAuthenticated,
   selectIsProfileComplete,
-} from '../redux/slices/authSlice';
+} from '../redux/slices/userSlice';
 import AuthStack from './AuthStack';
 import UnAuthStack from './UnAuthStack';
 
@@ -36,12 +36,29 @@ export default function AppNavigation() {
         ? colors.darkTransparent
         : colors.lightTransparent,
     },
+    fonts: {
+      regular: {
+        fontFamily: 'Poppins-Regular',
+        fontWeight: 'normal',
+      },
+      medium: {
+        fontFamily: 'Poppins-Medium',
+        fontWeight: '500',
+      },
+      bold: {
+        fontFamily: 'Poppins-Bold',
+        fontWeight: 'bold',
+      },
+      heavy: {
+        fontFamily: 'Poppins-Bold',
+        fontWeight: '900',
+      },
+    },
   };
 
   return (
     <NavigationContainer theme={MyTheme}>
-      {/* {isSignedIn ? <AuthStack /> : <UnAuthStack />} */}
-      <UnAuthStack />
+      {isSignedIn ? <AuthStack /> : <UnAuthStack />}
     </NavigationContainer>
   );
 }

@@ -283,3 +283,26 @@ export const Apple = `<svg width="19" height="19" viewBox="0 0 19 19" fill="none
 </defs>
 </svg>
 `;
+
+export const DocumentIcon = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0)">
+  <!-- Document body -->
+  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Folded corner -->
+  <polyline points="14 2 14 8 20 8" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Optional lines inside the document -->
+  <line x1="8" y1="12" x2="16" y2="12" stroke="black" stroke-width="2" stroke-linecap="round"/>
+  <line x1="8" y1="16" x2="16" y2="16" stroke="black" stroke-width="2" stroke-linecap="round"/>
+  <line x1="8" y1="20" x2="12" y2="20" stroke="black" stroke-width="2" stroke-linecap="round"/>
+</g>
+<defs>
+  <clipPath id="clip0">
+    <rect width="24" height="24" fill="white"/>
+  </clipPath>
+</defs>
+</svg>`;
+export const HeartIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3E64FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M20.8 4.6c-1.4-1.5-3.6-1.5-5 0l-.8.8-.8-.8c-1.4-1.5-3.6-1.5-5 0-1.5 1.6-1.5 4.2 0 5.8l5.8 6.2 5.8-6.2c1.5-1.6 1.5-4.2 0-5.8z"/>
+</svg>`;
