@@ -6,17 +6,18 @@ const styles = colors =>
   StyleSheet.create({
     safeArea: {
       flex: 1,
-      backgroundColor: colors.black,
+      backgroundColor: '#4C6EF5',
+      paddingTop: scale(40),
     },
     scrollView: {
       flex: 1,
-      backgroundColor: colors.black,
+      // backgroundColor: colors.black,
     },
     container: {
       flexGrow: 1,
       paddingHorizontal: moderateScale(24),
       paddingTop: moderateScale(20),
-      paddingBottom: moderateScale(20),
+      // paddingBottom: moderateScale(20),
       justifyContent: 'space-between',
     },
     header: {

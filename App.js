@@ -2,14 +2,13 @@ import { useEffect, useState } from 'react';
 import Toast from 'react-native-toast-message';
 
 import NetInfo from '@react-native-community/netinfo';
-import { NavigationContainer } from '@react-navigation/native';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'reduxjs-toolkit-persist/integration/react';
 
 // import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import InternetModal from './src/components/InternetModal/InternetModal';
-import UnAuthStack from './src/navigation/UnAuthStack';
+import AppNavigation from './src/navigation';
 import { persistedStore, store } from './src/redux/store';
 
 export default function App() {
@@ -42,9 +41,7 @@ export default function App() {
       <PersistGate loading={null} persistor={persistedStore}>
         <GestureHandlerRootView style={{ flex: 1 }}>
           {/* <BottomSheetModalProvider> */}
-          <NavigationContainer>
-            <UnAuthStack />
-          </NavigationContainer>
+          <AppNavigation />
           {/* </BottomSheetModalProvider> */}
         </GestureHandlerRootView>
       </PersistGate>

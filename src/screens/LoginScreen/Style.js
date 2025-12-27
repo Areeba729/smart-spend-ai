@@ -6,11 +6,12 @@ const styles = colors =>
   StyleSheet.create({
     safeArea: {
       flex: 1,
-      backgroundColor: colors.black,
+      backgroundColor: '#4C6EF5',
+      paddingHorizontal: moderateScale(24),
     },
     scrollView: {
       flex: 1,
-      backgroundColor: colors.black,
+      backgroundColor: '#4C6EF5',
     },
     container: {
       flexGrow: 1,
@@ -20,7 +21,7 @@ const styles = colors =>
       justifyContent: 'space-between',
     },
     header: {
-      alignItems: 'center',
+      alignItems: 'flex-start',
       marginTop: moderateScale(40),
       marginBottom: moderateScale(40),
     },
@@ -45,13 +46,13 @@ const styles = colors =>
       fontSize: moderateScale(28),
       color: colors.white,
       marginBottom: moderateScale(8),
-      textAlign: 'center',
+      // textAlign: 'center',
       ...Theme.typography.heading,
     },
     subtitle: {
       color: colors.grey,
       fontSize: moderateScale(14),
-      textAlign: 'center',
+      // textAlign: 'center',
       ...Theme.typography.body,
     },
     socialSection: {
@@ -99,7 +100,7 @@ const styles = colors =>
     footer: {
       flexDirection: 'row',
       justifyContent: 'center',
-      marginTop: moderateScale(40),
+      // marginTop: moderateScale(40),
       marginBottom: moderateScale(20),
     },
     footerText: {

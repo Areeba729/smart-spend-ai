@@ -1,4 +1,4 @@
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { scale } from 'react-native-size-matters';
 
 import { Theme } from '../../libs';
@@ -6,11 +6,14 @@ import NativeText from '../NativeText/NativeText';
 import {
   complaintIcon,
   complaintIconFilled,
+  DocumentIcon,
+  HeartIcon,
   homeIcon,
   homeIconFilled,
   profileIcon,
   profileIconFilled,
 } from '../../assets/icons';
+import { images } from '../../assets/images';
 import { SvgXml } from 'react-native-svg';
 
 const { colors } = Theme;
@@ -18,28 +21,41 @@ const { colors } = Theme;
 const BottomTabs = ({ activeTab, onTabPress }) => {
   const tabs = [
     {
-      name: 'Home',
+      name: 'DashboardHome',
       icon: homeIcon,
       iconFilled: homeIconFilled,
       label: 'Home',
     },
     {
-      name: 'Complaints',
-      icon: complaintIcon,
-      iconFilled: complaintIconFilled,
-      label: 'Complaints',
+      name: 'RFQDashboard',
+      icon: images.dashboard,
+      isImage: true,
+      label: 'Dashboard',
     },
     {
-      name: 'Profile',
-      icon: profileIcon,
-      iconFilled: profileIconFilled,
-      label: 'Profile',
+      name: 'supportTicket',
+      icon: images.document,
+      isImage: true,
+      label: 'Support',
+    },
+    {
+      name: 'heartFile',
+      icon: images.heart,
+      isImage: true,
+      label: 'Favorites',
     },
   ];
 
   return (
     <View
-      style={{ paddingHorizontal: 10, paddingTop: 10, flexDirection: 'row' }}
+      style={{
+        paddingHorizontal: 10,
+        paddingTop: 10,
+        flexDirection: 'row',
+        backgroundColor: '#FFFFFF',
+        borderTopWidth: 1,
+        borderTopColor: '#E2E8F0',
+      }}
     >
       {tabs.map(tab => (
         <TouchableOpacity
@@ -53,15 +69,28 @@ const BottomTabs = ({ activeTab, onTabPress }) => {
           ]}
           onPress={() => onTabPress(tab.name)}
         >
-          <SvgXml
-            xml={activeTab === tab.name ? tab.iconFilled : tab.icon}
-            style={[
-              styles.tabIcon,
-              {
-                color: activeTab === tab.name ? colors.primary : colors.text,
-              },
-            ]}
-          />
+          {tab.isImage ? (
+            <Image
+              source={tab.icon}
+              style={[
+                styles.tabIcon,
+                {
+                  opacity: activeTab === tab.name ? 1 : 0.6,
+                },
+              ]}
+              resizeMode="contain"
+            />
+          ) : (
+            <SvgXml
+              xml={activeTab === tab.name ? tab.iconFilled : tab.icon}
+              style={[
+                styles.tabIcon,
+                {
+                  color: activeTab === tab.name ? colors.primary : colors.text,
+                },
+              ]}
+            />
+          )}
           {activeTab === tab.name && (
             <NativeText style={[styles.tabText, { color: colors.primary }]}>
               {tab.label}
@@ -90,12 +119,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingTop: scale(10),
   },
-  // tabIcon: {
-  width: scale(24),
-  height: scale(24),
-  resizeMode: 'contain',
-  marginBottom: scale(4),
-
+  tabIcon: {
+    width: scale(22),
+    height: scale(22),
+    marginBottom: scale(4),
+  },
   tabText: {
     fontSize: scale(11),
     marginBottom: 10,
