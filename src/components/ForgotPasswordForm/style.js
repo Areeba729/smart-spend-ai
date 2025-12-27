@@ -6,6 +6,11 @@ export const styles = StyleSheet.create({
   container: {
     paddingVertical: 10,
     alignSelf: 'center',
+    backgroundColor: 'white',
+    borderRadius: scale(16),
+    width: scale(349),
+    height: scale(700),
+    paddingHorizontal: scale(16),
   },
   field: {
     marginBottom: 20,
@@ -18,20 +23,21 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
   },
   inputContainer: {
-    backgroundColor: Theme.colors.primary,
+    backgroundColor: Theme.colors.white,
+    borderColor: Theme.colors.text,
     width: scale(325),
-    borderColor: '#666',
     height: scale(50),
+    paddingHorizontal: scale(16),
   },
   label: {
-    fontWeight: '600',
+    fontWeight: '500',
     marginBottom: 8,
-    color: '#D6D6D6',
+    color: 'black',
     fontSize: 14,
   },
   input: {
     fontSize: 12,
-    color: '#fff',
+    color: 'black',
     flex: 1,
     padding: 0,
   },
@@ -41,7 +47,7 @@ export const styles = StyleSheet.create({
     marginTop: 4,
   },
   submitButton: {
-    backgroundColor: '#86AE12',
+    backgroundColor: '#4C6EF5',
     borderRadius: 50,
     paddingVertical: 16,
     alignItems: 'center',
@@ -50,7 +56,7 @@ export const styles = StyleSheet.create({
     marginTop: 20,
   },
   submitButtonText: {
-    color: '#000',
+    color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
   },
