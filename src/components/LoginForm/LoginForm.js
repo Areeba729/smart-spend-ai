@@ -54,7 +54,7 @@ const LoginForm = ({ onSubmit, navigation }) => {
           style={styles.input}
           errorStyle={styles.error}
           inputContainerStyle={styles.inputContainer}
-          leftIcon={<SvgXml xml={emailIcon} />}
+          // leftIcon={<SvgXml xml={emailIcon} />}
         />
         <SmartFormField
           name="password"
@@ -66,7 +66,7 @@ const LoginForm = ({ onSubmit, navigation }) => {
           labelStyle={styles.label}
           style={styles.input}
           errorStyle={styles.error}
-          leftIcon={<SvgXml xml={lockIcon} />}
+          // leftIcon={<SvgXml xml={lockIcon} />}
           inputContainerStyle={styles.inputContainer}
           rightIcon={
             <SvgXml
@@ -85,9 +85,20 @@ const LoginForm = ({ onSubmit, navigation }) => {
             <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
           </TouchableOpacity>
         </View>
-        <TouchableOpacity style={styles.loginButton} onPress={handleSubmit}>
-          <Text style={styles.loginButtonText}>Login ➜</Text>
-        </TouchableOpacity>
+        <View style={styles.footer}>
+          <TouchableOpacity style={styles.loginButton} onPress={handleSubmit}>
+            <Text style={styles.loginButtonText}>Sign Up</Text>
+          </TouchableOpacity>
+          <Text style={styles.footerText}>
+            Don't have an account?{' '}
+            <Text
+              style={styles.footerLink}
+              onPress={() => navigation.navigate('SignupScreen')}
+            >
+              Sign Up
+            </Text>
+          </Text>
+        </View>
       </View>
     </FormProvider>
   );

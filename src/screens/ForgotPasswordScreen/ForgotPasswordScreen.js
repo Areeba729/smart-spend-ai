@@ -26,56 +26,56 @@ const ForgotPasswordScreen = () => {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <View style={styles.safeArea}>
       <StatusBar
         barStyle="light-content"
         backgroundColor={Theme.colors.black}
       />
-      <ScrollView contentContainerStyle={styles.container}>
-        {/* Header */}
-        <View style={styles.header}>
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => navigation.goBack()}
-          >
-            <SvgXml
-              xml={arrowIcons}
-              width="24"
-              height="24"
-              fill={Theme.colors.white}
-            />
-          </TouchableOpacity>
-        </View>
+      {/* <ScrollView contentContainerStyle={styles.container}> */}
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <SvgXml
+            xml={arrowIcons}
+            width="24"
+            height="24"
+            fill={Theme.colors.white}
+          />
+        </TouchableOpacity>
+      </View>
 
-        <View style={styles.contentContainer}>
-          {/* Top Icon Placeholder */}
-          <View style={styles.iconContainer}>
+      <View style={styles.contentContainer}>
+        {/* Top Icon Placeholder */}
+        {/* <View style={styles.iconContainer}>
             <SvgXml
               xml={lockIcon}
               width="28"
               height="28"
               color={Theme.colors.secondary}
             />
-          </View>
+          </View> */}
 
-          <Text style={styles.title}>Forgot Password?</Text>
-          <Text style={styles.subtitle}>
-            Don’t worry! It happens. Please enter the email associated with your
-            account to reset it.
-          </Text>
+        <Text style={styles.title}>Forgot Password</Text>
+        <Text style={styles.subtitle}>
+          Lost your password please enter your email address. You wil receive a
+          link to create a new password email.
+        </Text>
 
-          {/* Form Component */}
-          <ForgotPasswordForm onSubmit={handleSendLink} />
-        </View>
+        {/* Form Component */}
+        <ForgotPasswordForm onSubmit={handleSendLink} />
+      </View>
 
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>Remember password?</Text>
-          <TouchableOpacity onPress={() => navigation.navigate('LoginScreen')}>
-            <Text style={styles.loginText}>Log in</Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+      {/* <View style={styles.footer}>
+        <Text style={styles.footerText}>Remember password?</Text>
+        <TouchableOpacity onPress={() => navigation.navigate('LoginScreen')}>
+          <Text style={styles.loginText}>Log in</Text>
+        </TouchableOpacity>
+      </View> */}
+      {/* </ScrollView> */}
+    </View>
   );
 };
 
