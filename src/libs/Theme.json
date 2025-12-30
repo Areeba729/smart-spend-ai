@@ -14,7 +14,10 @@
     "success": "#6CC070",
     "iconColor": "#555555",
     "dark": "#505050",
-    "grey": "#D1D6D9"
+    "grey": "#D1D6D9",
+    "darkTransparent": "rgba(0, 0, 0, 0.5)",
+    "lightTransparent": "rgba(255, 255, 255, 0.5)",
+    "lighttextcolor":"#A0A0A0"
   },
   "typography": {
     "heading": {
@@ -37,6 +40,18 @@
       "fontFamily": "Poppins-Medium",
       "fontWeight": "normal"
     }
+  },
+
+  "fonts": {
+    "regular": "Poppins-Regular",
+    "medium": "Poppins-Medium",
+    "light": "Poppins-Light",
+    "bold": "Poppins-Bold",
+    "semiBold": "Poppins-SemiBold",
+    "thin": "Poppins-Thin",
+    "extraLight": "Poppins-ExtraLight",
+    "extraBold": "Poppins-ExtraBold",
+    "black": "Poppins-Black"
   },
 
   "fontWeight": {

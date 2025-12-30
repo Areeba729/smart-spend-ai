@@ -1,32 +1,36 @@
+// components/HomeHeader.js
 import React from 'react';
-import { TouchableOpacity, View, Text } from 'react-native';
-import { SvgXml } from 'react-native-svg';
-import { useNavigation } from '@react-navigation/native';
-import { arrowIcon } from '../../assets/icons';
-import { Theme } from '../../libs';
+import { View, TouchableOpacity } from 'react-native';
+import NativeText from '../NativeText/NativeText';
 import styles from './style';
 
-const Header = ({ title, showBack = true, onBackPress, customStyles }) => {
-  const navigation = useNavigation();
-
+const HomeHeader = ({
+  initial = 'A',
+  greeting = 'Good Morning',
+  userName = 'Alex',
+  onNotificationPress,
+}) => {
   return (
-    <View style={[styles.container, customStyles?.container]}>
-      {showBack && (
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={onBackPress || (() => navigation.goBack())}
-        >
-          <SvgXml
-            xml={arrowIcon}
-            width={24}
-            height={24}
-            color={Theme.colors.white}
-          />
-        </TouchableOpacity>
-      )}
-      <Text style={[styles.title, customStyles?.title]}>{title}</Text>
+    <View style={styles.header}>
+      <View style={styles.headerLeft}>
+        <View style={styles.profilePic}>
+          <NativeText style={styles.profileInitial}>{initial}</NativeText>
+        </View>
+
+        <View>
+          <NativeText style={styles.greeting}>{greeting}</NativeText>
+          <NativeText style={styles.userName}>Hi, {userName}!</NativeText>
+        </View>
+      </View>
+
+      <TouchableOpacity
+        style={styles.notificationButton}
+        onPress={onNotificationPress}
+      >
+        <NativeText style={styles.notificationIcon}>🔔</NativeText>
+      </TouchableOpacity>
     </View>
   );
 };
 
-export default Header;
+export default HomeHeader;

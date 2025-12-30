@@ -67,31 +67,32 @@ const SignupScreen = ({ navigation }) => {
         keyboardShouldPersistTaps="handled"
       >
         <View>
-          {/* <TouchableOpacity
+          <TouchableOpacity
             onPress={() => navigation.goBack()}
             style={styles.backButton}
           >
             <Text style={styles.backButtonText}>←</Text>
-          </TouchableOpacity> */}
+          </TouchableOpacity>
 
           <View style={styles.header}>
-            <Text style={styles.title}>Sign Up</Text>
-            <Text style={styles.subtitle}>
-              Register today and take control of your materual sourcing
-            </Text>
+            <View style={styles.logoContainer}>
+              <Image source={images.Logo} style={styles.logo} />
+            </View>
+            <Text style={styles.title}>Create Account</Text>
+            <Text style={styles.subtitle}>Track your spending, save more.</Text>
           </View>
         </View>
 
         <SignupForm onSubmit={handleSignup} />
 
-        {/* <View style={styles.socialSection}>
+        <View style={styles.socialSection}>
           <View style={styles.dividerContainer}>
             <View style={styles.dividerLine} />
             <Text style={styles.dividerText}>OR SIGN UP WITH</Text>
             <View style={styles.dividerLine} />
-          </View> */}
+          </View>
 
-        {/* <View style={styles.socialButtons}>
+          <View style={styles.socialButtons}>
             <SocialButton
               // text="Google"
               icon={<SvgXml xml={Google} width={20} height={20} />}
@@ -107,14 +108,14 @@ const SignupScreen = ({ navigation }) => {
               />
             )}
           </View>
-        </View> */}
+        </View>
 
-        {/* <View style={styles.footer}>
+        <View style={styles.footer}>
           <Text style={styles.footerText}>Already have an account? </Text>
           <TouchableOpacity onPress={() => navigation.navigate('LoginScreen')}>
             <Text style={styles.loginText}>Login</Text>
           </TouchableOpacity>
-        </View> */}
+        </View>
       </KeyboardAwareScrollView>
     </View>
   );

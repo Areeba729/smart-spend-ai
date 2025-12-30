@@ -23,42 +23,25 @@ export default function AppNavigation() {
     (themeMode !== 'light' && scheme === 'dark') || themeMode === 'dark';
   const { colors } = Theme;
   // My Theme will auto apply colors to background and text based on theme, otherwise you can also use color as desired in your file
-  const MyTheme = {
-    dark: isDarkMode,
-    colors: {
-      primary: colors.primary,
-      background: isDarkMode ? colors.dark : colors.white,
-      card: isDarkMode ? colors.dark : colors.white,
-      text: isDarkMode ? colors.white : colors.text,
-      border: isDarkMode ? colors.border : colors.grey,
-      notification: colors.primary,
-      transparent: isDarkMode
-        ? colors.darkTransparent
-        : colors.lightTransparent,
-    },
-    fonts: {
-      regular: {
-        fontFamily: 'Poppins-Regular',
-        fontWeight: 'normal',
-      },
-      medium: {
-        fontFamily: 'Poppins-Medium',
-        fontWeight: '500',
-      },
-      bold: {
-        fontFamily: 'Poppins-Bold',
-        fontWeight: 'bold',
-      },
-      heavy: {
-        fontFamily: 'Poppins-Bold',
-        fontWeight: '900',
-      },
-    },
-  };
+  // const MyTheme = {
+  //   // dark: isDarkMode,
+  //   // colors: {
+  //   //   primary: colors.primary,
+  //   //   background: isDarkMode ? colors.dark : colors.white,
+  //   //   card: isDarkMode ? colors.dark : colors.white,
+  //   //   text: isDarkMode ? colors.white : colors.text,
+  //   //   border: isDarkMode ? colors.border : colors.grey,
+  //   //   notification: colors.primary,
+  //   //   transparent: isDarkMode
+  //   //     ? colors.darkTransparent
+  //   //     : colors.lightTransparent,
+  //   // },
+  // };
 
   return (
-    <NavigationContainer theme={MyTheme}>
-      {isSignedIn ? <AuthStack /> : <UnAuthStack />}
+    <NavigationContainer>
+      {/* {isSignedIn ? <AuthStack /> : <UnAuthStack />} */}
+      <AuthStack />
     </NavigationContainer>
   );
 }

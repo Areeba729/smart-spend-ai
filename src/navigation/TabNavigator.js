@@ -1,24 +1,26 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import BottomTabs from '../components/BottomTabs/BottomTabs';
-
-import supportTicket from '../screens/supportTicket/supportTicket';
-import heartFile from '../screens/heartFile/heartFile';
-import DashboardHome from '../screens/DashboardHome/DashboardHome';
-import RFQDashboard from '../screens/RFQDashboard/RFQDashboard';
+import Profile from '../screens/Profile/Profile';
+import Complaints from '../screens/Complaints/Complaints';
+import Home from '../screens/AuthStack/Home/Home';
+import Budget from '../screens/Profile/Budget';
+import Reports from '../screens/Profile/Reports';
+import AddExpense from '../screens/AddExpense/AddExpense';
 
 const Tab = createBottomTabNavigator();
 
 const TabNavigator = () => {
   const tabs = {
-    DashboardHome,
-    RFQDashboard,
-    supportTicket,
-    heartFile,
+    Home,
+    Budget,
+    AddExpense,
+    Reports,
+    Profile,
   };
 
   return (
     <Tab.Navigator
-      initialRouteName="DashboardHome"
+      initialRouteName="Home"
       // eslint-disable-next-line react/no-unstable-nested-components
       tabBar={props => (
         <BottomTabs

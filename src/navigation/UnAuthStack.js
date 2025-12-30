@@ -7,9 +7,6 @@ import SignupScreen from '../screens/SignupScreen/SignupScreen';
 import ForgotPasswordScreen from '../screens/ForgotPasswordScreen/ForgotPasswordScreen';
 import OtpScreen from '../screens/OtpScreen/OtpScreen';
 import ResetPasswordScreen from '../screens/ResetPasswordScreen/ResetPasswordScreen';
-import EssentialDetails from '../screens/EssentialDetails/EssentialDetails';
-import PrivacyPolicy from '../screens/PrivacyPolicy/PrivacyPolicy';
-import TermsAndConditions from '../screens/TermsAndConditions/TermsAndConditions';
 
 function UnAuthStack() {
   const Stack = createNativeStackNavigator();
@@ -24,9 +21,6 @@ function UnAuthStack() {
     ForgotPasswordScreen,
     OtpScreen,
     ResetPasswordScreen,
-    EssentialDetails,
-    PrivacyPolicy,
-    TermsAndConditions,
   };
 
   return (

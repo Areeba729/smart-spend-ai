@@ -6,16 +6,11 @@ export const styles = StyleSheet.create({
   container: {
     paddingVertical: 10,
     alignSelf: 'center',
-    backgroundColor: 'white',
-    borderRadius: scale(16),
-    width: scale(349),
-    height: scale(700),
-    paddingHorizontal: scale(16),
   },
   field: {
     marginBottom: 20,
     borderWidth: 1,
-    borderColor: '',
+    borderColor: '#333',
     borderRadius: 12,
     padding: 14,
     backgroundColor: '#1E1E1E',
@@ -23,20 +18,20 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
   },
   inputContainer: {
-    backgroundColor: Theme.colors.white,
-    borderColor: Theme.colors.text,
+    backgroundColor: Theme.colors.primary,
+    borderColor: '#666',
     width: scale(325),
     height: scale(50),
   },
   label: {
-    fontWeight: '500',
+    fontWeight: '600',
     marginBottom: 8,
-    color: 'black',
+    color: '#D6D6D6',
     fontSize: 14,
   },
   input: {
     fontSize: 12,
-    color: 'black',
+    color: '#fff',
     flex: 1,
   },
   error: {
@@ -49,12 +44,12 @@ export const styles = StyleSheet.create({
     marginBottom: 24,
   },
   forgotPasswordText: {
-    color: '#4C6EF5',
+    color: '#999',
     fontSize: 12,
     marginTop: scale(-8),
   },
   loginButton: {
-    backgroundColor: '#4C6EF5',
+    backgroundColor: '#86AE12',
     borderRadius: 12,
     paddingVertical: 16,
     alignItems: 'center',
@@ -62,24 +57,8 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   loginButtonText: {
-    color: '#fff',
+    color: '#000',
     fontSize: 16,
     fontWeight: 'bold',
-  },
-  footer: {
-    flex: 1,
-    justifyContent: 'flex-end',
-    marginBottom: scale(120),
-  },
-  footerText: {
-    color: '#666',
-    fontSize: 14,
-    fontWeight: '500',
-    alignSelf: 'center',
-    marginTop: scale(20),
-  },
-  footerLink: {
-    color: '#4C6EF5',
-    fontWeight: '600',
   },
 });

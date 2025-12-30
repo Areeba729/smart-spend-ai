@@ -1,4 +1,4 @@
-import Theme from './Theme.json'
-import Responsive from './responsive'
+import Theme from './Theme.json';
+import Responsive from './responsive';
 
-export { Responsive, Theme }
+export { Responsive, Theme };

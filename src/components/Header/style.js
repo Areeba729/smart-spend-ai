@@ -1,31 +1,64 @@
 import { StyleSheet } from 'react-native';
-import { moderateScale, scale, verticalScale } from 'react-native-size-matters';
+import { moderateScale, scale } from 'react-native-size-matters';
 import { Theme } from '../../libs';
 
 const styles = StyleSheet.create({
-  container: {
-    height: verticalScale(60),
-    backgroundColor: '#3E64FF',
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: moderateScale(20),
+    backgroundColor: Theme.colors.secondary,
+    paddingVertical: moderateScale(16),
+    paddingHorizontal: moderateScale(20),
+    width: scale(350),
+    borderBottomLeftRadius: moderateScale(20),
+    borderBottomRightRadius: moderateScale(20),
+    alignSelf: 'center',
+    paddingTop: scale(40),
+  },
+
+  headerLeft: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: scale(20),
-    paddingTop: scale(10),
   },
-  backButton: {
-    width: scale(40),
-    height: scale(40),
-    justifyContent: 'center',
+
+  profilePic: {
+    width: moderateScale(44),
+    height: moderateScale(44),
+    borderRadius: moderateScale(22),
+    backgroundColor: Theme.colors.grey,
     alignItems: 'center',
-    marginLeft: scale(-10),
+    justifyContent: 'center',
+    marginRight: moderateScale(12),
   },
-  title: {
+
+  profileInitial: {
+    fontSize: moderateScale(18),
+    color: Theme.colors.black,
+  },
+
+  greeting: {
+    fontSize: moderateScale(12),
     color: Theme.colors.white,
+  },
+
+  userName: {
+    fontSize: moderateScale(16),
+    color: Theme.colors.white,
+  },
+
+  notificationButton: {
+    width: moderateScale(44),
+    height: moderateScale(44),
+    borderRadius: moderateScale(22),
+    backgroundColor: '#1C1C1E',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  notificationIcon: {
     fontSize: moderateScale(20),
-    fontWeight: '700',
-    marginLeft: scale(10),
-    flex: 1,
-    textAlign: 'center',
-    marginRight: scale(40), // Balanced with back button
   },
 });
 

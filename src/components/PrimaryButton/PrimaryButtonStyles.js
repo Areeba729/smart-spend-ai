@@ -1,13 +1,13 @@
-import { StyleSheet } from "react-native"
+import { StyleSheet } from 'react-native';
 
-import { Theme, Responsive } from "../../libs"
+import { Theme, Responsive } from '../../libs';
 
-const { AppFonts } = Responsive
+const { AppFonts } = Responsive;
 const styles = StyleSheet.create({
   button: {
     backgroundColor: Theme.colors.primary,
     borderRadius: Theme.borders.regularRadius,
-    alignItems: "center",
+    alignItems: 'center',
     justifyContent: 'center',
     width: Responsive.sizeMatter.scale(325),
     height: Responsive.sizeMatter.scale(52),
@@ -19,6 +19,6 @@ const styles = StyleSheet.create({
     fontFamily: Theme?.typography?.subheading?.fontFamily,
     // lineHeight: Responsive?.getHeight(3.4),
   },
-})
+});
 
-export default styles
+export default styles;

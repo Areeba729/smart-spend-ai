@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, Alert } from 'react-native';
 import Toast from 'react-native-toast-message';
 import {
   useSmartForm,
@@ -8,14 +8,21 @@ import {
 } from 'react-native-fn-forms';
 import { styles } from './style';
 import { SvgXml } from 'react-native-svg';
-import { eyeIcon, eyeOffIcon } from '../../assets/icons';
-import { Theme } from '../../libs';
-import { useNavigation } from '@react-navigation/native';
+import {
+  emailIcon,
+  lockIcon,
+  profileIcon,
+  eyeIcon,
+  eyeOffIcon,
+  phoneIcon,
+  termsAndConditions,
+} from '../../assets/icons';
 
 const SignupForm = ({ onSubmit }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const navigation = useNavigation();
+  const [agreeToTerms, setAgreeToTerms] = useState(false);
+
   const form = useSmartForm({
     fields: {
       fullName: {
@@ -23,43 +30,67 @@ const SignupForm = ({ onSubmit }) => {
         required: true,
         minLength: 2,
       },
-      lastName: {
-        type: 'personName',
-        required: true,
-        minLength: 2,
-      },
+
       email: {
         type: 'email',
         required: true,
+      },
+      phone: {
+        type: 'phone',
+        required: true,
+      },
+      monthlyBudget: {
+        type: 'number',
+        required: true,
+        validate: value => parseFloat(value) > 0,
       },
       password: {
         type: 'password',
         required: true,
         minLength: 6,
+        maxLength: 8,
       },
       confirmPassword: {
         type: 'password',
         required: true,
-        validate: (value, fields) =>
-          value === fields.password.value || 'Passwords do not match',
+        validate: (value, fields) => value === fields.password.value,
       },
     },
   });
 
   const handleSubmit = async () => {
-    await form.submitForm();
-
-    if (!form.isValid) {
+    console.log('Submit button pressed');
+    if (!agreeToTerms) {
       Toast.show({
         type: 'error',
-        text1: 'Invalid Form',
-        text2: 'Please fix the errors',
+        text1: 'Agreement Required',
+        text2: 'Please agree to the Terms & Privacy.',
       });
       return;
     }
+    try {
+      console.log('Submitting form...');
+      await form.submitForm();
+      console.log('Form validity:', form.isValid);
+      console.log('Form values:', form.values);
 
-    onSubmit(form.values);
-    navigation.navigate('EssentialDetails', { userData: form.values });
+      if (form.isValid) {
+        onSubmit(form.values);
+      } else {
+        Toast.show({
+          type: 'error',
+          text1: 'Form Invalid',
+          text2: 'Please fix the errors in the form.',
+        });
+      }
+    } catch (error) {
+      console.log('Submit Error:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Submission Error',
+        text2: error.message || 'An unexpected error occurred.',
+      });
+    }
   };
 
   return (
@@ -68,91 +99,128 @@ const SignupForm = ({ onSubmit }) => {
         <SmartFormField
           name="fullName"
           label="Full Name"
-          placeholder="Enter full name"
-          placeholderTextColor={Theme.colors.grey}
+          placeholder="Enter your full name"
+          placeholderTextColor="#666"
           fieldStyle={styles.field}
           labelStyle={styles.label}
           style={styles.input}
           errorStyle={styles.error}
+          leftIcon={<SvgXml xml={profileIcon} width={20} height={20} />}
           inputContainerStyle={styles.inputContainer}
         />
-
-        <SmartFormField
-          name="lastName"
-          label="Last Name"
-          placeholder="Enter last name"
-          placeholderTextColor={Theme.colors.grey}
+        {/* <SmartFormField
+          name="username"
+          label="Username"
+          placeholder="Choose a username"
+          placeholderTextColor="#666"
           fieldStyle={styles.field}
           labelStyle={styles.label}
           style={styles.input}
           errorStyle={styles.error}
+          leftIcon={<SvgXml xml={profileIcon} width={20} height={20} />}
           inputContainerStyle={styles.inputContainer}
-        />
-
+        /> */}
         <SmartFormField
           name="email"
           label="Email"
-          placeholder="Enter email"
+          placeholder="Enter your email address"
+          placeholderTextColor="#666"
           keyboardType="email-address"
-          placeholderTextColor={Theme.colors.grey}
-          autoCapitalize="none"
+          fieldStyle={styles.field}
+          labelStyle={styles.label}
+          style={styles.input}
+          errorStyle={styles.error}
+          leftIcon={<SvgXml xml={emailIcon} width={20} height={20} />}
+          inputContainerStyle={styles.inputContainer}
+        />
+        <SmartFormField
+          name="phone"
+          label="Phone Number"
+          placeholder="Enter your phone number"
+          placeholderTextColor="#666"
+          keyboardType="phone-pad"
           fieldStyle={styles.field}
           labelStyle={styles.label}
           style={styles.input}
           errorStyle={styles.error}
           inputContainerStyle={styles.inputContainer}
+          leftIcon={<SvgXml xml={phoneIcon} width={20} height={20} />}
+          // No specific phone icon in list, using generic or skipping leftIcon if preferred
         />
-
+        <SmartFormField
+          name="monthlyBudget"
+          label="Monthly Budget"
+          placeholder="Enter your monthly budget"
+          placeholderTextColor="#666"
+          keyboardType="numeric"
+          fieldStyle={styles.field}
+          labelStyle={styles.label}
+          style={styles.input}
+          errorStyle={styles.error}
+          inputContainerStyle={styles.inputContainer}
+          leftIcon={<SvgXml xml={termsAndConditions} width={20} height={20} />}
+        />
         <SmartFormField
           name="password"
           label="Password"
-          placeholder="Create password"
-          placeholderTextColor={Theme.colors.grey}
+          placeholder="Create a password"
+          placeholderTextColor="#666"
           secureTextEntry={!showPassword}
           fieldStyle={styles.field}
           labelStyle={styles.label}
           style={styles.input}
           errorStyle={styles.error}
+          leftIcon={<SvgXml xml={lockIcon} width={20} height={20} />}
           rightIcon={
-            <SvgXml xml={showPassword ? eyeIcon : eyeOffIcon} width={20} />
+            <SvgXml
+              xml={showPassword ? eyeIcon : eyeOffIcon}
+              width={20}
+              height={20}
+              color="#666"
+            />
           }
           onRightIconPress={() => setShowPassword(!showPassword)}
           inputContainerStyle={styles.inputContainer}
         />
-
         <SmartFormField
           name="confirmPassword"
           label="Confirm Password"
           placeholder="Re-enter password"
-          placeholderTextColor={Theme.colors.grey}
+          placeholderTextColor="#666"
           secureTextEntry={!showConfirmPassword}
-          fieldStyle={styles.field}
+          // inputContainer={styles.field}
           labelStyle={styles.label}
           style={styles.input}
           errorStyle={styles.error}
+          leftIcon={<SvgXml xml={lockIcon} width={20} height={20} />}
           rightIcon={
             <SvgXml
               xml={showConfirmPassword ? eyeIcon : eyeOffIcon}
               width={20}
+              height={20}
+              color="#666"
             />
           }
           onRightIconPress={() => setShowConfirmPassword(!showConfirmPassword)}
           inputContainerStyle={styles.inputContainer}
         />
 
-        <TouchableOpacity style={styles.signupButton} onPress={handleSubmit}>
-          <Text style={styles.signupButtonText}>Sign Up And Continue</Text>
-        </TouchableOpacity>
-
-        <Text style={styles.footerText}>
-          Already have an account?{' '}
-          <Text
-            style={styles.footerLink}
-            onPress={() => navigation.navigate('LoginScreen')}
+        <View style={styles.checkboxContainer}>
+          <TouchableOpacity
+            style={[styles.checkbox, agreeToTerms && styles.checkboxChecked]}
+            onPress={() => setAgreeToTerms(!agreeToTerms)}
           >
-            Sign In
+            {agreeToTerms && <Text style={styles.checkboxCheckmark}>✓</Text>}
+          </TouchableOpacity>
+          <Text style={styles.checkboxText}>
+            I agree to the{' '}
+            <Text style={styles.checkboxLink}>Terms & Privacy</Text>
           </Text>
-        </Text>
+        </View>
+
+        <TouchableOpacity style={styles.signupButton} onPress={handleSubmit}>
+          <Text style={styles.signupButtonText}>Sign Up</Text>
+        </TouchableOpacity>
       </View>
     </FormProvider>
   );

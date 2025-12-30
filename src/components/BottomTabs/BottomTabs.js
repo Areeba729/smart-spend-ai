@@ -1,19 +1,17 @@
-import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { scale } from 'react-native-size-matters';
 
 import { Theme } from '../../libs';
 import NativeText from '../NativeText/NativeText';
 import {
-  complaintIcon,
-  complaintIconFilled,
-  DocumentIcon,
-  HeartIcon,
   homeIcon,
   homeIconFilled,
+  budgetIcon,
+  reportsIcon,
   profileIcon,
   profileIconFilled,
+  plusIcon,
 } from '../../assets/icons';
-import { images } from '../../assets/images';
 import { SvgXml } from 'react-native-svg';
 
 const { colors } = Theme;
@@ -21,83 +19,86 @@ const { colors } = Theme;
 const BottomTabs = ({ activeTab, onTabPress }) => {
   const tabs = [
     {
-      name: 'DashboardHome',
+      name: 'Home',
       icon: homeIcon,
-      iconFilled: homeIconFilled,
+      iconFilled: homeIcon,
       label: 'Home',
     },
     {
-      name: 'RFQDashboard',
-      icon: images.dashboard,
-      isImage: true,
-      label: 'Dashboard',
+      name: 'Budget',
+      icon: budgetIcon,
+      iconFilled: budgetIcon,
+      label: 'Budget',
     },
     {
-      name: 'supportTicket',
-      icon: images.document,
-      isImage: true,
-      label: 'Support',
+      name: 'AddExpense',
+      isPlus: true,
     },
     {
-      name: 'heartFile',
-      icon: images.heart,
-      isImage: true,
-      label: 'Favorites',
+      name: 'Reports',
+      icon: reportsIcon,
+      iconFilled: reportsIcon,
+      label: 'Reports',
+    },
+    {
+      name: 'Profile',
+      icon: profileIcon,
+      iconFilled: profileIconFilled,
+      label: 'Profile',
     },
   ];
 
   return (
-    <View
-      style={{
-        paddingHorizontal: 10,
-        paddingTop: 10,
-        flexDirection: 'row',
-        backgroundColor: '#FFFFFF',
-        borderTopWidth: 1,
-        borderTopColor: '#E2E8F0',
-      }}
-    >
-      {tabs.map(tab => (
-        <TouchableOpacity
-          key={tab.name}
-          style={[
-            styles.tabItem,
-            {
-              borderTopWidth: activeTab === tab.name ? 2 : 0,
-              borderTopColor: colors.primary,
-            },
-          ]}
-          onPress={() => onTabPress(tab.name)}
-        >
-          {tab.isImage ? (
-            <Image
-              source={tab.icon}
-              style={[
-                styles.tabIcon,
-                {
-                  opacity: activeTab === tab.name ? 1 : 0.6,
-                },
-              ]}
-              resizeMode="contain"
-            />
-          ) : (
+    <View style={styles.container}>
+      {tabs.map((tab, index) => {
+        if (tab.isPlus) {
+          return (
+            <TouchableOpacity
+              key="plus"
+              style={styles.plusButtonContainer}
+              onPress={() => onTabPress(tab.name)}
+            >
+              <View style={styles.plusButton}>
+                <SvgXml xml={plusIcon} />
+              </View>
+            </TouchableOpacity>
+          );
+        }
+
+        return (
+          <TouchableOpacity
+            key={tab.name}
+            style={styles.tabItem}
+            onPress={() => onTabPress(tab.name)}
+          >
             <SvgXml
               xml={activeTab === tab.name ? tab.iconFilled : tab.icon}
               style={[
                 styles.tabIcon,
                 {
-                  color: activeTab === tab.name ? colors.primary : colors.text,
+                  color:
+                    activeTab === tab.name
+                      ? colors.secondary
+                      : colors.lighttextcolor,
                 },
               ]}
             />
-          )}
-          {activeTab === tab.name && (
-            <NativeText style={[styles.tabText, { color: colors.primary }]}>
+            <NativeText
+              style={[
+                styles.tabText,
+                {
+                  color:
+                    activeTab === tab.name
+                      ? colors.secondary
+                      : colors.lighttextcolor,
+                },
+              ]}
+            >
               {tab.label}
             </NativeText>
-          )}
-        </TouchableOpacity>
-      ))}
+          </TouchableOpacity>
+        );
+      })}
     </View>
   );
 };
@@ -105,19 +106,38 @@ const BottomTabs = ({ activeTab, onTabPress }) => {
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    height: scale(70),
+    backgroundColor: Theme.colors.black,
+    borderTopWidth: 1,
+    borderTopColor: '#1C1C1E',
     alignItems: 'center',
-
-    borderTopLeftRadius: scale(20),
-    borderTopRightRadius: scale(20),
-    marginTop: 'auto',
-    overflow: 'hidden',
+    paddingBottom: scale(10),
   },
   tabItem: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingTop: scale(10),
+  },
+  plusButtonContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: scale(-30),
+  },
+  plusButton: {
+    width: scale(60),
+    height: scale(60),
+    borderRadius: scale(30),
+    backgroundColor: Theme.colors.secondary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 4,
+    borderColor: Theme.colors.black,
+    elevation: 8,
+    shadowColor: Theme.colors.secondary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
   },
   tabIcon: {
     width: scale(22),
@@ -125,9 +145,8 @@ const styles = StyleSheet.create({
     marginBottom: scale(4),
   },
   tabText: {
-    fontSize: scale(11),
-    marginBottom: 10,
-    ...Theme.fontWeight[500],
+    fontSize: scale(10),
+    fontWeight: '500',
   },
 });
 

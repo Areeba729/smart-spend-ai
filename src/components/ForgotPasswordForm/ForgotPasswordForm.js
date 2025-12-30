@@ -42,11 +42,11 @@ const ForgotPasswordForm = ({ onSubmit }) => {
           style={styles.input}
           errorStyle={styles.error}
           inputContainerStyle={styles.inputContainer}
-          // leftIcon={<SvgXml xml={emailIcon} width={20} height={20} />}
+          leftIcon={<SvgXml xml={emailIcon} width={20} height={20} />}
         />
 
         <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-          <Text style={styles.submitButtonText}>Reset Password</Text>
+          <Text style={styles.submitButtonText}>Send Reset Link</Text>
         </TouchableOpacity>
       </View>
     </FormProvider>

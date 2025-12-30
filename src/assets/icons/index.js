@@ -89,8 +89,8 @@ export const homeIconFilled = `
 <path fill-rule="evenodd" clip-rule="evenodd" d="M14.3624 2.36416C13.508 2.12759 12.606 2.12244 11.749 2.34926C10.7742 2.60723 9.91642 3.26724 8.67196 4.22479L5.78268 6.44572C4.9748 7.06629 4.41591 7.49558 4.00314 8.04706C3.6387 8.53396 3.36616 9.08326 3.19888 9.66799C3.00943 10.3303 3.00564 11.035 3.00018 12.0537L2.98511 14.7011C2.97892 15.7848 2.97393 16.659 3.02773 17.3672C3.08312 18.0964 3.20528 18.7372 3.50368 19.3312C3.97768 20.2748 4.73821 21.044 5.67627 21.5288C6.26683 21.8339 6.90629 21.9634 7.63479 22.0271C8.3423 22.089 9.21639 22.0939 10.3001 22.1001L15.5858 22.1302C16.6695 22.1364 17.5437 22.1414 18.2519 22.0876C18.981 22.0322 19.6219 21.9101 20.2159 21.6117C21.1595 21.1377 21.9287 20.3771 22.4134 19.4391C22.7186 18.8485 22.8481 18.2091 22.9118 17.4806C22.9736 16.7731 22.9786 15.899 22.9848 14.8152L22.9999 12.1677C23.0061 11.149 23.0103 10.4443 22.8284 9.77992C22.6678 9.19333 22.4016 8.64095 22.0427 8.14993C21.6363 7.59379 21.0823 7.15815 20.2816 6.52842L17.4178 4.27467C16.1843 3.30299 15.3342 2.63323 14.3624 2.36416ZM9.9772 16.0982C9.42492 16.0951 8.97466 16.5402 8.97151 17.0925C8.96836 17.6448 9.41352 18.095 9.96579 18.0982L15.9657 18.1324C16.518 18.1356 16.9682 17.6904 16.9714 17.1381C16.9745 16.5858 16.5294 16.1356 15.9771 16.1324L9.9772 16.0982Z" fill="url(#paint0_linear_1970_3025)"/>
 <defs>
 <linearGradient id="paint0_linear_1970_3025" x1="12.943" y1="22.1152" x2="13.0567" y2="2.18294" gradientUnits="userSpaceOnUse">
-<stop stop-color="#311B92"/>
-<stop offset="1" stop-color="#4A148C"/>
+<stop stop-color="currentColor"/>
+<stop offset="1" stop-color="currentColor"/>
 </linearGradient>
 </defs>
 </svg>
@@ -284,25 +284,36 @@ export const Apple = `<svg width="19" height="19" viewBox="0 0 19 19" fill="none
 </svg>
 `;
 
-export const DocumentIcon = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<g clip-path="url(#clip0)">
-  <!-- Document body -->
-  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-  
-  <!-- Folded corner -->
-  <polyline points="14 2 14 8 20 8" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-  
-  <!-- Optional lines inside the document -->
-  <line x1="8" y1="12" x2="16" y2="12" stroke="black" stroke-width="2" stroke-linecap="round"/>
-  <line x1="8" y1="16" x2="16" y2="16" stroke="black" stroke-width="2" stroke-linecap="round"/>
-  <line x1="8" y1="20" x2="12" y2="20" stroke="black" stroke-width="2" stroke-linecap="round"/>
-</g>
+export const BackArrowIcon = `<svg width="18" height="10" viewBox="0 0 18 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M1 5H17M1 5L5 1M1 5L5 9" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+`;
+
+export const plusIcon = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M12 5V19M5 12H19" stroke="black" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>`;
+
+export const budgetIcon = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect x="3" y="6" width="18" height="12" rx="2" stroke="currentColor" stroke-width="2"/>
+<circle cx="17" cy="12" r="2" fill="currentColor"/>
+</svg>`;
+
+export const reportsIcon = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M6 18V12M12 18V6M18 18V10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>`;
+
+export const calendarIcon = `<svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M3.08555 9.01553L21.0853 9.11817M7.1197 3.03843L7.1083 5.0384M17.1195 3.09546L17.1081 5.09543M6.0627 13.0326L8.06266 13.044M6.03989 17.0325L8.03985 17.0439M11.0626 13.0611L13.0626 13.0725M11.0398 17.061L13.0398 17.0724M16.0625 13.0896L18.0625 13.101M16.0397 17.0895L18.0397 17.1009M6.21707 21.0336L17.8169 21.0997C18.937 21.1061 19.497 21.1093 19.9261 20.8938C20.3035 20.7042 20.6112 20.4 20.8051 20.0247C21.0255 19.5982 21.0287 19.0381 21.0351 17.918L21.0898 8.31818C21.0962 7.1981 21.0994 6.63805 20.8839 6.20899C20.6943 5.83158 20.3901 5.52388 20.0148 5.32999C19.5883 5.10957 19.0282 5.10638 17.9081 5.09999L6.30831 5.03384C5.18822 5.02745 4.62818 5.02426 4.19912 5.2398C3.82171 5.4294 3.51401 5.73361 3.32012 6.10884C3.0997 6.53541 3.0965 7.09545 3.09012 8.21554L3.03537 17.8154C3.02899 18.9355 3.02579 19.4955 3.24134 19.9246C3.43093 20.302 3.73514 20.6097 4.11037 20.8036C4.53694 21.024 5.09699 21.0272 6.21707 21.0336Z" stroke="url(#paint0_linear_2975_8166)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 <defs>
-  <clipPath id="clip0">
-    <rect width="24" height="24" fill="white"/>
-  </clipPath>
+<linearGradient id="paint0_linear_2975_8166" x1="12.1555" y1="-7.42933" x2="11.993" y2="21.0665" gradientUnits="userSpaceOnUse">
+<stop stop-color="#86AE12"/>
+<stop offset="1" stop-color="#86AE12"/>
+</linearGradient>
 </defs>
-</svg>`;
-export const HeartIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3E64FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-  <path d="M20.8 4.6c-1.4-1.5-3.6-1.5-5 0l-.8.8-.8-.8c-1.4-1.5-3.6-1.5-5 0-1.5 1.6-1.5 4.2 0 5.8l5.8 6.2 5.8-6.2c1.5-1.6 1.5-4.2 0-5.8z"/>
-</svg>`;
+</svg>
+`;
+export const backIcon = `
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+`;

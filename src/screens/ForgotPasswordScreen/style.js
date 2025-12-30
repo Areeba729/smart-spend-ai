@@ -1,13 +1,11 @@
 import { StyleSheet } from 'react-native';
 import { Theme, Responsive } from '../../libs';
-import { scale } from 'react-native-size-matters';
 
 const styleGenerator = colors =>
   StyleSheet.create({
     safeArea: {
       flex: 1,
-      backgroundColor: '#4C6EF5',
-      paddingHorizontal: Responsive.getWidth(5),
+      backgroundColor: colors.black,
     },
     container: {
       paddingHorizontal: Responsive.getWidth(5),

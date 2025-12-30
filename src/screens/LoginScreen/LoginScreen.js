@@ -55,20 +55,21 @@ const LoginScreen = ({ navigation }) => {
         barStyle="light-content"
         backgroundColor={Theme.colors.black}
       />
-      {/* <ScrollView
+      <ScrollView
         contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}
-      > */}
-      <View style={styles.header}>
-        <Text style={styles.title}>Sign In</Text>
-        <Text style={styles.subtitle}>
-          Register today and take control of your materual sourcing
-        </Text>
-      </View>
+      >
+        <View style={styles.header}>
+          <View style={styles.logoContainer}>
+            <Image source={images.Logo} style={styles.logo} />
+          </View>
+          <Text style={styles.title}>Welcome Back</Text>
+          <Text style={styles.subtitle}>Master your money with ease</Text>
+        </View>
 
-      <LoginForm onSubmit={handleLogin} navigation={navigation} />
+        <LoginForm onSubmit={handleLogin} navigation={navigation} />
 
-      {/* <View style={styles.socialSection}>
+        <View style={styles.socialSection}>
           <View style={styles.dividerContainer}>
             <View style={styles.dividerLine} />
             <Text style={styles.dividerText}>Or continue with</Text>
@@ -91,15 +92,15 @@ const LoginScreen = ({ navigation }) => {
               />
             )}
           </View>
-        </View> */}
+        </View>
 
-      <View style={styles.footer}>
-        <Text style={styles.footerText}>Don't have an account? </Text>
-        <TouchableOpacity onPress={() => navigation.navigate('SignupScreen')}>
-          <Text style={styles.signupText}>Sign Up</Text>
-        </TouchableOpacity>
-      </View>
-      {/* </ScrollView> */}
+        <View style={styles.footer}>
+          <Text style={styles.footerText}>Don't have an account? </Text>
+          <TouchableOpacity onPress={() => navigation.navigate('SignupScreen')}>
+            <Text style={styles.signupText}>Sign Up</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
     </View>
   );
 };
