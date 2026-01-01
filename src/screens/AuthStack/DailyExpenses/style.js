@@ -86,7 +86,7 @@ export const styles = StyleSheet.create({
     fontWeight: '600',
   },
   dateSelector: {
-    marginBottom: moderateScale(30),
+    marginBottom: moderateScale(20),
   },
   dateCard: {
     width: moderateScale(65),
@@ -173,5 +173,11 @@ export const styles = StyleSheet.create({
   transactionCategory: {
     fontSize: moderateScale(12),
     color: '#A0A0A0',
+  },
+  categoryIcon: {
+    fontSize: moderateScale(24),
+  },
+  listContent: {
+    paddingBottom: moderateScale(20),
   },
 });

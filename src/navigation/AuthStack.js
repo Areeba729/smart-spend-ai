@@ -3,6 +3,9 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import TabNavigator from './TabNavigator';
 import Calendar from '../screens/Calendar/Calendar';
 import DailyExpenses from '../screens/AuthStack/DailyExpenses/DailyExpenses';
+import CategoryBudgetList from '../screens/AuthStack/CategoryBudgetList/CategoryBudgetList';
+import CategoryDetail from '../screens/AuthStack/CategoryDetail/CategoryDetail';
+import EditBudget from '../screens/AuthStack/EditBudget/EditBudget';
 
 function AuthStack() {
   const Stack = createNativeStackNavigator();
@@ -11,6 +14,9 @@ function AuthStack() {
     TabNavigator,
     Calendar,
     DailyExpenses,
+    CategoryBudgetList,
+    CategoryDetail,
+    EditBudget,
   };
 
   return (

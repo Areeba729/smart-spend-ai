@@ -317,3 +317,96 @@ export const backIcon = `
   <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
 `;
+
+// screens/Reports/components/ExpenseChart/expenseGraphSvg.js
+export const expenseGraphSvg = `
+<svg width="100%" height="160" viewBox="0 0 350 160" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="fillGradient" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#9AC23C" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#9AC23C" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Area -->
+  <path
+    d="M0 110 
+       C 40 80, 80 140, 120 110
+       S 200 40, 260 80
+       S 320 120, 350 90
+       L 350 160
+       L 0 160
+       Z"
+    fill="url(#fillGradient)"
+  />
+
+  <!-- Line -->
+  <path
+    d="M0 110 
+       C 40 80, 80 140, 120 110
+       S 200 40, 260 80
+       S 320 120, 350 90"
+    fill="none"
+    stroke="#9AC23C"
+    stroke-width="4"
+    stroke-linecap="round"
+  />
+</svg>
+`;
+
+// assets/svgs/expenseSvg.js
+export const expenseSvg = `
+<svg width="20" height="20" viewBox="0 0 20 20">
+  <circle cx="10" cy="10" r="10" fill="#3A1515"/>
+  <path
+    d="M4 6 L8 10 L12 7 L16 11"
+    stroke="#FF4D4F"
+    stroke-width="2"
+    fill="none"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+</svg>
+`;
+
+// assets/svgs/foodSvg.js
+export const foodSvg = `
+<svg width="20" height="20" viewBox="0 0 20 20">
+  <circle cx="10" cy="10" r="10" fill="#1F2A12"/>
+  <path d="M6 4v6" stroke="#9AC23C" stroke-width="2"/>
+  <path d="M8 4v6" stroke="#9AC23C" stroke-width="2"/>
+  <path d="M12 4v12" stroke="#9AC23C" stroke-width="2"/>
+</svg>
+`;
+
+// assets/svgs/entertainmentSvg.js
+export const entertainmentSvg = `
+<svg width="20" height="20" viewBox="0 0 20 20">
+  <circle cx="10" cy="10" r="10" fill="#2A1E3A"/>
+  <rect x="5" y="7" width="10" height="6" rx="1" fill="#9B7EDC"/>
+  <path d="M5 7l2-2M9 7l2-2M13 7l2-2" stroke="#9B7EDC" stroke-width="1"/>
+</svg>
+`;
+
+// assets/svgs/transportSvg.js
+export const transportSvg = `
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+ xmlns="http://www.w3.org/2000/svg">
+  <rect x="4" y="6" width="16" height="8" rx="2" fill="#1B2A10"/>
+  <circle cx="7" cy="16" r="2" fill="#9AC23C"/>
+  <circle cx="17" cy="16" r="2" fill="#9AC23C"/>
+</svg>
+`;
+
+// assets/svgs/grocerySvg.js
+export const grocerySvg = `
+<svg width="20" height="20" viewBox="0 0 20 20">
+  <circle cx="10" cy="10" r="10" fill="#3A2A1A"/>
+  <path
+    d="M5 6h10l-1 5H7L5 6Z"
+    fill="#F4A261"
+  />
+  <circle cx="8" cy="14" r="1" fill="#F4A261"/>
+  <circle cx="12" cy="14" r="1" fill="#F4A261"/>
+</svg>
+`;

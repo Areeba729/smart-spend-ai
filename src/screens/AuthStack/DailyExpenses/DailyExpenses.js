@@ -1,27 +1,54 @@
 import React, { useState } from 'react';
-import {
-  View,
-  ScrollView,
-  TouchableOpacity,
-  FlatList,
-  SafeAreaView,
-} from 'react-native';
+import { View, TouchableOpacity, FlatList } from 'react-native';
 import { SvgXml } from 'react-native-svg';
+import { moderateScale } from 'react-native-size-matters';
 import NativeText from '../../../components/NativeText/NativeText';
-import { calendarIcon, backIcon } from '../../../assets/icons'; // Need to check if backIcon exists
+import { calendarIcon } from '../../../assets/icons';
 import { styles } from './style';
-import { Theme } from '../../../libs';
+import SimpleHeader from '../../../components/SimpleHeader/SimpleHeader';
 
 const DailyExpenses = ({ navigation }) => {
-  const [selectedDate, setSelectedDate] = useState(24);
+  const dateListRef = React.useRef(null);
 
-  const dates = [
-    { day: 'Mon', date: 23 },
-    { day: 'Tue', date: 24 },
-    { day: 'Wed', date: 25 },
-    { day: 'Thu', date: 26 },
-    { day: 'Fri', date: 27 },
-  ];
+  const dates = React.useMemo(() => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = today.getMonth();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    return Array.from({ length: daysInMonth }, (_, i) => {
+      const d = new Date(year, month, i + 1);
+      return {
+        day: d.toLocaleDateString('en-US', { weekday: 'short' }),
+        date: i + 1,
+        month: d.toLocaleString('en-US', { month: 'long' }),
+        year: d.getFullYear(),
+        fullDate: d.toLocaleDateString('en-US', {
+          month: 'long',
+          day: 'numeric',
+          year: 'numeric',
+        }),
+      };
+    });
+  }, []);
+
+  const today = new Date().getDate();
+  const [selectedDate, setSelectedDate] = useState(today);
+
+  React.useEffect(() => {
+    if (dateListRef.current) {
+      setTimeout(() => {
+        dateListRef.current.scrollToIndex({
+          index: today - 1,
+          animated: true,
+          viewPosition: 0.5,
+        });
+      }, 500);
+    }
+  }, [today]);
+
+  const selectedDateInfo =
+    dates.find(d => d.date === selectedDate) || dates[today - 1];
 
   const transactions = [
     {
@@ -69,6 +96,24 @@ const DailyExpenses = ({ navigation }) => {
       icon: '☕',
       iconBg: 'rgba(255, 45, 85, 0.2)',
     },
+    {
+      id: '6',
+      title: 'Amazon Prime',
+      amount: '- 1,200',
+      time: '11:00 AM',
+      category: 'Subscription',
+      icon: '📦',
+      iconBg: 'rgba(0, 122, 255, 0.15)',
+    },
+    {
+      id: '7',
+      title: 'Gym Membership',
+      amount: '- 5,000',
+      time: '7:00 AM',
+      category: 'Health',
+      icon: '💪',
+      iconBg: 'rgba(52, 199, 89, 0.15)',
+    },
   ];
 
   const renderDateItem = ({ item }) => {
@@ -93,7 +138,7 @@ const DailyExpenses = ({ navigation }) => {
   const renderTransactionItem = ({ item }) => (
     <View style={styles.transactionItem}>
       <View style={[styles.iconContainer, { backgroundColor: item.iconBg }]}>
-        <NativeText style={{ fontSize: 24 }}>{item.icon}</NativeText>
+        <NativeText style={styles.categoryIcon}>{item.icon}</NativeText>
       </View>
       <View style={styles.transactionInfo}>
         <NativeText style={styles.transactionTitle}>{item.title}</NativeText>
@@ -111,20 +156,11 @@ const DailyExpenses = ({ navigation }) => {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.iconButton}
-          onPress={() => navigation.goBack()}
-        >
-          <SvgXml xml={backIcon} width={24} height={24} color="#fff" />
-        </TouchableOpacity>
-        <NativeText style={styles.headerTitle}>Daily Expenses</NativeText>
-        <TouchableOpacity style={styles.iconButton}>
-          <SvgXml xml={calendarIcon} width={20} height={20} />
-        </TouchableOpacity>
-      </View>
-
+    <View style={styles.container}>
+      <SimpleHeader
+        title="Expense Detail"
+        onBackPress={() => navigation.goBack()}
+      />
       <View style={styles.summarySection}>
         <View style={styles.dateRow}>
           <SvgXml
@@ -134,7 +170,9 @@ const DailyExpenses = ({ navigation }) => {
             style={styles.dateIcon}
             color="#A0A0A0"
           />
-          <NativeText style={styles.summaryDate}>October 24, 2023</NativeText>
+          <NativeText style={styles.summaryDate}>
+            {selectedDateInfo.fullDate}
+          </NativeText>
         </View>
         <View style={styles.amountRow}>
           <NativeText style={styles.pkrLabel}>PKR</NativeText>
@@ -148,11 +186,17 @@ const DailyExpenses = ({ navigation }) => {
 
       <View style={styles.dateSelector}>
         <FlatList
+          ref={dateListRef}
           data={dates}
           renderItem={renderDateItem}
           keyExtractor={item => item.date.toString()}
           horizontal
           showsHorizontalScrollIndicator={false}
+          getItemLayout={(data, index) => ({
+            length: moderateScale(65) + moderateScale(12), // width + marginRight from style.js
+            offset: (moderateScale(65) + moderateScale(12)) * index,
+            index,
+          })}
         />
       </View>
 
@@ -162,8 +206,9 @@ const DailyExpenses = ({ navigation }) => {
         keyExtractor={item => item.id}
         style={styles.transactionList}
         showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.listContent}
       />
-    </SafeAreaView>
+    </View>
   );
 };
 

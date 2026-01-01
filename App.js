@@ -10,9 +10,11 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import InternetModal from './src/components/InternetModal/InternetModal';
 import AppNavigation from './src/navigation';
 import { persistedStore, store } from './src/redux/store';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function App() {
   const [isConnectedModal, setIsConnectedModal] = useState(false);
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener(state => {

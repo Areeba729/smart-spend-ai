@@ -5,13 +5,21 @@ import styles from './style';
 import { SvgXml } from 'react-native-svg';
 import { BackArrowIcon } from '../../assets/icons';
 
-const SimpleHeader = ({ title = 'Title', onBackPress }) => {
+const SimpleHeader = ({
+  title = 'Title',
+  onBackPress,
+  showBack = !!onBackPress,
+}) => {
   return (
     <View style={styles.header}>
-      {/* Left: Back Arrow */}
-      <TouchableOpacity style={styles.backButton} onPress={onBackPress}>
-        <SvgXml xml={BackArrowIcon} />
-      </TouchableOpacity>
+      {/* Left: Back Arrow or Placeholder */}
+      {showBack ? (
+        <TouchableOpacity style={styles.backButton} onPress={onBackPress}>
+          <SvgXml xml={BackArrowIcon} />
+        </TouchableOpacity>
+      ) : (
+        <View style={styles.backButton} />
+      )}
 
       {/* Center: Title */}
       <NativeText style={styles.title}>{title}</NativeText>

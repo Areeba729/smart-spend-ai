@@ -35,7 +35,7 @@ const BottomTabs = ({ activeTab, onTabPress }) => {
       isPlus: true,
     },
     {
-      name: 'Reports',
+      name: 'Report',
       icon: reportsIcon,
       iconFilled: reportsIcon,
       label: 'Reports',

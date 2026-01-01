@@ -25,7 +25,7 @@ const Home = ({ navigation }) => {
 
   const handleAddExpense = () => {
     // Navigate to add expense screen
-    console.log('Add Expense');
+    navigation.navigate('AddExpense');
   };
 
   const handleScanBill = () => {

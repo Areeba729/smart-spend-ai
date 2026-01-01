@@ -1,11 +1,11 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import BottomTabs from '../components/BottomTabs/BottomTabs';
-import Profile from '../screens/Profile/Profile';
-import Complaints from '../screens/Complaints/Complaints';
+
 import Home from '../screens/AuthStack/Home/Home';
-import Budget from '../screens/Profile/Budget';
-import Reports from '../screens/Profile/Reports';
+import Budget from '../screens/AuthStack/BudgetScreen/BudgetScreen';
+
 import AddExpense from '../screens/AddExpense/AddExpense';
+import Report from '../screens/AuthStack/Report/Report';
 
 const Tab = createBottomTabNavigator();
 
@@ -14,8 +14,7 @@ const TabNavigator = () => {
     Home,
     Budget,
     AddExpense,
-    Reports,
-    Profile,
+    Report,
   };
 
   return (

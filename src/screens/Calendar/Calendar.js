@@ -149,27 +149,6 @@ const Calendar = ({ navigation, route }) => {
 
   return (
     <View style={styles.container}>
-      {/* Header */}
-      {/* <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
-          <SvgXml xml={BackArrowIcon} />
-        </TouchableOpacity>
-
-        <NativeText style={styles.headerTitle}>Calendar</NativeText>
-
-        <View style={styles.headerRight}>
-          <TouchableOpacity style={styles.menuButton}>
-            <NativeText style={styles.menuIcon}>⋯</NativeText>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.settingsButton}>
-            <NativeText style={styles.settingsIcon}>⚙️</NativeText>
-          </TouchableOpacity>
-        </View>
-      </View> */}
-
       <SimpleHeader title="Profile" onBackPress={() => navigation.goBack()} />
 
       <ScrollView
