@@ -14,19 +14,48 @@ import { Theme } from '../../libs';
 import styleGenerator from './style';
 import ForgotPasswordForm from '../../components/ForgotPasswordForm/ForgotPasswordForm';
 import { lockIcon, arrowIcons } from '../../assets/icons';
+import Toast from 'react-native-toast-message';
+import useAuth from '../../hooks/useAuth';
 
 const ForgotPasswordScreen = () => {
   const navigation = useNavigation();
   const styles = styleGenerator(Theme.colors);
+  const { resetPassword } = useAuth();
+  const handleSendLink = async values => {
+    try {
+      // ✅ Log start of function
+      console.log('handleSendLink called', values.email);
 
-  const handleSendLink = values => {
-    // Logic to send reset link
-    console.log('Sending reset link to:', values.email);
-    navigation.navigate('OtpScreen', { email: values.email });
+      // 🔥 Call Firebase resetPassword
+      await resetPassword(values.email);
+
+      // ✅ Log after successful resetPassword call
+      console.log('resetPassword finished');
+
+      Toast.show({
+        type: 'success',
+        text1: 'Email Sent',
+        text2:
+          'If an account exists with this email, a reset link has been sent',
+      });
+
+      navigation.goBack(); // or LoginScreen
+    } catch (error) {
+      console.log('Caught error:', error.code, error.message);
+
+      Toast.show({
+        type: 'error',
+        text1: 'Reset Failed',
+        text2:
+          error.code === 'auth/invalid-email'
+            ? 'Please enter a valid email address'
+            : 'Something went wrong. Try again later',
+      });
+    }
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <View style={styles.safeArea}>
       <StatusBar
         barStyle="light-content"
         backgroundColor={Theme.colors.black}
@@ -75,7 +104,7 @@ const ForgotPasswordScreen = () => {
           </TouchableOpacity>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 };
 

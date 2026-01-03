@@ -41,7 +41,7 @@ const BottomTabs = ({ activeTab, onTabPress }) => {
       label: 'Reports',
     },
     {
-      name: 'Profile',
+      name: 'ProfileScreen',
       icon: profileIcon,
       iconFilled: profileIconFilled,
       label: 'Profile',

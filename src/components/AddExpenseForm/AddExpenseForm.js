@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, TouchableOpacity, TextInput, Platform } from 'react-native';
 import {
   useSmartForm,
@@ -9,10 +9,10 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { SvgXml } from 'react-native-svg';
 import NativeText from '../NativeText/NativeText';
 import SuccessModal from '../SuccessModal/SuccessModal';
-import NativeInput from '../NativeInput/NativeInput';
 import { calendarIcon } from '../../assets/icons';
 import { styles } from './style';
 import { Theme } from '../../libs';
+import { saveExpenseToFirestore } from '../../hooks/ExpenseFunction';
 
 const AddExpenseForm = ({ onSubmit, onCancel }) => {
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -22,7 +22,7 @@ const AddExpenseForm = ({ onSubmit, onCancel }) => {
     { id: 1, name: 'Shopping', icon: '🛒', color: '#86AE12' },
     { id: 2, name: 'Food', icon: '🍴', color: '#1C1C1E' },
     { id: 3, name: 'Transport', icon: '🚗', color: '#1C1C1E' },
-    { id: 4, name: 'More', icon: '•••', color: '#1C1C1E' },
+    { id: 4, name: 'Medical', icon: '💊', color: '#1C1C1E' },
   ];
 
   const form = useSmartForm({
@@ -30,7 +30,7 @@ const AddExpenseForm = ({ onSubmit, onCancel }) => {
       amount: {
         type: 'number',
         required: true,
-        defaultValue: '0',
+        defaultValue: '', // Removed the default value of '0' for better flexibility
       },
       title: {
         type: 'text',
@@ -47,7 +47,6 @@ const AddExpenseForm = ({ onSubmit, onCancel }) => {
         required: true,
         defaultValue: new Date(), // ✅ MUST be Date object
       },
-
       note: {
         type: 'text',
         required: false,
@@ -56,27 +55,40 @@ const AddExpenseForm = ({ onSubmit, onCancel }) => {
   });
 
   const handleDateChange = (event, selectedDate) => {
-    // Android
     if (Platform.OS === 'android') {
       setShowDatePicker(false);
-
       if (event.type === 'set' && selectedDate) {
-        form.setFieldValue('date', selectedDate);
-        form.setFieldTouched('date', true);
+        // Ensure the selected date is updated in form state
+        form.setFieldValue('date', selectedDate); // Save selected date in form
+        form.setFieldTouched('date', true); // Mark the date field as touched
       }
-      return;
     }
+  };
 
-    // iOS
-    if (selectedDate) {
-      form.setFieldValue('date', selectedDate);
-      form.setFieldTouched('date', true);
-    }
+  const formatDate = date => {
+    if (!(date instanceof Date)) return '';
+    const day = String(date.getDate()).padStart(2, '0'); // Adds leading zero if necessary
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Adds leading zero if necessary
+    const year = date.getFullYear();
+    return `${month}/${day}/${year}`;
   };
 
   const handleSave = async () => {
     await form.submitForm();
     if (form.isValid) {
+      // Call Firebase function to save the expense
+      const expenseData = {
+        amount: form.values.amount,
+        title: form.values.title,
+        category: form.values.category,
+        date: form.values.date,
+        note: form.values.note,
+      };
+
+      // Call the saveExpense function
+      await saveExpenseToFirestore(expenseData);
+
+      // Show success modal after saving the expense
       setShowSuccessModal(true);
     }
   };
@@ -86,39 +98,32 @@ const AddExpenseForm = ({ onSubmit, onCancel }) => {
     onSubmit(form.values);
   };
 
-  const formatDate = date => {
-    if (!(date instanceof Date)) return '';
-    return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
-  };
-
   return (
     <FormProvider value={form}>
       <View style={styles.container}>
         {/* Amount Field */}
-        <View style={styles.amountSection}>
-          <NativeText style={styles.label}>AMOUNT</NativeText>
-          <View style={styles.amountInputRow}>
-            <NativeText style={styles.currencySymbol}>PKR</NativeText>
-            <TextInput
-              style={styles.amountValue}
-              value={form.values.amount}
-              onChangeText={val => form.setFieldValue('amount', val)}
-              keyboardType="numeric"
-            />
-          </View>
-          {form.errors.amount && (
-            <NativeText style={styles.error}>{form.errors.amount}</NativeText>
-          )}
-        </View>
+        <SmartFormField
+          name="amount"
+          label="Amount"
+          placeholder="Enter amount"
+          placeholderTextColor="#666"
+          fieldStyle={styles.field}
+          labelStyle={styles.label}
+          style={styles.input}
+          errorStyle={styles.error}
+          inputContainerStyle={styles.inputContainer}
+          keyboardType="numeric" // Ensures numeric input for the amount
+        />
 
         {/* Title Field */}
         <SmartFormField
           name="title"
           label="Expense Title"
-          placeholder="e.g. Grocery Shopping"
+          placeholder="Enter title"
           placeholderTextColor="#666"
           fieldStyle={styles.field}
           labelStyle={styles.label}
+          keyboardType="default"
           style={styles.input}
           errorStyle={styles.error}
           inputContainerStyle={styles.inputContainer}
@@ -129,7 +134,6 @@ const AddExpenseForm = ({ onSubmit, onCancel }) => {
         <View style={styles.inputSection}>
           <View style={styles.sectionHeader}>
             <NativeText style={styles.label}>Category</NativeText>
-            <NativeText style={styles.aiTag}>✨ AI Suggested</NativeText>
           </View>
           <View style={styles.categoryGrid}>
             {categories.map(cat => (
@@ -162,45 +166,52 @@ const AddExpenseForm = ({ onSubmit, onCancel }) => {
           </View>
         </View>
 
+        <SmartFormField
+          name="date"
+          label="Date"
+          placeholder="Enter date"
+          placeholderTextColor="#666"
+          fieldStyle={styles.field}
+          labelStyle={styles.label}
+          style={styles.input}
+          errorStyle={styles.error}
+          inputContainerStyle={styles.inputContainer}
+          leftIcon={<SvgXml xml={calendarIcon} width={20} height={20} />}
+        />
         {/* Date Field */}
-        <View style={styles.inputSection1}>
+        {/* <View style={styles.inputSection1}>
           <NativeText style={styles.label}>Date</NativeText>
 
           <TouchableOpacity
             activeOpacity={0.8}
             onPress={() => setShowDatePicker(true)}
           >
-            <NativeInput
-              value={formatDate(form.values.date)}
-              placeholder="Select date"
+            <SmartFormField
+              name="date"
+              value={formatDate(form.values.date)} // Display formatted date
+              placeholder="3-10-2025"
               placeholderTextColor="#666"
               editable={false} // ⛔ keyboard nahi khulega
               pointerEvents="none" // ⛔ input touch handle nahi karega
               leftIcon={<SvgXml xml={calendarIcon} width={20} height={20} />}
-              inputContainerStyle={[
-                styles.datePickerTrigger,
-                form.errors.date && styles.datePickerError,
-              ]}
-              inputStyle={styles.dateText}
+              // errorStyle={styles.error}
+              inputContainerStyle={styles.inputContainer}
+              style={styles.input}
             />
           </TouchableOpacity>
+        </View> */}
 
-          {form.errors.date && (
-            <NativeText style={styles.error}>{form.errors.date}</NativeText>
-          )}
-        </View>
-
-        {showDatePicker && (
+        {/* {showDatePicker && (
           <DateTimePicker
             value={
               form.values.date instanceof Date ? form.values.date : new Date()
-            }
+            } // Use form value or fallback to current date
             mode="date"
-            minimumDate={new Date()} // 🚫 past date disabled
-            display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-            onChange={handleDateChange}
+            minimumDate={new Date()} // Disallow past dates
+            display="default" // Default picker for Android
+            onChange={handleDateChange} // Update date field on change
           />
-        )}
+        )} */}
 
         {/* Note Field */}
         <SmartFormField
@@ -211,7 +222,7 @@ const AddExpenseForm = ({ onSubmit, onCancel }) => {
           multiline
           fieldStyle={[styles.field, styles.noteContainer]}
           labelStyle={styles.label}
-          style={styles.noteInput}
+          style={[styles.noteInput, { textAlignVertical: 'top' }]}
           errorStyle={styles.error}
           inputContainerStyle={[
             styles.inputContainer,
@@ -220,12 +231,7 @@ const AddExpenseForm = ({ onSubmit, onCancel }) => {
         />
 
         <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-          <NativeText style={styles.saveButtonIcon}>✓</NativeText>
           <NativeText style={styles.saveButtonText}>Save Expense</NativeText>
-        </TouchableOpacity>
-
-        <TouchableOpacity onPress={onCancel}>
-          <NativeText style={styles.cancelText}>Cancel</NativeText>
         </TouchableOpacity>
 
         <SuccessModal

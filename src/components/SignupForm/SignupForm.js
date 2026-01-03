@@ -17,12 +17,19 @@ import {
   phoneIcon,
   termsAndConditions,
 } from '../../assets/icons';
+import { useNavigation } from '@react-navigation/native';
+import { login } from '../../redux/slices/userSlice';
+import { useDispatch } from 'react-redux';
+import useAuth from '../../hooks/useAuth';
 
 const SignupForm = ({ onSubmit }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [agreeToTerms, setAgreeToTerms] = useState(false);
+  const navigation = useNavigation();
+  const { signup } = useAuth();
 
+  const dispatch = useDispatch();
   const form = useSmartForm({
     fields: {
       fullName: {
@@ -47,8 +54,8 @@ const SignupForm = ({ onSubmit }) => {
       password: {
         type: 'password',
         required: true,
-        minLength: 6,
-        maxLength: 8,
+        minLength: 8,
+        maxLength: 10,
       },
       confirmPassword: {
         type: 'password',
@@ -59,36 +66,50 @@ const SignupForm = ({ onSubmit }) => {
   });
 
   const handleSubmit = async () => {
-    console.log('Submit button pressed');
-    if (!agreeToTerms) {
-      Toast.show({
-        type: 'error',
-        text1: 'Agreement Required',
-        text2: 'Please agree to the Terms & Privacy.',
-      });
-      return;
-    }
     try {
-      console.log('Submitting form...');
+      // 1️⃣ Validate form
       await form.submitForm();
-      console.log('Form validity:', form.isValid);
-      console.log('Form values:', form.values);
 
-      if (form.isValid) {
-        onSubmit(form.values);
-      } else {
+      if (!form.isValid) {
         Toast.show({
           type: 'error',
           text1: 'Form Invalid',
           text2: 'Please fix the errors in the form.',
         });
+        return;
       }
+      if (!agreeToTerms) {
+        Toast.show({
+          type: 'error',
+          text1: 'Agreement Required',
+          text2: 'Please agree to the Terms & Privacy.',
+        });
+        return;
+      }
+      // 2️⃣ Signup with validated values
+      const userData = await signup(form.values);
+      console.log('Redux Login Dispatched:', userData);
+
+      // 3️⃣ Save to Redux
+
+      Toast.show({
+        type: 'success',
+        text1: 'Account Created',
+        text2: 'Your account has been created successfully 👋',
+      });
+      dispatch(
+        login({
+          ...userData,
+          isProfileComplete: true,
+        }),
+      );
     } catch (error) {
-      console.log('Submit Error:', error);
+      console.log('Signup Error:', error);
+
       Toast.show({
         type: 'error',
-        text1: 'Submission Error',
-        text2: error.message || 'An unexpected error occurred.',
+        text1: 'Signup Failed',
+        text2: error.message || 'Something went wrong',
       });
     }
   };

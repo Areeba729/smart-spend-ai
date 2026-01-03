@@ -26,7 +26,7 @@ const LoginForm = ({ onSubmit, navigation }) => {
       password: {
         type: 'password',
         required: true,
-        minLength: 6,
+        minLength: 8,
       },
     },
   });

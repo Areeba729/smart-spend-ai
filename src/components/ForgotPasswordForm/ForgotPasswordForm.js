@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
 import {
   useSmartForm,
   FormProvider,
@@ -10,6 +10,7 @@ import { styles } from './style';
 import { emailIcon } from '../../assets/icons';
 
 const ForgotPasswordForm = ({ onSubmit }) => {
+  const [loading, setLoading] = useState(false);
   const form = useSmartForm({
     fields: {
       email: {
@@ -44,9 +45,16 @@ const ForgotPasswordForm = ({ onSubmit }) => {
           inputContainerStyle={styles.inputContainer}
           leftIcon={<SvgXml xml={emailIcon} width={20} height={20} />}
         />
-
-        <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-          <Text style={styles.submitButtonText}>Send Reset Link</Text>
+        <TouchableOpacity
+          style={[styles.submitButton, loading && { opacity: 0.6 }]}
+          onPress={handleSubmit}
+          disabled={loading}
+        >
+          {loading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.submitButtonText}>Send Reset Link</Text>
+          )}
         </TouchableOpacity>
       </View>
     </FormProvider>

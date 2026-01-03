@@ -13,11 +13,11 @@ const styles = colors =>
       backgroundColor: colors.black,
     },
     container: {
-      flexGrow: 1,
+      // flexGrow: 1,
       paddingHorizontal: moderateScale(24),
       paddingTop: moderateScale(20),
-      paddingBottom: moderateScale(20),
-      justifyContent: 'space-between',
+      paddingBottom: moderateScale(40),
+      // justifyContent: 'space-between',
     },
     header: {
       alignItems: 'center',

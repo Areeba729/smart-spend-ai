@@ -6,7 +6,7 @@ import DailyExpenses from '../screens/AuthStack/DailyExpenses/DailyExpenses';
 import CategoryBudgetList from '../screens/AuthStack/CategoryBudgetList/CategoryBudgetList';
 import CategoryDetail from '../screens/AuthStack/CategoryDetail/CategoryDetail';
 import EditBudget from '../screens/AuthStack/EditBudget/EditBudget';
-
+import AddEvents from '../screens/AuthStack/AddEvents/AddEvents';
 function AuthStack() {
   const Stack = createNativeStackNavigator();
 
@@ -17,6 +17,7 @@ function AuthStack() {
     CategoryBudgetList,
     CategoryDetail,
     EditBudget,
+    AddEvents,
   };
 
   return (

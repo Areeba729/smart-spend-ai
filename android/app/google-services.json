@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "539664822476",
+    "project_id": "smartspendai-5681d",
+    "storage_bucket": "smartspendai-5681d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:539664822476:android:9ffbc4c3dc4b5402181269",
+        "android_client_info": {
+          "package_name": "com.smartspendai"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA5U0B-PXsX8Q9RaibN6FSfd1I0OU8ce7c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

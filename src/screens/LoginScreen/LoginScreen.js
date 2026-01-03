@@ -16,6 +16,7 @@ import { SvgXml } from 'react-native-svg';
 import { useDispatch } from 'react-redux';
 import { Apple, Google } from '../../assets/icons';
 import { login } from '../../redux/slices/userSlice';
+import useAuth from '../../hooks/useAuth';
 
 const SocialButton = ({ icon, text, onPress, styles }) => (
   <TouchableOpacity style={styles.socialButton} onPress={onPress}>
@@ -28,25 +29,49 @@ const SocialButton = ({ icon, text, onPress, styles }) => (
 const LoginScreen = ({ navigation }) => {
   const styles = styleGenerator(Theme.colors);
   const dispatch = useDispatch();
+  const { loginUser } = useAuth();
 
-  const handleLogin = values => {
-    // Simulated user data after successful login
-    const userData = {
-      ...values,
-      id: '123',
-      name: 'User',
-      isProfileComplete: true,
-    };
+  // const handleLogin = values => {
+  //   // Simulated user data after successful login
+  //   const userData = {
+  //     ...values,
+  //     id: '123',
+  //     name: 'User',
+  //     isProfileComplete: true,
+  //   };
 
-    dispatch(login(userData));
-    // console.log('User logged in:', userData);
+  //   dispatch(login(userData));
+  //   // console.log('User logged in:', userData);
 
-    Toast.show({
-      type: 'success',
-      text1: 'Login Successful',
-      text2: 'You have successfully logged in 👋',
-    });
-    // navigation.replace('Home');
+  //   Toast.show({
+  //     type: 'success',
+  //     text1: 'Login Successful',
+  //     text2: 'You have successfully logged in 👋',
+  //   });
+  //   // navigation.replace('Home');
+  // };
+
+  const handleLogin = async values => {
+    try {
+      const userData = await loginUser(values); // 🔥 Firebase login
+
+      dispatch(login({ ...userData, isProfileComplete: true })); // ✅ Redux update
+
+      Toast.show({
+        type: 'success',
+        text1: 'Login Successful',
+        text2: 'You have successfully logged in 👋',
+      });
+
+      // navigation handled by RootNavigator (recommended)
+      // navigation.replace('Home');
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: 'Login Failed',
+        text2: error.message || 'Invalid email or password',
+      });
+    }
   };
 
   return (
@@ -56,6 +81,7 @@ const LoginScreen = ({ navigation }) => {
         backgroundColor={Theme.colors.black}
       />
       <ScrollView
+        keyboardShouldPersistTaps="handled"
         contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}
       >

@@ -55,6 +55,7 @@ export const styles = StyleSheet.create({
     borderRadius: 12,
     alignSelf: 'center',
   },
+
   input: {
     fontSize: 12,
     color: '#fff',

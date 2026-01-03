@@ -18,7 +18,7 @@ import { SvgXml } from 'react-native-svg';
 import { useDispatch } from 'react-redux';
 import { Apple, Google } from '../../assets/icons';
 import { login } from '../../redux/slices/userSlice';
-
+import useAuth from '../../hooks/useAuth';
 const SocialButton = ({ icon, text, onPress, styles }) => (
   <TouchableOpacity style={styles.socialButton} onPress={onPress}>
     <Text style={[styles.socialButtonText, { color: Theme.colors.white }]}>
@@ -30,29 +30,51 @@ const SocialButton = ({ icon, text, onPress, styles }) => (
 const SignupScreen = ({ navigation }) => {
   const styles = styleGenerator(Theme.colors);
   const dispatch = useDispatch();
+  const { signup } = useAuth();
 
-  const handleSignup = formValues => {
-    // console.log('Signup Data:', formValues);
+  // const handleSignup = formValues => {
+  //   // console.log('Signup Data:', formValues);
 
-    // Simulated user data after successful signup
-    const userData = {
-      ...formValues,
-      id: '124', // Unique ID for signup
-      isProfileComplete: false, // Usually profile isn't complete right after basic signup
-    };
+  //   // Simulated user data after successful signup
+  //   const userData = {
+  //     ...formValues,
+  //     id: '124', // Unique ID for signup
+  //     isProfileComplete: false,
+  //   };
+  //   console.log(userData);
+  //   dispatch(login(userData));
+  //   // console.log('User signed up and logged in:', userData);
 
-    dispatch(login(userData));
-    // console.log('User signed up and logged in:', userData);
+  //   Toast.show({
+  //     type: 'success',
+  //     text1: 'Account Created',
+  //     text2: 'Your account has been created successfully 👋',
+  //   });
+  //   // Navigate to next screen
+  //   // navigation.navigate('Home');
+  // };
 
-    Toast.show({
-      type: 'success',
-      text1: 'Account Created',
-      text2: 'Your account has been created successfully 👋',
-    });
-    // Navigate to next screen
-    // navigation.navigate('Home');
+  const handleSignup = async formValues => {
+    try {
+      const userData = await signup(formValues);
+
+      dispatch(login(userData));
+
+      Toast.show({
+        type: 'success',
+        text1: 'Account Created',
+        text2: 'Your account has been created successfully 👋',
+      });
+
+      // navigation.replace('Home');
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: 'Signup Failed',
+        text2: error.message || 'Something went wrong',
+      });
+    }
   };
-
   return (
     <View style={styles.safeArea}>
       <StatusBar

@@ -16,7 +16,7 @@ export default function AppNavigation() {
   const isProfileComplete = useSelector(selectIsProfileComplete);
   const isAuthenticated = useSelector(selectIsAuthenticated);
 
-  const isSignedIn = isProfileComplete && isAuthenticated;
+  const isSignedIn = isProfileComplete;
 
   const scheme = useColorScheme();
   let isDarkMode =
@@ -40,8 +40,7 @@ export default function AppNavigation() {
 
   return (
     <NavigationContainer>
-      {/* {isSignedIn ? <AuthStack /> : <UnAuthStack />} */}
-      <AuthStack />
+      {isSignedIn ? <AuthStack /> : <UnAuthStack />}
     </NavigationContainer>
   );
 }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, TouchableOpacity, FlatList } from 'react-native';
 import { SvgXml } from 'react-native-svg';
 import { moderateScale } from 'react-native-size-matters';
@@ -6,10 +6,32 @@ import NativeText from '../../../components/NativeText/NativeText';
 import { calendarIcon } from '../../../assets/icons';
 import { styles } from './style';
 import SimpleHeader from '../../../components/SimpleHeader/SimpleHeader';
+import { useSelector } from 'react-redux';
+import { selectUser } from '../../../redux/slices/userSlice';
+import { getExpensesFromFirestore } from '../../../hooks/ExpenseFunction';
+import ExpenseItem from '../../../components/HomeComponents/ExpenseItem/ExpenseItem';
 
 const DailyExpenses = ({ navigation }) => {
   const dateListRef = React.useRef(null);
+  const user = useSelector(selectUser);
+  const [selectedDate, setSelectedDate] = useState(new Date().getDate());
+  const [loading, setLoading] = useState(true); // Loading state to show while fetching
+  const [expenses, setExpenses] = useState([]);
+  useEffect(() => {
+    const fetchExpenses = async () => {
+      try {
+        setLoading(true);
+        const fetchedExpenses = await getExpensesFromFirestore(); // Fetch expenses from Firestore
+        setExpenses(fetchedExpenses); // Set expenses data to state
+      } catch (error) {
+        console.error('Error fetching expenses:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
+    fetchExpenses();
+  }, []);
   const dates = React.useMemo(() => {
     const today = new Date();
     const year = today.getFullYear();
@@ -33,7 +55,6 @@ const DailyExpenses = ({ navigation }) => {
   }, []);
 
   const today = new Date().getDate();
-  const [selectedDate, setSelectedDate] = useState(today);
 
   React.useEffect(() => {
     if (dateListRef.current) {
@@ -50,71 +71,71 @@ const DailyExpenses = ({ navigation }) => {
   const selectedDateInfo =
     dates.find(d => d.date === selectedDate) || dates[today - 1];
 
-  const transactions = [
-    {
-      id: '1',
-      title: 'Lunch at Haveli',
-      amount: '- 2,450',
-      time: '1:30 PM',
-      category: 'Food',
-      icon: '🍴',
-      iconBg: 'rgba(255, 149, 0, 0.2)',
-    },
-    {
-      id: '2',
-      title: 'Uber Ride',
-      amount: '- 650',
-      time: '9:15 AM',
-      category: 'Transport',
-      icon: '🚗',
-      iconBg: 'rgba(0, 122, 255, 0.2)',
-    },
-    {
-      id: '3',
-      title: 'Grocery Run',
-      amount: '- 8,500',
-      time: '6:45 PM',
-      category: 'Shopping',
-      icon: '🛍️',
-      iconBg: 'rgba(52, 199, 89, 0.2)',
-    },
-    {
-      id: '4',
-      title: 'Internet Bill',
-      amount: '- 3,500',
-      time: '10:00 AM',
-      category: 'Bills',
-      icon: '⚡',
-      iconBg: 'rgba(88, 86, 214, 0.2)',
-    },
-    {
-      id: '5',
-      title: 'Coffee Break',
-      amount: '- 850',
-      time: '4:20 PM',
-      category: 'Snacks',
-      icon: '☕',
-      iconBg: 'rgba(255, 45, 85, 0.2)',
-    },
-    {
-      id: '6',
-      title: 'Amazon Prime',
-      amount: '- 1,200',
-      time: '11:00 AM',
-      category: 'Subscription',
-      icon: '📦',
-      iconBg: 'rgba(0, 122, 255, 0.15)',
-    },
-    {
-      id: '7',
-      title: 'Gym Membership',
-      amount: '- 5,000',
-      time: '7:00 AM',
-      category: 'Health',
-      icon: '💪',
-      iconBg: 'rgba(52, 199, 89, 0.15)',
-    },
-  ];
+  // const transactions = [
+  //   {
+  //     id: '1',
+  //     title: 'Lunch at Haveli',
+  //     amount: '- 2,450',
+  //     time: '1:30 PM',
+  //     category: 'Food',
+  //     icon: '🍴',
+  //     iconBg: 'rgba(255, 149, 0, 0.2)',
+  //   },
+  //   {
+  //     id: '2',
+  //     title: 'Uber Ride',
+  //     amount: '- 650',
+  //     time: '9:15 AM',
+  //     category: 'Transport',
+  //     icon: '🚗',
+  //     iconBg: 'rgba(0, 122, 255, 0.2)',
+  //   },
+  //   {
+  //     id: '3',
+  //     title: 'Grocery Run',
+  //     amount: '- 8,500',
+  //     time: '6:45 PM',
+  //     category: 'Shopping',
+  //     icon: '🛍️',
+  //     iconBg: 'rgba(52, 199, 89, 0.2)',
+  //   },
+  //   {
+  //     id: '4',
+  //     title: 'Internet Bill',
+  //     amount: '- 3,500',
+  //     time: '10:00 AM',
+  //     category: 'Bills',
+  //     icon: '⚡',
+  //     iconBg: 'rgba(88, 86, 214, 0.2)',
+  //   },
+  //   {
+  //     id: '5',
+  //     title: 'Coffee Break',
+  //     amount: '- 850',
+  //     time: '4:20 PM',
+  //     category: 'Snacks',
+  //     icon: '☕',
+  //     iconBg: 'rgba(255, 45, 85, 0.2)',
+  //   },
+  //   {
+  //     id: '6',
+  //     title: 'Amazon Prime',
+  //     amount: '- 1,200',
+  //     time: '11:00 AM',
+  //     category: 'Subscription',
+  //     icon: '📦',
+  //     iconBg: 'rgba(0, 122, 255, 0.15)',
+  //   },
+  //   {
+  //     id: '7',
+  //     title: 'Gym Membership',
+  //     amount: '- 5,000',
+  //     time: '7:00 AM',
+  //     category: 'Health',
+  //     icon: '💪',
+  //     iconBg: 'rgba(52, 199, 89, 0.15)',
+  //   },
+  // ];
 
   const renderDateItem = ({ item }) => {
     const isActive = selectedDate === item.date;
@@ -135,25 +156,25 @@ const DailyExpenses = ({ navigation }) => {
     );
   };
 
-  const renderTransactionItem = ({ item }) => (
-    <View style={styles.transactionItem}>
-      <View style={[styles.iconContainer, { backgroundColor: item.iconBg }]}>
-        <NativeText style={styles.categoryIcon}>{item.icon}</NativeText>
-      </View>
-      <View style={styles.transactionInfo}>
-        <NativeText style={styles.transactionTitle}>{item.title}</NativeText>
-        <View style={styles.timeRow}>
-          <NativeText style={styles.timeText}>🕒 {item.time}</NativeText>
-        </View>
-      </View>
-      <View style={styles.transactionRight}>
-        <NativeText style={styles.transactionAmount}>{item.amount}</NativeText>
-        <NativeText style={styles.transactionCategory}>
-          {item.category}
-        </NativeText>
-      </View>
-    </View>
-  );
+  // const renderTransactionItem = ({ item }) => (
+  //   <View style={styles.transactionItem}>
+  //     <View style={[styles.iconContainer, { backgroundColor: item.iconBg }]}>
+  //       <NativeText style={styles.categoryIcon}>{item.icon}</NativeText>
+  //     </View>
+  //     <View style={styles.transactionInfo}>
+  //       <NativeText style={styles.transactionTitle}>{item.title}</NativeText>
+  //       <View style={styles.timeRow}>
+  //         <NativeText style={styles.timeText}>🕒 {item.time}</NativeText>
+  //       </View>
+  //     </View>
+  //     <View style={styles.transactionRight}>
+  //       <NativeText style={styles.transactionAmount}>{item.amount}</NativeText>
+  //       <NativeText style={styles.transactionCategory}>
+  //         {item.category}
+  //       </NativeText>
+  //     </View>
+  //   </View>
+  // );
 
   return (
     <View style={styles.container}>
@@ -176,7 +197,9 @@ const DailyExpenses = ({ navigation }) => {
         </View>
         <View style={styles.amountRow}>
           <NativeText style={styles.pkrLabel}>PKR</NativeText>
-          <NativeText style={styles.totalAmount}>12,450</NativeText>
+          <NativeText style={styles.totalAmount}>
+            {user?.monthlyBudget}
+          </NativeText>
         </View>
         <View style={styles.budgetBadge}>
           <View style={styles.budgetDot} />
@@ -200,14 +223,20 @@ const DailyExpenses = ({ navigation }) => {
         />
       </View>
 
-      <FlatList
-        data={transactions}
-        renderItem={renderTransactionItem}
-        keyExtractor={item => item.id}
-        style={styles.transactionList}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.listContent}
-      />
+      {/* Dynamically render ExpenseItems */}
+      {expenses.length > 0 ? (
+        expenses.map((expense, index) => (
+          <ExpenseItem
+            key={index}
+            icon={expense.icon || '💸'} // Default icon if not provided
+            category={expense.category}
+            note={expense.note}
+            amount={`${expense.amount} PKR`}
+          />
+        ))
+      ) : (
+        <NativeText>No expenses found for today.</NativeText>
+      )}
     </View>
   );
 };

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, ScrollView, TouchableOpacity } from 'react-native';
 import NativeText from '../../../components/NativeText/NativeText';
 import BudgetCard from '../../../components/HomeComponents/BudgetCard/BudgetCard';
@@ -11,12 +11,32 @@ import AIInsightCard from '../../../components/HomeComponents/AIInsightCard/AIIn
 import { Theme } from '../../../libs';
 import styles from './style';
 import HomeHeader from '../../../components/Header/Header';
+import { useUserGreeting } from '../../../libs/getUserGreetings';
+import { useSelector } from 'react-redux';
+import { selectUser } from '../../../redux/slices/userSlice';
+import { SvgXml } from 'react-native-svg';
+import { calendarIcon } from '../../../assets/icons';
+import { getExpensesFromFirestore } from '../../../hooks/ExpenseFunction';
 
 const Home = ({ navigation }) => {
+  const { name, greeting } = useUserGreeting();
+  const user = useSelector(selectUser);
+  console.log(user);
   const [selectedDate, setSelectedDate] = useState(
     new Date().setHours(0, 0, 0, 0),
   );
 
+  const [expenses, setExpenses] = useState([]); // State to hold expenses
+
+  useEffect(() => {
+    // Fetch expenses when the component is mounted
+    const fetchExpenses = async () => {
+      const fetchedExpenses = await getExpensesFromFirestore();
+      setExpenses(fetchedExpenses.slice(0, 2)); // Set fetched expenses to state
+    };
+
+    fetchExpenses();
+  }, []); // Empty dependen
   const handleDateSelect = date => {
     setSelectedDate(date);
     // Navigate to Calendar screen with selected date
@@ -33,17 +53,17 @@ const Home = ({ navigation }) => {
     console.log('Scan Bill');
   };
 
-  const handleVoiceInput = () => {
+  const handleAddEvent = () => {
     // Navigate to voice input screen
-    console.log('Voice Input');
+    navigation.navigate('AddEvents');
   };
 
   return (
     <View style={styles.container}>
       <HomeHeader
-        initial="A"
-        greeting="Good Morning"
-        userName="Alex"
+        initial={name.charAt(0).toUpperCase()}
+        greeting={greeting} // dynamic greeting
+        userName={name}
         onNotificationPress={() => console.log('Notification pressed')}
       />
       <ScrollView
@@ -58,7 +78,11 @@ const Home = ({ navigation }) => {
         />
 
         {/* Budget Card */}
-        <BudgetCard totalBudget={150000} spentPercentage={30} currency="PKR" />
+        <BudgetCard
+          totalBudget={user?.monthlyBudget}
+          spentPercentage={30}
+          currency="PKR"
+        />
 
         {/* Stats Row */}
         <View style={styles.statsRow}>
@@ -81,19 +105,20 @@ const Home = ({ navigation }) => {
           </TouchableOpacity>
         </View>
 
-        <ExpenseItem
-          icon="🍔"
-          category="Food"
-          location="Lunch At Office"
-          amount="-500 PKR"
-        />
-        <ExpenseItem
-          icon="🚗"
-          category="Travel"
-          location="Uber Ride"
-          amount="-300 PKR"
-        />
-
+        {/* Dynamically render ExpenseItems */}
+        {expenses.length > 0 ? (
+          expenses.map((expense, index) => (
+            <ExpenseItem
+              key={index}
+              icon={expense.icon || '💸'} // Default icon if not provided
+              category={expense.category}
+              note={expense.note}
+              amount={`${expense.amount} PKR`}
+            />
+          ))
+        ) : (
+          <NativeText>No expenses found for today.</NativeText>
+        )}
         {/* Upcoming Alerts Section */}
         <View style={styles.sectionHeader}>
           <NativeText style={styles.sectionTitle}>UPCOMING ALERTS</NativeText>
@@ -148,9 +173,9 @@ const Home = ({ navigation }) => {
             isPrimary
           />
           <QuickActionButton
-            icon="🎤"
-            label="Voice Input"
-            onPress={handleVoiceInput}
+            icon={<SvgXml xml={calendarIcon} />}
+            label="Add Events"
+            onPress={handleAddEvent}
           />
         </View>
 

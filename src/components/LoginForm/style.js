@@ -5,7 +5,9 @@ import { Theme } from '../../libs';
 export const styles = StyleSheet.create({
   container: {
     paddingVertical: 10,
-    alignSelf: 'center',
+    width: '100%',
+
+    // alignSelf: 'center',
   },
   field: {
     marginBottom: 20,
@@ -22,6 +24,7 @@ export const styles = StyleSheet.create({
     borderColor: '#666',
     width: scale(325),
     height: scale(50),
+    alignSelf: 'center',
   },
   label: {
     fontWeight: '600',

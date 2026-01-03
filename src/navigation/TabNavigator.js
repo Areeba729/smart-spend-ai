@@ -4,8 +4,9 @@ import BottomTabs from '../components/BottomTabs/BottomTabs';
 import Home from '../screens/AuthStack/Home/Home';
 import Budget from '../screens/AuthStack/BudgetScreen/BudgetScreen';
 
-import AddExpense from '../screens/AddExpense/AddExpense';
+import AddExpense from '../screens/AuthStack/AddExpense/AddExpense';
 import Report from '../screens/AuthStack/Report/Report';
+import ProfileScreen from '../screens/AuthStack/ProfileScreen/ProfileScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -15,6 +16,7 @@ const TabNavigator = () => {
     Budget,
     AddExpense,
     Report,
+    ProfileScreen,
   };
 
   return (

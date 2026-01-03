@@ -10,7 +10,10 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import InternetModal from './src/components/InternetModal/InternetModal';
 import AppNavigation from './src/navigation';
 import { persistedStore, store } from './src/redux/store';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
 
 export default function App() {
   const [isConnectedModal, setIsConnectedModal] = useState(false);
@@ -39,27 +42,32 @@ export default function App() {
   };
 
   return (
-    <Provider store={store}>
-      <PersistGate loading={null} persistor={persistedStore}>
-        <GestureHandlerRootView style={{ flex: 1 }}>
-          {/* <BottomSheetModalProvider> */}
-          <AppNavigation />
-          {/* </BottomSheetModalProvider> */}
-        </GestureHandlerRootView>
-      </PersistGate>
-      {isConnectedModal && (
-        <InternetModal
-          isVisible={isConnectedModal}
-          handleRetry={() => checkInternet()}
-          title={'No Internet Connection'}
-          description={
-            "Oops! We can't load the content until the internet connection is restored."
-          }
-          shortDescription={'Please check your connection.'}
-          btnTxt={'Retry'}
-        />
-      )}
-      <Toast />
-    </Provider>
+    <SafeAreaView
+      style={{ flex: 1, backgroundColor: '#fff' }}
+      edges={['bottom', 'left', 'right']}
+    >
+      <Provider store={store}>
+        <PersistGate loading={null} persistor={persistedStore}>
+          <GestureHandlerRootView style={{ flex: 1 }}>
+            {/* <BottomSheetModalProvider> */}
+            <AppNavigation />
+            {/* </BottomSheetModalProvider> */}
+          </GestureHandlerRootView>
+        </PersistGate>
+        {isConnectedModal && (
+          <InternetModal
+            isVisible={isConnectedModal}
+            handleRetry={() => checkInternet()}
+            title={'No Internet Connection'}
+            description={
+              "Oops! We can't load the content until the internet connection is restored."
+            }
+            shortDescription={'Please check your connection.'}
+            btnTxt={'Retry'}
+          />
+        )}
+        <Toast />
+      </Provider>
+    </SafeAreaView>
   );
 }

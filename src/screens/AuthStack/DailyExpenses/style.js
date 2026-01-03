@@ -90,7 +90,7 @@ export const styles = StyleSheet.create({
   },
   dateCard: {
     width: moderateScale(65),
-    height: moderateScale(85),
+    height: moderateScale(65),
     borderRadius: moderateScale(20),
     backgroundColor: '#1C1C1E',
     justifyContent: 'center',
