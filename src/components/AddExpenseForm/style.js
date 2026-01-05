@@ -15,6 +15,7 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
+
   currencySymbol: {
     fontSize: moderateScale(18),
     color: Theme.colors.grey,
@@ -27,6 +28,14 @@ export const styles = StyleSheet.create({
     fontWeight: '600',
     minWidth: moderateScale(100),
     textAlign: 'center',
+  },
+  inputContainer1: {
+    backgroundColor: Theme.colors.primary,
+    borderColor: '#666',
+    width: scale(325),
+    height: scale(120),
+    borderRadius: 12,
+    alignSelf: 'center',
   },
   inputSection1: {
     marginBottom: moderateScale(12),

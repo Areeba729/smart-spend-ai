@@ -18,7 +18,7 @@ const BudgetCard = ({ totalBudget, spentPercentage, currency = 'PKR' }) => {
       <View style={styles.progressContainer}>
         <View style={styles.progressBar}>
           <View
-            style={[styles.progressFill, { width: `${spentPercentage}%` }]}
+            style={[styles.progressFill, { width: `${spentPercentage}%` }]} // Dynamically set width based on spentPercentage
           />
         </View>
       </View>
@@ -26,9 +26,11 @@ const BudgetCard = ({ totalBudget, spentPercentage, currency = 'PKR' }) => {
       <View style={styles.messageContainer}>
         <View style={styles.dot} />
         <NativeText style={styles.message}>
-          23 din mein aap ne{' '}
-          <NativeText style={styles.highlight}>30% budget</NativeText> use kar
-          liya hai.
+          You have used{' '}
+          <NativeText style={styles.highlight}>
+            {spentPercentage.toFixed(0)}%
+          </NativeText>{' '}
+          of your budget so far.
         </NativeText>
       </View>
     </View>

@@ -48,7 +48,7 @@ const AddEvents = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <SimpleHeader
-        title="Add Expense"
+        title="Add Events"
         onBackPress={() => navigation.goBack()}
       />
 

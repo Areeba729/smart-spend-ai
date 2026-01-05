@@ -3,7 +3,7 @@ import React from 'react';
 import { View, TouchableOpacity, Text } from 'react-native';
 import styles from './style';
 
-const tabs = ['Weekly', 'Monthly', 'Yearly'];
+const tabs = ['Daily', 'Weekly', 'Monthly'];
 
 const ReportTabs = ({ activeTab, onChange }) => {
   return (

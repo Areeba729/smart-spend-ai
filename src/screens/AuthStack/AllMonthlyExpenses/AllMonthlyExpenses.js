@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, TouchableOpacity, FlatList } from 'react-native';
+import { View, TouchableOpacity, FlatList, ScrollView } from 'react-native';
 import { SvgXml } from 'react-native-svg';
 import { moderateScale } from 'react-native-size-matters';
 import NativeText from '../../../components/NativeText/NativeText';
@@ -18,6 +18,11 @@ const DailyExpenses = ({ navigation }) => {
   const [selectedDate, setSelectedDate] = useState(new Date().getDate());
   const [loading, setLoading] = useState(true); // Loading state to show while fetching
   const [expenses, setExpenses] = useState([]);
+  const totalMonthlyExpense = expenses.reduce((sum, expense) => {
+    const amount = Number(expense.amount) || 0;
+    return sum + amount;
+  }, 0);
+
   useEffect(() => {
     const fetchExpenses = async () => {
       try {
@@ -72,25 +77,6 @@ const DailyExpenses = ({ navigation }) => {
   const selectedDateInfo =
     dates.find(d => d.date === selectedDate) || dates[today - 1];
 
-  const renderDateItem = ({ item }) => {
-    const isActive = selectedDate === item.date;
-    return (
-      <TouchableOpacity
-        onPress={() => setSelectedDate(item.date)}
-        style={[styles.dateCard, isActive && styles.activeDateCard]}
-      >
-        <NativeText style={[styles.dayText, isActive && styles.activeDayText]}>
-          {item.day}
-        </NativeText>
-        <NativeText
-          style={[styles.dateNumber, isActive && styles.activeDateNumber]}
-        >
-          {item.date}
-        </NativeText>
-      </TouchableOpacity>
-    );
-  };
-
   return (
     <View style={styles.container}>
       <SimpleHeader
@@ -116,25 +102,39 @@ const DailyExpenses = ({ navigation }) => {
             {user?.monthlyBudget}
           </NativeText>
         </View>
+        <View style={styles.amountRow}>
+          <NativeText style={styles.pkrLabel}>Spent</NativeText>
+          <NativeText style={styles.totalAmount}>
+            {totalMonthlyExpense} PKR
+          </NativeText>
+        </View>
       </View>
 
       <Text style={styles.viewAllText}>View All Monthly Expenses</Text>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{
+          flexGrow: 1,
+          paddingBottom: moderateScale(20),
+        }}
+      >
+        {expenses.length > 0 ? (
+          expenses.map((expense, index) => (
+            <ExpenseItem
+              key={index}
+              icon={expense.icon || '💸'} // Default icon if not provided
+              category={expense.category}
+              note={expense.note}
+              amount={`${expense.amount} PKR`}
+              title={expense.title}
+              date={expense.date}
+            />
+          ))
+        ) : (
+          <NativeText>No expenses found for today.</NativeText>
+        )}
+      </ScrollView>
       {/* Dynamically render ExpenseItems */}
-      {expenses.length > 0 ? (
-        expenses.map((expense, index) => (
-          <ExpenseItem
-            key={index}
-            icon={expense.icon || '💸'} // Default icon if not provided
-            category={expense.category}
-            note={expense.note}
-            amount={`${expense.amount} PKR`}
-            title={expense.title}
-            date={expense.date}
-          />
-        ))
-      ) : (
-        <NativeText>No expenses found for today.</NativeText>
-      )}
     </View>
   );
 };

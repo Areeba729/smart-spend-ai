@@ -47,6 +47,12 @@ export const styles = StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 1,
   },
+  noExpensesText: {
+    fontSize: moderateScale(12),
+    color: Theme.colors.grey,
+    textAlign: 'center',
+    marginTop: moderateScale(10),
+  },
   amountRow: {
     flexDirection: 'row',
     alignItems: 'baseline',
@@ -87,6 +93,9 @@ export const styles = StyleSheet.create({
   },
   dateSelector: {
     marginBottom: moderateScale(20),
+  },
+  content: {
+    paddingBottom: scale(40),
   },
   dateCard: {
     width: moderateScale(65),

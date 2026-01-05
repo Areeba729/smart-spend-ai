@@ -5,13 +5,15 @@ import { format } from 'date-fns';
 import styles from './style'; // Assuming you already have styles defined
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
+import { updateUser } from '../../redux/slices/userSlice';
+import { useDispatch } from 'react-redux';
 
 const BudgetDateRange = ({ onDateChange }) => {
   const [isStartDatePickerVisible, setStartDatePickerVisibility] =
     useState(false);
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
-
+  const dispatch = useDispatch();
   // Function to calculate the end date (one month after the start date)
   const calculateEndDate = start => {
     const endDate = new Date(start);
@@ -69,22 +71,25 @@ const BudgetDateRange = ({ onDateChange }) => {
   const saveBudgetDateRange = async (startDate, endDate) => {
     try {
       const user = auth().currentUser;
+      if (!user) return;
 
-      if (!user) {
-        throw new Error('User is not logged in');
-      }
+      const startTimestamp = firestore.Timestamp.fromDate(startDate);
+      const endTimestamp = firestore.Timestamp.fromDate(endDate);
 
-      const userRef = firestore().collection('users').doc(user.uid);
-
-      // Update Firestore with the start date and end date
-      await userRef.update({
-        startDate: firestore.Timestamp.fromDate(new Date(startDate)),
-        endDate: firestore.Timestamp.fromDate(endDate),
+      await firestore().collection('users').doc(user.uid).update({
+        startDate: startTimestamp,
+        endDate: endTimestamp,
       });
 
-      console.log('Budget date range saved successfully!');
+      // ✅ UPDATE REDUX
+      dispatch(
+        updateUser({
+          startDate: startTimestamp,
+          endDate: endTimestamp,
+        }),
+      );
     } catch (error) {
-      console.error('Error saving budget date range:', error.message);
+      console.error('Error saving budget date range:', error);
     }
   };
 

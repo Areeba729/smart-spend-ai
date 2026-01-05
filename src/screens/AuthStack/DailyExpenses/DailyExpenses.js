@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, TouchableOpacity, FlatList } from 'react-native';
+import { View, TouchableOpacity, FlatList, ScrollView } from 'react-native';
 import { SvgXml } from 'react-native-svg';
 import { moderateScale } from 'react-native-size-matters';
 import NativeText from '../../../components/NativeText/NativeText';
@@ -18,12 +18,43 @@ const DailyExpenses = ({ navigation }) => {
   const [selectedDate, setSelectedDate] = useState(new Date().getDate());
   const [loading, setLoading] = useState(true); // Loading state to show while fetching
   const [expenses, setExpenses] = useState([]);
+
+  const parseDate = dateField => {
+    if (!dateField) return null; // Skip invalid or undefined date fields
+
+    if (typeof dateField === 'string') {
+      // Handle string format (e.g., DD-MM-YYYY)
+      const [day, month, year] = dateField.split('-');
+      return new Date(`${year}-${month}-${day}`); // Convert to YYYY-MM-DD format
+    }
+
+    if (typeof dateField === 'object' && dateField._seconds) {
+      // Handle Firestore timestamp
+      return new Date(dateField._seconds * 1000);
+    }
+
+    return null; // Skip unsupported formats
+  };
+
   useEffect(() => {
     const fetchExpenses = async () => {
       try {
         setLoading(true);
         const fetchedExpenses = await getExpensesFromFirestore(); // Fetch expenses from Firestore
-        setExpenses(fetchedExpenses); // Set expenses data to state
+        console.log('Fetched Expenses:', fetchedExpenses); // Debugging log
+        const today = new Date();
+        const filteredExpenses = fetchedExpenses.filter(expense => {
+          const expenseDate = parseDate(expense.date); // Parse the date field
+          console.log('Parsed Expense Date:', expenseDate); // Log parsed date
+          return (
+            expenseDate &&
+            expenseDate.getDate() === today.getDate() &&
+            expenseDate.getMonth() === today.getMonth() &&
+            expenseDate.getFullYear() === today.getFullYear()
+          );
+        });
+        console.log('Filtered Expenses:', filteredExpenses); // Debugging log
+        setExpenses(filteredExpenses); // Set filtered expenses data to state
       } catch (error) {
         console.error('Error fetching expenses:', error);
       } finally {
@@ -33,6 +64,7 @@ const DailyExpenses = ({ navigation }) => {
 
     fetchExpenses();
   }, []);
+
   const dates = React.useMemo(() => {
     const today = new Date();
     const year = today.getFullYear();
@@ -91,26 +123,6 @@ const DailyExpenses = ({ navigation }) => {
     );
   };
 
-  // const renderTransactionItem = ({ item }) => (
-  //   <View style={styles.transactionItem}>
-  //     <View style={[styles.iconContainer, { backgroundColor: item.iconBg }]}>
-  //       <NativeText style={styles.categoryIcon}>{item.icon}</NativeText>
-  //     </View>
-  //     <View style={styles.transactionInfo}>
-  //       <NativeText style={styles.transactionTitle}>{item.title}</NativeText>
-  //       <View style={styles.timeRow}>
-  //         <NativeText style={styles.timeText}>🕒 {item.time}</NativeText>
-  //       </View>
-  //     </View>
-  //     <View style={styles.transactionRight}>
-  //       <NativeText style={styles.transactionAmount}>{item.amount}</NativeText>
-  //       <NativeText style={styles.transactionCategory}>
-  //         {item.category}
-  //       </NativeText>
-  //     </View>
-  //   </View>
-  // );
-
   return (
     <View style={styles.container}>
       <SimpleHeader
@@ -165,21 +177,29 @@ const DailyExpenses = ({ navigation }) => {
         </NativeText>
       </TouchableOpacity>
       {/* Dynamically render ExpenseItems */}
-      {expenses.length > 0 ? (
-        expenses.map((expense, index) => (
-          <ExpenseItem
-            key={index}
-            icon={expense.icon || '💸'} // Default icon if not provided
-            category={expense.category}
-            note={expense.note}
-            amount={`${expense.amount} PKR`}
-            title={expense.title}
-            date={expense.date}
-          />
-        ))
-      ) : (
-        <NativeText>No expenses found for today.</NativeText>
-      )}
+
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.content}
+      >
+        {expenses.length > 0 ? (
+          expenses.map((expense, index) => (
+            <ExpenseItem
+              key={index}
+              icon={expense.icon || '💸'} // Default icon if not provided
+              category={expense.category}
+              note={expense.note}
+              amount={`${expense.amount} PKR`}
+              title={expense.title}
+              date={expense.date}
+            />
+          ))
+        ) : (
+          <NativeText style={styles.noExpensesText}>
+            No expenses found for today.
+          </NativeText>
+        )}
+      </ScrollView>
     </View>
   );
 };

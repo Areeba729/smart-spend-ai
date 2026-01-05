@@ -69,6 +69,12 @@ const styles = StyleSheet.create({
     marginBottom: moderateScale(12),
     marginTop: moderateScale(8),
   },
+  noExpensesText: {
+    fontSize: moderateScale(12),
+    color: Theme.colors.secondary,
+    textAlign: 'flex-start',
+    marginBottom: moderateScale(10),
+  },
   sectionTitle: {
     fontSize: moderateScale(11),
     color: Theme.colors.text,
@@ -88,6 +94,19 @@ const styles = StyleSheet.create({
   alertsScroll: {
     marginBottom: moderateScale(20),
   },
+  dailyLimitContainer: {
+    marginVertical: 10,
+    padding: 10,
+    backgroundColor: '#e0f7fa',
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  dailyLimitText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#00796b',
+  },
+
   quickActionsRow: {
     flexDirection: 'row',
     marginBottom: moderateScale(20),
