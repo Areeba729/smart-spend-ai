@@ -17,11 +17,22 @@ import { selectUser } from '../../../redux/slices/userSlice';
 import { SvgXml } from 'react-native-svg';
 import { calendarIcon } from '../../../assets/icons';
 import { getExpensesFromFirestore } from '../../../hooks/ExpenseFunction';
+import BudgetDateRange from '../../../components/BudgetDateRange/BudgetDateRange';
 
 const Home = ({ navigation }) => {
   const { name, greeting } = useUserGreeting();
   const user = useSelector(selectUser);
   console.log(user);
+  console.log('User Created At:', user?.createdAt);
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+  const handleDateChange = (date, type) => {
+    if (type === 'start') {
+      setStartDate(date);
+    } else if (type === 'end') {
+      setEndDate(date);
+    }
+  };
   const [selectedDate, setSelectedDate] = useState(
     new Date().setHours(0, 0, 0, 0),
   );
@@ -76,14 +87,15 @@ const Home = ({ navigation }) => {
           selectedDate={selectedDate}
           onDateSelect={handleDateSelect}
         />
-
         {/* Budget Card */}
         <BudgetCard
           totalBudget={user?.monthlyBudget}
           spentPercentage={30}
           currency="PKR"
         />
-
+        {/* Budget Date Range - Added here */}
+        <BudgetDateRange onDateChange={handleDateChange} />
+        {/* Display Budget Date Range */}
         {/* Stats Row */}
         <View style={styles.statsRow}>
           <StatCard icon="💸" label="Spent" amount="45k" iconColor="#FF6B6B" />
@@ -94,7 +106,6 @@ const Home = ({ navigation }) => {
             iconColor={Theme.colors.secondary}
           />
         </View>
-
         {/* Today's Expense Section */}
         <View style={styles.sectionHeader}>
           <NativeText style={styles.sectionTitle}>TODAY'S EXPENSE</NativeText>
@@ -104,7 +115,6 @@ const Home = ({ navigation }) => {
             <NativeText style={styles.viewAll}>View All</NativeText>
           </TouchableOpacity>
         </View>
-
         {/* Dynamically render ExpenseItems */}
         {expenses.length > 0 ? (
           expenses.map((expense, index) => (
@@ -112,7 +122,7 @@ const Home = ({ navigation }) => {
               key={index}
               icon={expense.icon || '💸'} // Default icon if not provided
               category={expense.category}
-              note={expense.note}
+              title={expense.title}
               amount={`${expense.amount} PKR`}
             />
           ))
@@ -123,7 +133,6 @@ const Home = ({ navigation }) => {
         <View style={styles.sectionHeader}>
           <NativeText style={styles.sectionTitle}>UPCOMING ALERTS</NativeText>
         </View>
-
         <View style={styles.alertsGrid}>
           <AlertCard
             icon="🔔"
@@ -154,12 +163,10 @@ const Home = ({ navigation }) => {
             description="Reduce utility bills"
           />
         </View>
-
         {/* Quick Actions Section */}
         <View style={styles.sectionHeader}>
           <NativeText style={styles.sectionTitle}>QUICK ACTIONS</NativeText>
         </View>
-
         <View style={styles.quickActionsRow}>
           <QuickActionButton
             icon="+"
@@ -178,7 +185,6 @@ const Home = ({ navigation }) => {
             onPress={handleAddEvent}
           />
         </View>
-
         {/* AI Smart Insight */}
         <AIInsightCard
           title="AI Smart Insight"

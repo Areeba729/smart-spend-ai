@@ -3,7 +3,7 @@ import { View, TouchableOpacity } from 'react-native';
 import NativeText from '../../NativeText/NativeText';
 import styles from './ExpenseItemStyles';
 
-const ExpenseItem = ({ icon, category, note, amount, onPress }) => {
+const ExpenseItem = ({ icon, category, title, amount, onPress }) => {
   return (
     <TouchableOpacity
       style={styles.container}
@@ -15,8 +15,8 @@ const ExpenseItem = ({ icon, category, note, amount, onPress }) => {
           <NativeText style={styles.icon}>{icon}</NativeText>
         </View>
         <View style={styles.textContainer}>
-          <NativeText style={styles.category}>{category}</NativeText>
-          <NativeText style={styles.location}>{note}</NativeText>
+          <NativeText style={styles.category}>{title}</NativeText>
+          <NativeText style={styles.location}>{category}</NativeText>
         </View>
       </View>
       <NativeText style={styles.amount}>{amount}</NativeText>

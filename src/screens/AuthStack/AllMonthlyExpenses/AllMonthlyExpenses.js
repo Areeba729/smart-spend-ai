@@ -91,30 +91,10 @@ const DailyExpenses = ({ navigation }) => {
     );
   };
 
-  // const renderTransactionItem = ({ item }) => (
-  //   <View style={styles.transactionItem}>
-  //     <View style={[styles.iconContainer, { backgroundColor: item.iconBg }]}>
-  //       <NativeText style={styles.categoryIcon}>{item.icon}</NativeText>
-  //     </View>
-  //     <View style={styles.transactionInfo}>
-  //       <NativeText style={styles.transactionTitle}>{item.title}</NativeText>
-  //       <View style={styles.timeRow}>
-  //         <NativeText style={styles.timeText}>🕒 {item.time}</NativeText>
-  //       </View>
-  //     </View>
-  //     <View style={styles.transactionRight}>
-  //       <NativeText style={styles.transactionAmount}>{item.amount}</NativeText>
-  //       <NativeText style={styles.transactionCategory}>
-  //         {item.category}
-  //       </NativeText>
-  //     </View>
-  //   </View>
-  // );
-
   return (
     <View style={styles.container}>
       <SimpleHeader
-        title="Expense Detail"
+        title="All Monthly Expenses"
         onBackPress={() => navigation.goBack()}
       />
       <View style={styles.summarySection}>
@@ -136,34 +116,9 @@ const DailyExpenses = ({ navigation }) => {
             {user?.monthlyBudget}
           </NativeText>
         </View>
-        <View style={styles.budgetBadge}>
-          <View style={styles.budgetDot} />
-          <NativeText style={styles.budgetText}>On Budget</NativeText>
-        </View>
       </View>
 
-      <View style={styles.dateSelector}>
-        <FlatList
-          ref={dateListRef}
-          data={dates}
-          renderItem={renderDateItem}
-          keyExtractor={item => item.date.toString()}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          getItemLayout={(data, index) => ({
-            length: moderateScale(65) + moderateScale(12), // width + marginRight from style.js
-            offset: (moderateScale(65) + moderateScale(12)) * index,
-            index,
-          })}
-        />
-      </View>
-      <TouchableOpacity
-        onPress={() => navigation.navigate('AllMonthlyExpenses')}
-      >
-        <NativeText style={styles.viewAllText}>
-          View All Monthly Expenses
-        </NativeText>
-      </TouchableOpacity>
+      <Text style={styles.viewAllText}>View All Monthly Expenses</Text>
       {/* Dynamically render ExpenseItems */}
       {expenses.length > 0 ? (
         expenses.map((expense, index) => (

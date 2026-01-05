@@ -1,22 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import { View, TouchableOpacity, TextInput, Platform } from 'react-native';
+import React, { useState } from 'react';
+import { View, TouchableOpacity } from 'react-native';
 import {
   useSmartForm,
   FormProvider,
   SmartFormField,
 } from 'react-native-fn-forms';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import DateTimePickerModal from 'react-native-modal-datetime-picker'; // Import DateTimePickerModal
 import { SvgXml } from 'react-native-svg';
 import NativeText from '../NativeText/NativeText';
 import SuccessModal from '../SuccessModal/SuccessModal';
 import { calendarIcon } from '../../assets/icons';
 import { styles } from './style';
-import { Theme } from '../../libs';
 import { saveExpenseToFirestore } from '../../hooks/ExpenseFunction';
 
 const AddExpenseForm = ({ onSubmit, onCancel }) => {
-  const [showDatePicker, setShowDatePicker] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false); // For DateTimePicker visibility
+  const [selectedDate, setSelectedDate] = useState(new Date()); // Store selected date
 
   const categories = [
     { id: 1, name: 'Shopping', icon: '🛒', color: '#86AE12' },
@@ -54,23 +54,19 @@ const AddExpenseForm = ({ onSubmit, onCancel }) => {
     },
   });
 
-  const handleDateChange = (event, selectedDate) => {
-    if (Platform.OS === 'android') {
-      setShowDatePicker(false);
-      if (event.type === 'set' && selectedDate) {
-        // Ensure the selected date is updated in form state
-        form.setFieldValue('date', selectedDate); // Save selected date in form
-        form.setFieldTouched('date', true); // Mark the date field as touched
-      }
-    }
-  };
-
   const formatDate = date => {
     if (!(date instanceof Date)) return '';
     const day = String(date.getDate()).padStart(2, '0'); // Adds leading zero if necessary
     const month = String(date.getMonth() + 1).padStart(2, '0'); // Adds leading zero if necessary
     const year = date.getFullYear();
     return `${month}/${day}/${year}`;
+  };
+
+  // Handle Date Picker Confirmation
+  const handleDateConfirm = date => {
+    setSelectedDate(date);
+    form.setFieldValue('date', date); // Set selected date in form
+    setDatePickerVisibility(false); // Close the date picker
   };
 
   const handleSave = async () => {
@@ -166,52 +162,22 @@ const AddExpenseForm = ({ onSubmit, onCancel }) => {
           </View>
         </View>
 
+        {/* Date Field */}
         <SmartFormField
           name="date"
           label="Date"
-          placeholder="Enter date"
+          placeholder="Select date"
           placeholderTextColor="#666"
           fieldStyle={styles.field}
           labelStyle={styles.label}
           style={styles.input}
           errorStyle={styles.error}
+          editable={false}
           inputContainerStyle={styles.inputContainer}
           leftIcon={<SvgXml xml={calendarIcon} width={20} height={20} />}
+          value={formatDate(selectedDate)} // Display the selected date
+          onFocus={() => setDatePickerVisibility(true)} // Show the date picker when the input field is focused
         />
-        {/* Date Field */}
-        {/* <View style={styles.inputSection1}>
-          <NativeText style={styles.label}>Date</NativeText>
-
-          <TouchableOpacity
-            activeOpacity={0.8}
-            onPress={() => setShowDatePicker(true)}
-          >
-            <SmartFormField
-              name="date"
-              value={formatDate(form.values.date)} // Display formatted date
-              placeholder="3-10-2025"
-              placeholderTextColor="#666"
-              editable={false} // ⛔ keyboard nahi khulega
-              pointerEvents="none" // ⛔ input touch handle nahi karega
-              leftIcon={<SvgXml xml={calendarIcon} width={20} height={20} />}
-              // errorStyle={styles.error}
-              inputContainerStyle={styles.inputContainer}
-              style={styles.input}
-            />
-          </TouchableOpacity>
-        </View> */}
-
-        {/* {showDatePicker && (
-          <DateTimePicker
-            value={
-              form.values.date instanceof Date ? form.values.date : new Date()
-            } // Use form value or fallback to current date
-            mode="date"
-            minimumDate={new Date()} // Disallow past dates
-            display="default" // Default picker for Android
-            onChange={handleDateChange} // Update date field on change
-          />
-        )} */}
 
         {/* Note Field */}
         <SmartFormField
@@ -239,6 +205,14 @@ const AddExpenseForm = ({ onSubmit, onCancel }) => {
           onClose={handleModalClose}
           title="Added Successfully"
           message="Your expense has been added successfully. You can now view it in your transaction history."
+        />
+
+        {/* DateTimePickerModal */}
+        <DateTimePickerModal
+          isVisible={isDatePickerVisible}
+          mode="date"
+          onConfirm={handleDateConfirm}
+          onCancel={() => setDatePickerVisibility(false)} // Close the date picker
         />
       </View>
     </FormProvider>
