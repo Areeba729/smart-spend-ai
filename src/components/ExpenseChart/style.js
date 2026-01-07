@@ -1,5 +1,7 @@
 // screens/Reports/components/ExpenseChart/style.js
 import { StyleSheet } from 'react-native';
+import { scale } from 'react-native-size-matters';
+import { Theme } from '../../libs';
 
 export default StyleSheet.create({
   container: {
@@ -39,7 +41,14 @@ export default StyleSheet.create({
     fontWeight: '700',
     fontSize: 12,
   },
-
+  alertText: {
+    fontSize: scale(10),
+    color: Theme.colors.secondary,
+  },
+  remainingText: {
+    fontSize: scale(10),
+    color: Theme.colors.secondary,
+  },
   graphWrapper: {
     marginTop: 16,
   },

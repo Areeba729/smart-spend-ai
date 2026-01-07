@@ -5,6 +5,7 @@ import CustomStatusBar from '../../components/CustomStatusBar/CustomStatusBar';
 import { useOnboardingStatus } from '../../hooks/useOnboardingStatus';
 import { Theme } from '../../libs';
 import getStyles from './style';
+import { Image } from 'react-native-svg';
 
 const Splash = () => {
   const navigation = useNavigation();
@@ -25,6 +26,10 @@ const Splash = () => {
       <CustomStatusBar barStyle="light-content" />
       <View style={styles.container}>
         <View style={styles.logoContainer}>
+          {/* <Image
+            source={require('../../assets/images/logo.png')}
+            style={{ height: 50, width: 50 }}
+          /> */}
           <Text style={styles.logoText}>SmartSpendAI</Text>
         </View>
       </View>

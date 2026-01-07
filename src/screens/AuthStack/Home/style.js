@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { moderateScale } from 'react-native-size-matters';
+import { moderateScale, scale } from 'react-native-size-matters';
 import { Theme } from '../../../libs';
 
 const styles = StyleSheet.create({
@@ -95,16 +95,17 @@ const styles = StyleSheet.create({
     marginBottom: moderateScale(20),
   },
   dailyLimitContainer: {
-    marginVertical: 10,
+    // marginVertical: 10,
     padding: 10,
-    backgroundColor: '#e0f7fa',
+    backgroundColor: Theme.colors.primary,
     borderRadius: 8,
-    alignItems: 'center',
+    alignItems: 'flex-start',
+    marginBottom: scale(15),
   },
   dailyLimitText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#00796b',
+    fontSize: scale(14),
+    fontWeight: 'bolfd',
+    color: Theme.colors.secondary,
   },
 
   quickActionsRow: {
@@ -114,6 +115,29 @@ const styles = StyleSheet.create({
   budgetAmount: {
     color: '#93C523',
     fontWeight: 'bold',
+  },
+  alertText: {
+    fontSize: scale(12),
+    color: Theme.colors.text,
+    fontWeight: 'bold',
+  },
+  alertContainer: {
+    padding: moderateScale(10),
+  },
+  loaderContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    // backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  dailyLimitExplanation: {
+    marginTop: scale(5),
+    fontSize: scale(12),
+    color: Theme.colors.text,
   },
 });
 

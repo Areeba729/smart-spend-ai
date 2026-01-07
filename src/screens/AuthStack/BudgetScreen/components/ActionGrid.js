@@ -2,7 +2,7 @@ import React from 'react';
 import { View, TouchableOpacity } from 'react-native';
 import { SvgXml } from 'react-native-svg';
 import NativeText from '../../../../components/NativeText/NativeText';
-import { editIcon } from '../../../../assets/icons';
+import { editBudget, editIcon } from '../../../../assets/icons';
 import { styles } from '../style';
 
 const ActionItem = ({ icon, label, onPress }) => (
@@ -27,7 +27,7 @@ const ActionGrid = ({ navigation }) => {
         onPress={() => navigation.navigate('CategoryBudgetList')}
       />
       <ActionItem
-        icon={editIcon}
+        icon={<SvgXml xml={editBudget} />}
         label="Edit Budget"
         onPress={() => navigation.navigate('EditBudget')}
       />

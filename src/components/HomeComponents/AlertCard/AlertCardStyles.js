@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { moderateScale } from 'react-native-size-matters';
+import { moderateScale, scale } from 'react-native-size-matters';
 import { Theme } from '../../../libs';
 
 const styles = StyleSheet.create({
@@ -9,7 +9,7 @@ const styles = StyleSheet.create({
     padding: moderateScale(12),
     marginHorizontal: moderateScale(4),
     marginBottom: moderateScale(8),
-    width: '47.5%', // Adjusted to be more reliable for 2 per row
+    width: scale(150), // Adjusted to be more reliable for 2 per row
     borderWidth: 1,
     borderColor: '#1C1C1E',
   },

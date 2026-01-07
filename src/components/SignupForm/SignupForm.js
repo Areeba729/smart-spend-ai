@@ -1,5 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Alert } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Alert,
+  ActivityIndicator,
+} from 'react-native';
 import Toast from 'react-native-toast-message';
 import {
   useSmartForm,
@@ -26,6 +32,7 @@ const SignupForm = ({ onSubmit }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [agreeToTerms, setAgreeToTerms] = useState(false);
+  const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
   const { signup } = useAuth();
 
@@ -66,6 +73,7 @@ const SignupForm = ({ onSubmit }) => {
   });
 
   const handleSubmit = async () => {
+    setLoading(true);
     try {
       // 1️⃣ Validate form
       await form.submitForm();
@@ -76,6 +84,7 @@ const SignupForm = ({ onSubmit }) => {
           text1: 'Form Invalid',
           text2: 'Please fix the errors in the form.',
         });
+        setLoading(false);
         return;
       }
       if (!agreeToTerms) {
@@ -84,6 +93,7 @@ const SignupForm = ({ onSubmit }) => {
           text1: 'Agreement Required',
           text2: 'Please agree to the Terms & Privacy.',
         });
+        setLoading(false);
         return;
       }
       // 2️⃣ Signup with validated values
@@ -111,6 +121,8 @@ const SignupForm = ({ onSubmit }) => {
         text1: 'Signup Failed',
         text2: error.message || 'Something went wrong',
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -239,8 +251,16 @@ const SignupForm = ({ onSubmit }) => {
           </Text>
         </View>
 
-        <TouchableOpacity style={styles.signupButton} onPress={handleSubmit}>
-          <Text style={styles.signupButtonText}>Sign Up</Text>
+        <TouchableOpacity
+          style={styles.signupButton}
+          onPress={handleSubmit}
+          disabled={loading}
+        >
+          {loading ? (
+            <ActivityIndicator size="small" color="#0000" />
+          ) : (
+            <Text style={styles.signupButtonText}>Sign Up</Text>
+          )}
         </TouchableOpacity>
       </View>
     </FormProvider>

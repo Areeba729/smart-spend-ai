@@ -36,36 +36,6 @@ export const saveExpenseToFirestore = async expenseData => {
   }
 };
 
-//Get Expenses Function
-// export const fetchAllExpenses = async () => {
-//   try {
-//     const user = auth().currentUser;
-//     console.log('Current user:', user); // Log the user object
-
-//     if (!user) throw new Error('User is not logged in');
-
-//     const expensesQuerySnapshot = await firestore()
-//       .collection('userExpenses')
-//       .doc(user.uid)
-//       .collection('expenses')
-//       .get();
-
-//     if (expensesQuerySnapshot.empty) {
-//       console.log('No expenses found');
-//       return [];
-//     }
-
-//     const expenses = [];
-//     expensesQuerySnapshot.forEach(doc => {
-//       expenses.push(doc.data());
-//     });
-//     return expenses;
-//   } catch (error) {
-//     console.error('Error fetching expenses:', error);
-//     return [];
-//   }
-// };
-
 export const getExpensesFromFirestore = async () => {
   try {
     // Get current user from Firebase Authentication
@@ -99,4 +69,95 @@ export const getExpensesFromFirestore = async () => {
   }
 };
 
-// Add budget date range function
+export const getCategorizedExpensesFromFirestore = async () => {
+  try {
+    // Get current user from Firebase Authentication
+    const user = auth().currentUser;
+
+    if (!user) {
+      throw new Error('User is not logged in');
+    }
+
+    // Reference to the user's expenses collection
+    const userExpensesRef = firestore()
+      .collection('userExpenses')
+      .doc(user.uid);
+
+    // Get expenses data
+    const doc = await userExpensesRef.get();
+
+    if (!doc.exists) {
+      console.log('No expenses found for this user');
+      return {
+        Food: [],
+        Transport: [],
+        Shopping: [],
+        Medical: [],
+      };
+    }
+
+    // Extract expenses from the document
+    const expenses = doc.data().expenses || [];
+
+    // Categorize expenses
+    const categorizedExpenses = {
+      Food: expenses.filter(expense => expense.category === 'Food'),
+      Transport: expenses.filter(expense => expense.category === 'Transport'),
+      Shopping: expenses.filter(expense => expense.category === 'Shopping'),
+      Medical: expenses.filter(expense => expense.category === 'Medical'),
+    };
+
+    console.log(
+      'Categorized expenses retrieved successfully:',
+      categorizedExpenses,
+    );
+
+    return categorizedExpenses;
+  } catch (error) {
+    console.error('Error retrieving categorized expenses:', error.message);
+    return {
+      Food: [],
+      Transport: [],
+      Shopping: [],
+      Medical: [],
+    };
+  }
+};
+
+// get user current date expense
+export const getTodayExpensesFromFirestore = async () => {
+  try {
+    const user = auth().currentUser;
+
+    if (!user) {
+      throw new Error('User not logged in');
+    }
+
+    const doc = await firestore()
+      .collection('userExpenses')
+      .doc(user.uid)
+      .get();
+
+    if (!doc.exists) {
+      return [];
+    }
+
+    const expenses = doc.data().expenses || [];
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
+
+    const todayExpenses = expenses.filter(expense => {
+      const expenseDate = expense.date.toDate(); // 🔥 VERY IMPORTANT
+      return expenseDate >= today && expenseDate < tomorrow;
+    });
+
+    return todayExpenses;
+  } catch (error) {
+    console.error('Error getting today expenses:', error.message);
+    return [];
+  }
+};

@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import {
   View,
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
+  RefreshControl,
 } from 'react-native';
 import NativeText from '../../../components/NativeText/NativeText';
 import BudgetCard from '../../../components/HomeComponents/BudgetCard/BudgetCard';
@@ -13,6 +14,7 @@ import ExpenseItem from '../../../components/HomeComponents/ExpenseItem/ExpenseI
 import AlertCard from '../../../components/HomeComponents/AlertCard/AlertCard';
 import QuickActionButton from '../../../components/HomeComponents/QuickActionButton/QuickActionButton';
 import AIInsightCard from '../../../components/HomeComponents/AIInsightCard/AIInsightCard';
+import ExpenseChart from '../../../components/ExpenseChart/ExpenseChart';
 import { Theme } from '../../../libs';
 import styles from './style';
 import HomeHeader from '../../../components/Header/Header';
@@ -34,6 +36,7 @@ const Home = ({ navigation }) => {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [loading, setLoading] = useState(false); // State for loader
+  const [refreshing, setRefreshing] = useState(false);
 
   const handleDateChange = (date, type) => {
     if (type === 'start') {
@@ -50,25 +53,16 @@ const Home = ({ navigation }) => {
   // calculate daily limit
 
   const calculateDailyLimit = () => {
-    if (!startDate || !endDate || !user?.monthlyBudget) return 0;
+    if (!user?.monthlyBudget) return 0;
 
-    const start = new Date(startDate);
-    const end = new Date(endDate);
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = today.getMonth();
 
-    // Ensure valid date range
-    if (isNaN(start.getTime()) || isNaN(end.getTime()) || start > end) {
-      return 0;
-    }
+    // Get the total number of days in the current month
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-    // Calculate difference in milliseconds
-    const diffTime = end.getTime() - start.getTime();
-
-    // Calculate days difference (+1 to include both start and end dates)
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
-
-    if (diffDays <= 0) return 0;
-
-    return user.monthlyBudget / diffDays;
+    return user.monthlyBudget / daysInMonth;
   };
 
   const dailyLimit = calculateDailyLimit();
@@ -94,69 +88,60 @@ const Home = ({ navigation }) => {
     return null; // Skip unsupported formats
   };
 
-  useEffect(() => {
-    // Fetch expenses when the component is mounted
-    const fetchExpenses = async () => {
-      setLoading(true); // Show loader
-      try {
-        const fetchedExpenses = await getExpensesFromFirestore();
-        const today = new Date();
-        const filteredExpenses = fetchedExpenses.filter(expense => {
-          const expenseDate = parseDate(expense.date); // Parse the date field
-          return (
-            expenseDate &&
-            expenseDate.getDate() === today.getDate() &&
-            expenseDate.getMonth() === today.getMonth() &&
-            expenseDate.getFullYear() === today.getFullYear()
-          );
-        });
-        setExpenses(filteredExpenses.slice(0, 2)); // Limit to first 2 expenses
+  const fetchExpenses = async () => {
+    setLoading(true); // Show loader
+    try {
+      const fetchedExpenses = await getExpensesFromFirestore();
+      const today = new Date();
+      const filteredExpenses = fetchedExpenses.filter(expense => {
+        const expenseDate = parseDate(expense.date); // Parse the date field
+        return (
+          expenseDate &&
+          expenseDate.getDate() === today.getDate() &&
+          expenseDate.getMonth() === today.getMonth() &&
+          expenseDate.getFullYear() === today.getFullYear()
+        );
+      });
+      setExpenses(filteredExpenses.slice(0, 2)); // Limit to first 2 expenses
 
-        // Calculate total spent
-        const total = fetchedExpenses.reduce((sum, expense) => {
-          return sum + (parseFloat(expense.amount) || 0);
-        }, 0);
-        setTotalSpent(total);
-      } catch (error) {
-        console.error('Error fetching expenses:', error);
-      } finally {
-        setLoading(false); // Hide loader
-      }
-    };
+      // Calculate total spent
+      const total = fetchedExpenses.reduce((sum, expense) => {
+        return sum + (parseFloat(expense.amount) || 0);
+      }, 0);
+      setTotalSpent(total);
+    } catch (error) {
+      console.error('Error fetching expenses:', error);
+    } finally {
+      setLoading(false); // Hide loader
+    }
+  };
 
-    fetchExpenses();
-  }, []); // Empty dependency array
+  const loadEvents = async () => {
+    setLoadingEvents(true);
+    try {
+      const userEvents = await fetchUserEvents();
 
-  useEffect(() => {
-    const loadEvents = async () => {
-      setLoadingEvents(true);
-      try {
-        const userEvents = await fetchUserEvents();
+      const now = new Date();
 
-        const now = new Date();
+      // Filter events starting today or later
+      const upcomingEvents = userEvents.filter(event => {
+        const eventStart = new Date(event.start);
+        return eventStart >= now;
+      });
 
-        // Filter events starting today or later
-        const upcomingEvents = userEvents.filter(event => {
-          const eventStart = new Date(event.start);
-          return eventStart >= now;
-        });
+      // Sort by closest start date
+      upcomingEvents.sort((a, b) => new Date(a.start) - new Date(b.start));
 
-        // Sort by closest start date
-        upcomingEvents.sort((a, b) => new Date(a.start) - new Date(b.start));
+      // Limit to 2 closest events
+      const nearestTwoEvents = upcomingEvents.slice(0, 2);
 
-        // Limit to 2 closest events
-        const nearestTwoEvents = upcomingEvents.slice(0, 2);
-
-        setEvents(nearestTwoEvents);
-      } catch (error) {
-        console.log('Error fetching events:', error);
-      } finally {
-        setLoadingEvents(false);
-      }
-    };
-
-    loadEvents();
-  }, []);
+      setEvents(nearestTwoEvents);
+    } catch (error) {
+      console.log('Error fetching events:', error);
+    } finally {
+      setLoadingEvents(false);
+    }
+  };
 
   const fetchUserDates = async () => {
     try {
@@ -187,9 +172,24 @@ const Home = ({ navigation }) => {
   };
 
   useEffect(() => {
+    // Fetch expenses when the component is mounted
+    fetchExpenses();
+    loadEvents();
     fetchUserDates();
+  }, []); // Empty dependency array
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      // Re-fetch data
+      await Promise.all([fetchExpenses(), loadEvents(), fetchUserDates()]);
+    } catch (error) {
+      console.error('Error during refresh:', error);
+    } finally {
+      setRefreshing(false);
+    }
   }, []);
-  console.log('Start Date:', startDate);
+
   const handleDateSelect = date => {
     setSelectedDate(date);
     // Navigate to Calendar screen with selected date
@@ -213,9 +213,20 @@ const Home = ({ navigation }) => {
 
   const remainingBudget = (user?.monthlyBudget || 0) - totalSpent; // Calculate remaining budget
 
+  const daysRemaining = () => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = today.getMonth();
+    const totalDays = new Date(year, month + 1, 0).getDate();
+    return totalDays - today.getDate();
+  };
+
+  const remainingDays = daysRemaining();
+  const isBudgetAtRisk = remainingBudget < dailyLimit * remainingDays;
+
   if (loading) {
     return (
-      <View style={styles.loaderContainer}>
+      <View style={[styles.loaderContainer]}>
         <ActivityIndicator size="small" color={Theme.colors.primary} />
       </View>
     );
@@ -227,12 +238,15 @@ const Home = ({ navigation }) => {
         initial={name.charAt(0).toUpperCase()}
         greeting={greeting} // dynamic greeting
         userName={name}
-        onNotificationPress={() => console.log('Notification pressed')}
+        onNotificationPress={() => navigation.navigate('Notifications')}
       />
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
       >
         {/* Calendar Week */}
         <CalendarWeek
@@ -251,6 +265,10 @@ const Home = ({ navigation }) => {
         <View style={styles.dailyLimitContainer}>
           <NativeText style={styles.dailyLimitText}>
             Daily Spending Limit: {dailyLimit.toFixed(2)} PKR
+          </NativeText>
+          <NativeText style={styles.dailyLimitExplanation}>
+            (If you spend within this limit daily, your monthly budget will last
+            the entire month without exceeding it.)
           </NativeText>
         </View>
 
@@ -297,36 +315,36 @@ const Home = ({ navigation }) => {
         <View style={styles.sectionHeader}>
           <NativeText style={styles.sectionTitle}>UPCOMING ALERTS</NativeText>
         </View>
+        {/* <View style={styles.alertsGrid}> */}
         <View style={styles.alertsGrid}>
-          <View style={styles.alertsGrid}>
-            {loadingEvents ? (
-              <ActivityIndicator size="small" color={Theme.colors.primary} />
-            ) : events.length > 0 ? (
-              events.map((event, index) => (
-                <AlertCard
-                  key={index}
-                  icon="🔔"
-                  title={event.title}
-                  description={event.description}
-                  status={new Date(event.start).toLocaleDateString()}
-                  statusColor="#4CD964"
-                  onPress={() => console.log(`Event pressed: ${event.title}`)}
-                />
-              ))
-            ) : (
-              <>
-                {/* Optionally keep your existing static alerts here */}
-                <AlertCard
-                  icon="🔔"
-                  status="No upcoming events"
-                  statusColor={Theme.colors.secondary}
-                  title="No Events"
-                  description="You have no scheduled events."
-                />
-              </>
-            )}
-          </View>
+          {loadingEvents ? (
+            <ActivityIndicator size="small" color={Theme.colors.primary} />
+          ) : events.length > 0 ? (
+            events.map((event, index) => (
+              <AlertCard
+                key={index}
+                icon="🔔"
+                title={event.title}
+                description={event.description}
+                status={new Date(event.start).toLocaleDateString()}
+                statusColor="#4CD964"
+                onPress={() => console.log(`Event pressed: ${event.title}`)}
+              />
+            ))
+          ) : (
+            <>
+              {/* Optionally keep your existing static alerts here */}
+              <AlertCard
+                icon="🔔"
+                status="No upcoming events"
+                statusColor={Theme.colors.secondary}
+                title="No Events"
+                description="You have no scheduled events."
+              />
+            </>
+          )}
         </View>
+        {/* </View> */}
         {/* Quick Actions Section */}
         <View style={styles.sectionHeader}>
           <NativeText style={styles.sectionTitle}>QUICK ACTIONS</NativeText>
@@ -352,16 +370,48 @@ const Home = ({ navigation }) => {
         {/* AI Smart Insight */}
         <AIInsightCard
           title="AI Smart Insight"
-          message={
-            <NativeText>
-              You can still spend{' '}
-              <NativeText style={styles.budgetAmount}>8,500 PKR</NativeText>{' '}
-              comfortably this month based on your spending habits.
-            </NativeText>
-          }
+          message={`You can still spend ${remainingBudget.toFixed(
+            0,
+          )} PKR comfortably this month based on your spending habits.`}
           actionLabel="View Details"
           onActionPress={() => navigation.navigate('Calendar')}
         />
+        {/* Expense Chart Section */}
+        <View style={styles.sectionHeader}>
+          <NativeText style={styles.sectionTitle}>EXPENSE CHART</NativeText>
+        </View>
+        <ExpenseChart
+          monthlyBudget={user?.monthlyBudget || 0}
+          totalSpent={totalSpent}
+          remainingBudget={remainingBudget}
+          isBudgetAtRisk={isBudgetAtRisk}
+        />
+
+        {isBudgetAtRisk && (
+          <View style={[styles.alertContainer, { backgroundColor: 'red' }]}>
+            {' '}
+            {/* Red background for alert */}
+            <NativeText style={styles.alertText}>
+              Warning: Only {remainingDays} days left, and your budget is at
+              risk of being exceeded! If you don’t control your spending, it
+              will be difficult to manage within the budget.
+            </NativeText>
+          </View>
+        )}
+        {remainingBudget >= dailyLimit * remainingDays && (
+          <View
+            style={[
+              styles.alertContainer,
+              { backgroundColor: Theme.colors.secondary },
+            ]}
+          >
+            {' '}
+            {/* Green background for success */}
+            <NativeText style={styles.alertText}>
+              Great job! You are on track with your budget. Keep it up!
+            </NativeText>
+          </View>
+        )}
       </ScrollView>
     </View>
   );

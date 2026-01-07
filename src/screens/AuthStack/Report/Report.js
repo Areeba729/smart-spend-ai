@@ -9,10 +9,12 @@ import ExpenseChart from '../../../components/ExpenseChart/ExpenseChart';
 import AIInsightCard from '../../../components/AIInsightard/AIInsightCard';
 import RecentList from '../../../components/RecentList/RecentList';
 import SimpleHeader from '../../../components/SimpleHeader/SimpleHeader';
+import { selectUser } from '../../../redux/slices/userSlice';
+import { useSelector } from 'react-redux';
 
 const Report = () => {
-  const [activeTab, setActiveTab] = useState('Monthly');
-
+  const [activeTab, setActiveTab] = useState('Daily');
+  const user = useSelector(selectUser);
   return (
     <View style={styles.container}>
       <SimpleHeader title="Reports" />
@@ -24,7 +26,7 @@ const Report = () => {
         <View style={styles.cardRow}>
           <SummaryCard
             title="EXPENSE"
-            value="PKR 125k"
+            value={`PKR ${user ? user.expense : ''}`}
             subtitle="-12% vs last mo"
             type="expense"
           />
@@ -38,7 +40,7 @@ const Report = () => {
         </View>
 
         {/* Expense Chart */}
-        <ExpenseChart />
+        {/* <ExpenseChart /> */}
 
         {/* AI Insight */}
         <AIInsightCard />

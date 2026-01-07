@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, ScrollView, TouchableOpacity } from 'react-native';
 import { SvgXml } from 'react-native-svg';
 import NativeText from '../../../components/NativeText/NativeText';
@@ -7,42 +7,95 @@ import CategoryBudgetItem from '../../../components/CategoryBudgetItem/CategoryB
 import { plusIcon } from '../../../assets/icons';
 import { styles } from './style';
 import SimpleHeader from '../../../components/SimpleHeader/SimpleHeader';
+import { useSelector } from 'react-redux';
+import { selectUser } from '../../../redux/slices/userSlice';
+import { getCategorizedExpensesFromFirestore } from '../../../hooks/ExpenseFunction';
 
 const CategoryBudgetList = ({ navigation }) => {
-  const categories = [
-    {
-      id: '1',
-      title: 'Food & Dining',
-      icon: '🍴',
-      iconBg: 'rgba(255, 149, 0, 0.15)',
-      spent: 12000,
-      totalLimit: 20000,
-    },
-    {
-      id: '2',
-      title: 'Travel',
-      icon: '✈️',
-      iconBg: 'rgba(0, 122, 255, 0.15)',
-      spent: 2000,
-      totalLimit: 15000,
-    },
-    {
-      id: '3',
-      title: 'Shopping',
-      icon: '🛍️',
-      iconBg: 'rgba(255, 45, 85, 0.15)',
-      spent: 45000,
-      totalLimit: 40000,
-    },
-    {
-      id: '4',
-      title: 'Utilities',
-      icon: '⚡',
-      iconBg: 'rgba(52, 199, 89, 0.15)',
-      spent: 9000,
-      totalLimit: 20000,
-    },
-  ];
+  const user = useSelector(selectUser);
+  const [categories, setCategories] = useState([]);
+  const [insight, setInsight] = useState('');
+
+  useEffect(() => {
+    const fetchExpenses = async () => {
+      const categorizedExpenses = await getCategorizedExpensesFromFirestore();
+
+      const categoryNames = ['Food', 'Transport', 'Shopping', 'Medical'];
+      const categoryIcons = ['🍴', '✈️', '🛍️', '💊'];
+      const categoryColors = [
+        'rgba(255, 149, 0, 0.15)',
+        'rgba(0, 122, 255, 0.15)',
+        'rgba(255, 45, 85, 0.15)',
+        'rgba(88, 86, 214, 0.15)',
+      ];
+
+      const monthlyBudget = user?.monthlyBudget || 0;
+      const currentDate = new Date();
+      const budgetStartDate = new Date(
+        currentDate.getFullYear(),
+        currentDate.getMonth(),
+        4,
+      ); // Budget starts on 4th January
+      const daysPassed = Math.max(
+        0,
+        Math.ceil((currentDate - budgetStartDate) / (1000 * 60 * 60 * 24)),
+      );
+      const daysInMonth = new Date(
+        currentDate.getFullYear(),
+        currentDate.getMonth() + 1,
+        0,
+      ).getDate();
+      const remainingDays = daysInMonth - currentDate.getDate();
+
+      const categoryData = categoryNames.map((name, index) => {
+        const categoryExpenses = categorizedExpenses[name] || [];
+        const spent = categoryExpenses.reduce(
+          (sum, expense) => sum + parseFloat(expense.amount),
+          0,
+        );
+        const totalLimit = Math.round(monthlyBudget / categoryNames.length);
+        const percentageUsed = Math.round((spent / totalLimit) * 100);
+        const expectedUsage = Math.round(
+          (totalLimit / daysInMonth) * daysPassed,
+        );
+        const isOnTrack = spent <= expectedUsage;
+        const remaining = totalLimit - spent;
+
+        return {
+          id: `${index + 1}`,
+          title: name,
+          icon: categoryIcons[index],
+          iconBg: categoryColors[index],
+          spent,
+          totalLimit,
+          percentageUsed,
+          expectedUsage,
+          isOnTrack,
+          remaining,
+        };
+      });
+
+      setCategories(categoryData);
+
+      // Generate insights for all categories
+      const insights = categoryData.map(category => {
+        if (!category.isOnTrack) {
+          const suggestedReduction = Math.round(
+            ((category.spent - category.expectedUsage) / remainingDays) *
+              remainingDays,
+          );
+          return `The budget for ${category.title} is being overused. Reducing it by ${suggestedReduction} would be better to stay on track.`;
+        }
+        return `The budget for ${category.title} is on track.`;
+      });
+
+      setInsight(insights.join(' \n '));
+    };
+
+    fetchExpenses();
+  }, [user]);
+
+  const currentDate = new Date(); // Ensure currentDate is defined outside useEffect
 
   return (
     <View style={styles.container}>
@@ -55,23 +108,28 @@ const CategoryBudgetList = ({ navigation }) => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        {/* <View style={styles.header}>
-          <NativeText style={styles.screenTitle}>My Budgets</NativeText>
-          <TouchableOpacity style={styles.addButton}>
-            <SvgXml xml={plusIcon} width={20} height={20} color="#fff" />
-          </TouchableOpacity>
-        </View> */}
-
         <View style={styles.budgetSummary}>
           <NativeText style={styles.summaryLabel}>
             Total Monthly Budget
           </NativeText>
-          <NativeText style={styles.summaryAmount}>PKR 150,000</NativeText>
+          <NativeText style={styles.summaryAmount}>
+            PKR {user?.monthlyBudget?.toLocaleString() || 0}
+          </NativeText>
         </View>
 
         <AIInsightCard
-          insightText="Food budget thora high hai, 5% kam karna behtar hoga."
-          onButtonPress={() => console.log('Advice pressed')}
+          insightText={insight}
+          onButtonPress={() =>
+            navigation.navigate('AdviceScreen', {
+              categories,
+              remainingDays:
+                new Date(
+                  currentDate.getFullYear(),
+                  currentDate.getMonth() + 1,
+                  0,
+                ).getDate() - currentDate.getDate(),
+            })
+          }
         />
 
         <View style={styles.sectionHeader}>

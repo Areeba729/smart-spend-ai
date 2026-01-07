@@ -87,7 +87,7 @@ const LoginScreen = ({ navigation }) => {
       >
         <View style={styles.header}>
           <View style={styles.logoContainer}>
-            <Image source={images.Logo} style={styles.logo} />
+            <Image source={images.logo} style={styles.logo} />
           </View>
           <Text style={styles.title}>Welcome Back</Text>
           <Text style={styles.subtitle}>Master your money with ease</Text>

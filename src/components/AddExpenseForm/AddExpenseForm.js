@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, TouchableOpacity, Text } from 'react-native';
+import { View, TouchableOpacity, Text, ActivityIndicator } from 'react-native';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
@@ -11,10 +11,11 @@ import { calendarIcon } from '../../assets/icons';
 import { styles } from './style';
 import { saveExpenseToFirestore } from '../../hooks/ExpenseFunction';
 
-const AddExpenseForm = ({ onSubmit }) => {
+const AddExpenseForm = ({ onSubmit, navigation }) => {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [loading, setLoading] = useState(false); // State for loader
 
   const categories = [
     { id: 1, name: 'Shopping', icon: '🛒', color: '#86AE12' },
@@ -42,6 +43,7 @@ const AddExpenseForm = ({ onSubmit }) => {
   };
 
   const handleSave = async (values, { resetForm }) => {
+    setLoading(true); // Show loader
     const expenseData = {
       amount: values.amount,
       title: values.title,
@@ -50,9 +52,15 @@ const AddExpenseForm = ({ onSubmit }) => {
       note: values.note,
     };
 
-    await saveExpenseToFirestore(expenseData);
-    setShowSuccessModal(true);
-    resetForm();
+    try {
+      await saveExpenseToFirestore(expenseData);
+      setShowSuccessModal(true);
+      resetForm();
+    } catch (error) {
+      console.error('Error saving expense:', error);
+    } finally {
+      setLoading(false); // Hide loader
+    }
   };
 
   return (
@@ -174,13 +182,26 @@ const AddExpenseForm = ({ onSubmit }) => {
             style={[styles.noteInput, { textAlignVertical: 'top' }]}
           />
 
-          <TouchableOpacity style={styles.saveButton} onPress={handleSubmit}>
-            <NativeText style={styles.saveButtonText}>Save Expense</NativeText>
+          <TouchableOpacity
+            style={styles.saveButton}
+            onPress={handleSubmit}
+            disabled={loading} // Disable button while loading
+          >
+            {loading ? (
+              <ActivityIndicator size="small" color="#0000" />
+            ) : (
+              <NativeText style={styles.saveButtonText}>
+                Save Expense
+              </NativeText>
+            )}
           </TouchableOpacity>
 
           <SuccessModal
             visible={showSuccessModal}
-            onClose={() => setShowSuccessModal(false)}
+            onClose={() => {
+              setShowSuccessModal(false);
+              navigation.replace('Home'); // Navigate to Home on modal close
+            }}
             title="Added Successfully"
             message="Your expense has been added successfully. You can now view it in your transaction history."
           />

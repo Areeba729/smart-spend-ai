@@ -87,7 +87,10 @@ const BudgetScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <SimpleHeader title="Budget" />
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
         <MonthlyBudgetCard
           monthlyBudget={monthlyBudget}
           totalSpent={totalSpent}
@@ -95,11 +98,11 @@ const BudgetScreen = ({ navigation }) => {
 
         <LimitCard dailyLimit={aiResult.dailyLimit} />
 
-        <HealthCard
+        {/* <HealthCard
           status={aiResult.health}
           badge={aiResult.badge}
           description={aiResult.healthMessage}
-        />
+        /> */}
 
         <ActionGrid navigation={navigation} />
 

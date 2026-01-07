@@ -1,0 +1,260 @@
+import { StyleSheet } from 'react-native';
+import { moderateScale } from 'react-native-size-matters';
+import { Theme } from '../../../libs';
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: Theme.colors.black,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: moderateScale(18),
+    paddingBottom: moderateScale(30),
+  },
+  headerTitle: {
+    fontSize: moderateScale(20),
+    fontWeight: 'bold',
+    color: Theme.colors.white,
+  },
+  notificationButton: {
+    width: moderateScale(44),
+    height: moderateScale(44),
+    borderRadius: moderateScale(22),
+    backgroundColor: '#1C1C1E',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  notificationIcon: {
+    fontSize: moderateScale(20),
+    color: Theme.colors.white,
+  },
+  scrollContent: {
+    paddingHorizontal: moderateScale(16),
+    paddingBottom: moderateScale(50),
+    alignItems: 'center',
+  },
+  profileSection: {
+    backgroundColor: '#1C1C1E',
+    borderRadius: moderateScale(20),
+    width: '100%',
+    height: moderateScale(220),
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: moderateScale(25),
+  },
+  profileImageContainer: {
+    position: 'relative',
+    marginBottom: moderateScale(15),
+    borderWidth: 1,
+    borderColor: Theme.colors.secondary,
+    borderRadius: moderateScale(50),
+  },
+  profileImage: {
+    width: moderateScale(100),
+    height: moderateScale(100),
+    borderRadius: moderateScale(50),
+  },
+  verifiedBadge: {
+    position: 'absolute',
+    right: 0,
+    bottom: 0,
+    backgroundColor: '#4CD964',
+    width: moderateScale(30),
+    height: moderateScale(30),
+    borderRadius: moderateScale(15),
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 3,
+    borderColor: Theme.colors.black,
+  },
+  verifiedIcon: {
+    color: Theme.colors.black,
+    fontSize: moderateScale(14),
+    fontWeight: 'bold',
+  },
+  userName: {
+    fontSize: moderateScale(22),
+    fontWeight: 'bold',
+    color: Theme.colors.white,
+    marginBottom: moderateScale(5),
+  },
+  userEmail: {
+    fontSize: moderateScale(14),
+    color: Theme.colors.grey,
+    marginBottom: moderateScale(3),
+  },
+  userPhone: {
+    fontSize: moderateScale(14),
+    color: Theme.colors.grey,
+  },
+  cardsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginBottom: moderateScale(30),
+  },
+  budgetCard: {
+    backgroundColor: '#1C1C1E',
+    borderRadius: moderateScale(20),
+    paddingHorizontal: moderateScale(16),
+    paddingVertical: moderateScale(20),
+    alignItems: 'center',
+    flex: 1,
+    marginHorizontal: moderateScale(4),
+  },
+  cardIcon: {
+    fontSize: moderateScale(30),
+    marginBottom: moderateScale(6),
+  },
+  cardLabel: {
+    fontSize: moderateScale(11),
+    color: Theme.colors.grey,
+    letterSpacing: 0.5,
+    marginBottom: moderateScale(5),
+    fontWeight: '600',
+  },
+  cardAmount: {
+    fontSize: moderateScale(18),
+    fontWeight: 'bold',
+    color: '#93C523',
+  },
+  menuContainer: {
+    width: '100%',
+    backgroundColor: '#1C1C1E',
+    borderRadius: moderateScale(16),
+    overflow: 'hidden',
+    marginBottom: moderateScale(30),
+  },
+  menuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: moderateScale(16),
+    borderBottomWidth: 1,
+    borderBottomColor: '#2C2C2E',
+  },
+  logoutItem: {
+    borderBottomWidth: 0,
+  },
+  menuIcon: {
+    fontSize: moderateScale(20),
+    marginRight: moderateScale(16),
+    width: moderateScale(30),
+    color: Theme.colors.white,
+  },
+  logoutIcon: {
+    fontSize: moderateScale(20),
+    marginRight: moderateScale(16),
+    width: moderateScale(30),
+    color: '#FF3B30',
+  },
+  menuText: {
+    flex: 1,
+    fontSize: moderateScale(15),
+    color: Theme.colors.white,
+  },
+  logoutText: {
+    flex: 1,
+    fontSize: moderateScale(15),
+    color: '#FF3B30',
+  },
+  arrow: {
+    fontSize: moderateScale(20),
+    color: Theme.colors.grey,
+  },
+  versionText: {
+    fontSize: moderateScale(12),
+    color: Theme.colors.grey,
+    marginBottom: moderateScale(20),
+  },
+  bottomNav: {
+    flexDirection: 'row',
+    backgroundColor: '#1C1C1E',
+    paddingVertical: moderateScale(10),
+    paddingHorizontal: moderateScale(10),
+    borderTopWidth: 1,
+    borderTopColor: '#2C2C2E',
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+  },
+  navItem: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  navIcon: {
+    fontSize: moderateScale(24),
+    marginBottom: moderateScale(4),
+    color: Theme.colors.grey,
+  },
+  activeNavIcon: {
+    color: '#93C523',
+  },
+  navLabel: {
+    fontSize: moderateScale(10),
+    color: Theme.colors.grey,
+  },
+  activeNavLabel: {
+    color: '#93C523',
+    fontWeight: 'bold',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    width: '80%',
+    backgroundColor: Theme.colors.black,
+    borderRadius: 10,
+    padding: 20,
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: Theme.colors.white,
+    marginBottom: 10,
+  },
+  modalMessage: {
+    fontSize: 16,
+    color: Theme.colors.white,
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  cancelButton: {
+    flex: 1,
+    backgroundColor: Theme.colors.secondary,
+    padding: 10,
+    borderRadius: 5,
+    marginRight: 5,
+    alignItems: 'center',
+  },
+  cancelButtonText: {
+    color: Theme.colors.black,
+    fontWeight: 'bold',
+  },
+  logoutButton: {
+    flex: 1,
+    backgroundColor: Theme.colors.primary,
+    padding: 10,
+    borderRadius: 5,
+    marginLeft: 5,
+    alignItems: 'center',
+  },
+  logoutButtonText: {
+    color: Theme.colors.white,
+    fontWeight: 'bold',
+  },
+});
+
+export default styles;

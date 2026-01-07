@@ -8,6 +8,12 @@ import CategoryDetail from '../screens/AuthStack/CategoryDetail/CategoryDetail';
 import EditBudget from '../screens/AuthStack/EditBudget/EditBudget';
 import AddEvents from '../screens/AuthStack/AddEvents/AddEvents';
 import AllMonthlyExpenses from '../screens/AuthStack/AllMonthlyExpenses/AllMonthlyExpenses';
+import AdviceScreen from '../screens/AdviceScreen/AdviceScreen';
+import UserProfile from '../screens/AuthStack/UserProfile/UserProfile';
+import BudgetGoalScreen from '../screens/AuthStack/BudgetGoalScreen/BudgetGoalScreen';
+import Settings from '../screens/AuthStack/Settings/Settings';
+import Notifications from '../screens/AuthStack/Notifications/Notifications';
+import HelpAndSupport from '../screens/AuthStack/HelpAndSupport/HelpAndSupport';
 function AuthStack() {
   const Stack = createNativeStackNavigator();
 
@@ -20,6 +26,12 @@ function AuthStack() {
     EditBudget,
     AddEvents,
     AllMonthlyExpenses,
+    AdviceScreen,
+    UserProfile,
+    BudgetGoalScreen,
+    Settings,
+    Notifications,
+    HelpAndSupport,
   };
 
   return (

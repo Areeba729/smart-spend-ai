@@ -98,7 +98,7 @@ const SignupScreen = ({ navigation }) => {
 
           <View style={styles.header}>
             <View style={styles.logoContainer}>
-              <Image source={images.Logo} style={styles.logo} />
+              <Image source={images.logo} style={styles.logo} />
             </View>
             <Text style={styles.title}>Create Account</Text>
             <Text style={styles.subtitle}>Track your spending, save more.</Text>

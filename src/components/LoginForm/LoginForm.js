@@ -1,5 +1,11 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, Alert } from 'react-native';
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Alert,
+  ActivityIndicator,
+} from 'react-native';
 import {
   useSmartForm,
   FormProvider,
@@ -17,6 +23,7 @@ import {
 
 const LoginForm = ({ onSubmit, navigation }) => {
   const [showPassword, setShowPassword] = React.useState(false);
+  const [loading, setLoading] = useState(false);
   const form = useSmartForm({
     fields: {
       email: {
@@ -32,12 +39,12 @@ const LoginForm = ({ onSubmit, navigation }) => {
   });
 
   const handleSubmit = async () => {
+    setLoading(true);
     await form.submitForm();
     if (form.isValid) {
-      onSubmit(form.values);
-    } else {
-      // Alert.alert('Error', 'Please fix the errors in the form.');
+      await onSubmit(form.values);
     }
+    setLoading(false);
   };
 
   return (
@@ -85,8 +92,16 @@ const LoginForm = ({ onSubmit, navigation }) => {
             <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
           </TouchableOpacity>
         </View>
-        <TouchableOpacity style={styles.loginButton} onPress={handleSubmit}>
-          <Text style={styles.loginButtonText}>Login ➜</Text>
+        <TouchableOpacity
+          style={styles.loginButton}
+          onPress={handleSubmit}
+          disabled={loading}
+        >
+          {loading ? (
+            <ActivityIndicator size="small" color="#0000" />
+          ) : (
+            <Text style={styles.loginButtonText}>Login ➜</Text>
+          )}
         </TouchableOpacity>
       </View>
     </FormProvider>

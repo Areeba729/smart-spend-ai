@@ -25,7 +25,7 @@ const getStyles = colors =>
     },
     logoText: {
       color: Theme.colors.secondary,
-      fontSize: moderateScale(24),
+      fontSize: moderateScale(26),
       fontWeight: 'bold',
     },
   });
