@@ -1,3 +1,5 @@
+import React, { useState, useEffect } from 'react';
+import { Keyboard } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import BottomTabs from '../components/BottomTabs/BottomTabs';
 
@@ -11,6 +13,17 @@ import ProfileScreen from '../screens/AuthStack/ProfileScreen/ProfileScreen';
 const Tab = createBottomTabNavigator();
 
 const TabNavigator = () => {
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
+
+  useEffect(() => {
+    const show = Keyboard.addListener('keyboardDidShow', () => setKeyboardVisible(true));
+    const hide = Keyboard.addListener('keyboardDidHide', () => setKeyboardVisible(false));
+    return () => {
+      show.remove();
+      hide.remove();
+    };
+  }, []);
+
   const tabs = {
     Home,
     Budget,
@@ -23,14 +36,16 @@ const TabNavigator = () => {
     <Tab.Navigator
       initialRouteName="Home"
       // eslint-disable-next-line react/no-unstable-nested-components
-      tabBar={props => (
-        <BottomTabs
-          activeTab={props.state.routes[props.state.index].name}
-          onTabPress={name => {
-            props.navigation.navigate(name);
-          }}
-        />
-      )}
+      tabBar={props =>
+        keyboardVisible ? null : (
+          <BottomTabs
+            activeTab={props.state.routes[props.state.index].name}
+            onTabPress={name => {
+              props.navigation.navigate(name);
+            }}
+          />
+        )
+      }
       screenOptions={{
         headerShown: false,
       }}

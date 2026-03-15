@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
   TouchableOpacity,
-  SafeAreaView,
   StatusBar,
   ScrollView,
+  StyleSheet,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { SvgXml } from 'react-native-svg';
@@ -13,6 +13,7 @@ import { SvgXml } from 'react-native-svg';
 import { Theme } from '../../libs';
 import styleGenerator from './style';
 import ForgotPasswordForm from '../../components/ForgotPasswordForm/ForgotPasswordForm';
+import ScreenLoader from '../../components/ScreenLoader/ScreenLoader';
 import { lockIcon, arrowIcons } from '../../assets/icons';
 import Toast from 'react-native-toast-message';
 import useAuth from '../../hooks/useAuth';
@@ -20,6 +21,7 @@ import useAuth from '../../hooks/useAuth';
 const ForgotPasswordScreen = () => {
   const navigation = useNavigation();
   const styles = styleGenerator(Theme.colors);
+  const [loading, setLoading] = useState(false);
   const { resetPassword } = useAuth();
   const handleSendLink = async values => {
     try {
@@ -60,9 +62,8 @@ const ForgotPasswordScreen = () => {
         barStyle="light-content"
         backgroundColor={Theme.colors.black}
       />
-      <ScrollView contentContainerStyle={styles.container}>
-        {/* Header */}
-        <View style={styles.header}>
+      {/* Header */}
+      <View style={styles.header}>
           <TouchableOpacity
             style={styles.backButton}
             onPress={() => navigation.goBack()}
@@ -74,10 +75,11 @@ const ForgotPasswordScreen = () => {
               fill={Theme.colors.white}
             />
           </TouchableOpacity>
-        </View>
+      </View>
 
-        <View style={styles.contentContainer}>
-          {/* Top Icon Placeholder */}
+      <View style={localStyles.contentWrap}>
+        <ScrollView contentContainerStyle={styles.container}>
+          <View style={styles.contentContainer}>
           <View style={styles.iconContainer}>
             <SvgXml
               xml={lockIcon}
@@ -93,19 +95,41 @@ const ForgotPasswordScreen = () => {
             account to reset it.
           </Text>
 
-          {/* Form Component */}
-          <ForgotPasswordForm onSubmit={handleSendLink} />
-        </View>
+            <ForgotPasswordForm
+              onSubmit={handleSendLink}
+              onLoadingChange={setLoading}
+            />
+          </View>
 
-        <View style={styles.footer}>
+          <View style={styles.footer}>
           <Text style={styles.footerText}>Remember password?</Text>
           <TouchableOpacity onPress={() => navigation.navigate('LoginScreen')}>
             <Text style={styles.loginText}>Log in</Text>
           </TouchableOpacity>
-        </View>
-      </ScrollView>
+          </View>
+        </ScrollView>
+
+        {loading && (
+          <View style={localStyles.loaderOverlay}>
+            <ScreenLoader color={Theme.colors.secondary} />
+          </View>
+        )}
+      </View>
     </View>
   );
 };
+
+const localStyles = StyleSheet.create({
+  contentWrap: {
+    flex: 1,
+    position: 'relative',
+  },
+  loaderOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: Theme.colors.black,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+});
 
 export default ForgotPasswordScreen;

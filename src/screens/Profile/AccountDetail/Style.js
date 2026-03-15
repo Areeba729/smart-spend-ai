@@ -28,6 +28,19 @@ const getStyles = colors =>
       borderRadius: moderateScale(70),
       resizeMode: 'cover',
     },
+    avatarPlaceholder: {
+      width: '100%',
+      height: '100%',
+      borderRadius: moderateScale(70),
+      backgroundColor: Theme.colors.tertiary || '#4E6F66',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    avatarPlaceholderText: {
+      fontSize: moderateScale(48),
+      fontWeight: 'bold',
+      color: Theme.colors.white,
+    },
     editIconWrapper: {
       position: 'absolute',
       right: moderateScale(10),

@@ -5,7 +5,7 @@ import NativeText from '../NativeText/NativeText';
 import { checkMark } from '../../assets/icons';
 import { styles } from './style';
 
-const SuccessModal = ({ visible, onClose, title, message }) => {
+const SuccessModal = ({ visible, onClose, title, message,m }) => {
   return (
     <Modal visible={visible} transparent animationType="fade">
       <View style={styles.overlay}>

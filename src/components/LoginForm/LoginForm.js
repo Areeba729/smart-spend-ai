@@ -1,11 +1,5 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  Alert,
-  ActivityIndicator,
-} from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 import {
   useSmartForm,
   FormProvider,
@@ -21,7 +15,7 @@ import {
   lockIcon,
 } from '../../assets/icons';
 
-const LoginForm = ({ onSubmit, navigation }) => {
+const LoginForm = ({ onSubmit, navigation, onLoadingChange }) => {
   const [showPassword, setShowPassword] = React.useState(false);
   const [loading, setLoading] = useState(false);
   const form = useSmartForm({
@@ -40,11 +34,16 @@ const LoginForm = ({ onSubmit, navigation }) => {
 
   const handleSubmit = async () => {
     setLoading(true);
-    await form.submitForm();
-    if (form.isValid) {
-      await onSubmit(form.values);
+    onLoadingChange?.(true);
+    try {
+      await form.submitForm();
+      if (form.isValid) {
+        await onSubmit(form.values);
+      }
+    } finally {
+      setLoading(false);
+      onLoadingChange?.(false);
     }
-    setLoading(false);
   };
 
   return (
@@ -97,11 +96,7 @@ const LoginForm = ({ onSubmit, navigation }) => {
           onPress={handleSubmit}
           disabled={loading}
         >
-          {loading ? (
-            <ActivityIndicator size="small" color="#0000" />
-          ) : (
-            <Text style={styles.loginButtonText}>Login ➜</Text>
-          )}
+          <Text style={styles.loginButtonText}>Login ➜</Text>
         </TouchableOpacity>
       </View>
     </FormProvider>

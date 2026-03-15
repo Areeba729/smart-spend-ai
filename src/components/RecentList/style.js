@@ -19,6 +19,20 @@ export default StyleSheet.create({
     fontWeight: '700',
   },
 
+  subheading: {
+    color: '#888',
+    fontSize: 12,
+    marginTop: 2,
+    marginBottom: 12,
+  },
+
+  emptyText: {
+    color: '#888',
+    fontSize: 14,
+    textAlign: 'center',
+    paddingVertical: 20,
+  },
+
   viewAll: {
     color: '#9AC23C',
     fontSize: 13,
@@ -38,6 +52,8 @@ export default StyleSheet.create({
   itemTitle: {
     color: '#fff',
     fontWeight: '600',
+    flex: 1,
+    marginRight: 8,
   },
 
   itemTime: {
@@ -49,10 +65,17 @@ export default StyleSheet.create({
   amount: {
     color: '#FF4D4F',
     fontWeight: '700',
+    flexShrink: 0,
   },
   left: {
     flexDirection: 'row',
     alignItems: 'center',
+    flex: 1,
+    minWidth: 0,
+  },
+  itemTextWrap: {
+    flex: 1,
+    minWidth: 0,
   },
 
   iconWrapper: {

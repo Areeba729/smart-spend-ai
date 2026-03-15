@@ -5,7 +5,6 @@ import {
   TouchableOpacity,
   Switch,
   SafeAreaView,
-  StatusBar,
 } from 'react-native';
 import { moderateScale } from 'react-native-size-matters';
 import { Theme } from '../../../libs';
@@ -21,10 +20,6 @@ const Settings = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <StatusBar
-        barStyle="light-content"
-        backgroundColor={Theme.colors.black}
-      />
       <SimpleHeader title="Settings" />
       <ScrollView
         showsVerticalScrollIndicator={false}

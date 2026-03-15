@@ -30,8 +30,8 @@ const mergeDateAndTime = (date, time) => {
 
 /* ================= COMPONENT ================= */
 
-export default function MyCalendar() {
-  const [events, setEvents] = useState({});
+export default function MyCalendar({ events, setEvents }) {
+  // const [events, setEvents] = useState({});
   const [selectedDate, setSelectedDate] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -47,16 +47,16 @@ export default function MyCalendar() {
   const [showStartTimePicker, setShowStartTimePicker] = useState(false);
   const [showEndDatePicker, setShowEndDatePicker] = useState(false);
   const [showEndTimePicker, setShowEndTimePicker] = useState(false);
-  useFocusEffect(
-    useCallback(() => {
-      const loadEvents = async () => {
-        const userEvents = await fetchUserEvents(); // Fetch events from Firestore
-        setEvents(userEvents);
-      };
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     const loadEvents = async () => {
+  //       const userEvents = await fetchUserEvents(); // Fetch events from Firestore
+  //       setEvents(userEvents);
+  //     };
 
-      loadEvents();
-    }, []),
-  );
+  //     loadEvents();
+  //   }, []),
+  // );
   const isFormValid =
     eventTitle.trim().length > 0 &&
     startTime !== null &&
@@ -103,7 +103,7 @@ export default function MyCalendar() {
   //     setModalVisible(false);
   //   };
 
-  const addEvent = () => {
+  const addEvent = async () => {
     if (!isFormValid) {
       Toast.show({
         type: 'error',
@@ -124,14 +124,9 @@ export default function MyCalendar() {
       end,
     };
 
-    // 1️⃣ Save in local state
-    setEvents(prev => ({
-      ...prev,
-      [selectedDate]: [...(prev[selectedDate] || []), newEvent],
-    }));
+    await saveEventToFirestore(newEvent);
 
-    // 2️⃣ Save in Firestore
-    saveEventToFirestore(newEvent);
+    setEvents(prev => [...prev, newEvent]);
 
     Toast.show({
       type: 'success',
@@ -163,12 +158,37 @@ export default function MyCalendar() {
           resetModalFields(); // 👈 clear previous data
           setModalVisible(true);
         }}
-        markedDates={Object.keys(events).reduce((acc, date) => {
-          acc[date] = { marked: true, dotColor: Theme.colors.secondary };
+        markedDates={events.reduce((acc, event) => {
+          if (!event?.start) return acc;
+
+          // 🔥 Convert Firestore Timestamp properly
+          const d =
+            typeof event.start.toDate === 'function'
+              ? event.start.toDate()
+              : new Date(event.start);
+
+          const year = d.getFullYear();
+          const month = String(d.getMonth() + 1).padStart(2, '0');
+          const day = String(d.getDate()).padStart(2, '0');
+
+          const formattedDate = `${year}-${month}-${day}`;
+
+          if (!acc[formattedDate]) {
+            acc[formattedDate] = {
+              marked: true,
+              dotColor: 'red',
+            };
+          }
+
           return acc;
         }, {})}
+        //        markedDates={events.reduce((acc, event) => {
+        //   const date = new Date(event.start).toISOString().split('T')[0];
+        //   acc[date] = { marked: true, dotColor: Theme.colors.secondary };
+        //   return acc;
+        // }, {})}
       />
-      x{/* MODAL */}
+      {/* MODAL */}
       <Modal
         visible={modalVisible}
         transparent

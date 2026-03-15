@@ -22,6 +22,22 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Theme.colors.secondary,
   },
+  avatarPlaceholder: {
+    backgroundColor: Theme.colors.tertiary || '#4E6F66',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  avatarPlaceholderText: {
+    fontSize: moderateScale(48),
+    fontWeight: 'bold',
+    color: Theme.colors.white,
+  },
+  photoErrorText: {
+    fontSize: moderateScale(12),
+    color: Theme.colors.error,
+    marginTop: moderateScale(8),
+    textAlign: 'center',
+  },
   cameraButton: {
     position: 'absolute',
     right: 0,
@@ -71,6 +87,12 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: moderateScale(16),
     color: Theme.colors.white,
+  },
+  inputReadOnly: {
+    opacity: 0.8,
+  },
+  inputReadOnlyText: {
+    color: Theme.colors.grey,
   },
   saveButton: {
     backgroundColor: '#93C523',

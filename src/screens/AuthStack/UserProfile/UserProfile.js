@@ -1,81 +1,101 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
   TouchableOpacity,
   Image,
   TextInput,
-  SafeAreaView,
-  StatusBar,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
 } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import { moderateScale } from 'react-native-size-matters';
 import { Theme } from '../../../libs';
 import styles from './style';
-import { images } from '../../../assets/images';
-import ProfileHeader from '../../../components/ProfileHeader/ProfileHeader';
 import SimpleHeader from '../../../components/SimpleHeader/SimpleHeader';
+import ScreenLoader from '../../../components/ScreenLoader/ScreenLoader';
 import { selectUser } from '../../../redux/slices/userSlice';
 import { useSelector } from 'react-redux';
+import { useProfileImage } from '../../../hooks/useProfileImage';
+
 const UserProfile = ({ navigation }) => {
   const user = useSelector(selectUser);
+  const {
+    profileImageUrl,
+    loading: imageLoading,
+    error: imageError,
+    refreshProfileImage,
+    pickAndUploadProfileImage,
+  } = useProfileImage();
 
-  // Initialize state with user data
+  useFocusEffect(
+    useCallback(() => {
+      refreshProfileImage();
+    }, [refreshProfileImage])
+  );
+
   const [name, setName] = useState(user?.fullName || '');
   const [phone, setPhone] = useState(user?.phone || '');
-  const [email, setEmail] = useState(user?.email || '');
 
   const handleChangePhoto = () => {
-    console.log('Change Photo Pressed');
+    pickAndUploadProfileImage();
   };
 
   const handleSave = () => {
-    console.log('Saving:', { name, phone, email });
+    console.log('Saving:', { name, phone });
     navigation.goBack();
   };
 
+  const firstLetter = (user?.fullName || user?.email || '?').charAt(0).toUpperCase();
+
   return (
     <View style={styles.container}>
-      <StatusBar
-        barStyle="light-content"
-        backgroundColor={Theme.colors.black}
+      <SimpleHeader
+        title="Edit Profile"
+        onBackPress={() => navigation.goBack()}
       />
 
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}
-      >
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-          contentContainerStyle={{ paddingBottom: moderateScale(30) }}
+      {imageLoading ? (
+        <ScreenLoader color={Theme.colors.secondary} />
+      ) : (
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}
         >
-          <SimpleHeader
-            title="Edit Profile"
-            onBackPress={() => navigation.goBack()}
-          />
-
-          {/* ---------- PROFILE PHOTO ---------- */}
-          <View style={styles.photoSection}>
-            <View style={styles.avatarContainer}>
-              <Image source={images.profile} style={styles.avatar} />
-              <TouchableOpacity
-                style={styles.cameraButton}
-                onPress={handleChangePhoto}
-              >
-                <Text style={styles.cameraIcon}>📷</Text>
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+            contentContainerStyle={{ paddingBottom: moderateScale(30) }}
+          >
+            {/* ---------- PROFILE PHOTO (update only here) ---------- */}
+            <View style={styles.photoSection}>
+              <View style={styles.avatarContainer}>
+                {profileImageUrl ? (
+                  <Image source={{ uri: profileImageUrl }} style={styles.avatar} />
+                ) : (
+                  <View style={[styles.avatar, styles.avatarPlaceholder]}>
+                    <Text style={styles.avatarPlaceholderText}>{firstLetter}</Text>
+                  </View>
+                )}
+                <TouchableOpacity
+                  style={styles.cameraButton}
+                  onPress={handleChangePhoto}
+                >
+                  <Text style={styles.cameraIcon}>📷</Text>
+                </TouchableOpacity>
+              </View>
+              <TouchableOpacity onPress={handleChangePhoto}>
+                <Text style={styles.changePhotoText}>Change Photo</Text>
               </TouchableOpacity>
+              {imageError ? (
+                <Text style={styles.photoErrorText}>{imageError}</Text>
+              ) : null}
             </View>
-            <TouchableOpacity onPress={handleChangePhoto}>
-              <Text style={styles.changePhotoText}>Change Photo</Text>
-            </TouchableOpacity>
-          </View>
 
-          {/* ---------- FORM ---------- */}
-          <View style={styles.formContainer}>
+            {/* ---------- FORM ---------- */}
+            <View style={styles.formContainer}>
             {/* Full Name */}
             <Text style={styles.label}>Full Name</Text>
             <View style={styles.inputContainer}>
@@ -105,28 +125,27 @@ const UserProfile = ({ navigation }) => {
               />
             </View>
 
-            {/* Email */}
+            {/* Email - read-only (linked to account) */}
             <Text style={styles.label}>Email</Text>
-            <View style={styles.inputContainer}>
+            <View style={[styles.inputContainer, styles.inputReadOnly]}>
               <Text style={styles.inputIcon}>✉️</Text>
               <TextInput
-                style={styles.input}
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
+                style={[styles.input, styles.inputReadOnlyText]}
+                value={user?.email || ''}
+                editable={false}
                 placeholder="Email"
                 placeholderTextColor="#666"
-                returnKeyType="done"
               />
             </View>
           </View>
 
-          {/* ---------- SAVE BUTTON ---------- */}
-          <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-            <Text style={styles.saveButtonText}>Save Changes</Text>
-          </TouchableOpacity>
-        </ScrollView>
-      </KeyboardAvoidingView>
+            {/* ---------- SAVE BUTTON ---------- */}
+            <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+              <Text style={styles.saveButtonText}>Save Changes</Text>
+            </TouchableOpacity>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      )}
     </View>
   );
 };

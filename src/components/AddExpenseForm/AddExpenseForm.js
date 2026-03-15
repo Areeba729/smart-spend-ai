@@ -1,5 +1,12 @@
 import React, { useState } from 'react';
-import { View, TouchableOpacity, Text, ActivityIndicator } from 'react-native';
+import {
+  View,
+  TouchableOpacity,
+  Text,
+  ActivityIndicator,
+  Modal,
+  StyleSheet,
+} from 'react-native';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
@@ -10,9 +17,12 @@ import SuccessModal from '../SuccessModal/SuccessModal';
 import { calendarIcon } from '../../assets/icons';
 import { styles } from './style';
 import { saveExpenseToFirestore } from '../../hooks/ExpenseFunction';
+import { useNavigation } from '@react-navigation/native';
+import { Theme } from '../../libs';
 
-const AddExpenseForm = ({ onSubmit, navigation }) => {
+const AddExpenseForm = ({ onSubmit }) => {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const navigation = useNavigation();
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [loading, setLoading] = useState(false); // State for loader
@@ -54,12 +64,12 @@ const AddExpenseForm = ({ onSubmit, navigation }) => {
 
     try {
       await saveExpenseToFirestore(expenseData);
+      setLoading(false);
       setShowSuccessModal(true);
       resetForm();
     } catch (error) {
       console.error('Error saving expense:', error);
-    } finally {
-      setLoading(false); // Hide loader
+      setLoading(false);
     }
   };
 
@@ -185,22 +195,28 @@ const AddExpenseForm = ({ onSubmit, navigation }) => {
           <TouchableOpacity
             style={styles.saveButton}
             onPress={handleSubmit}
-            disabled={loading} // Disable button while loading
+            disabled={loading}
           >
-            {loading ? (
-              <ActivityIndicator size="small" color="#0000" />
-            ) : (
-              <NativeText style={styles.saveButtonText}>
-                Save Expense
-              </NativeText>
-            )}
+            <NativeText style={styles.saveButtonText}>
+              Save Expense
+            </NativeText>
           </TouchableOpacity>
+
+          {/* Full-screen loader while saving */}
+          <Modal visible={loading} transparent animationType="fade">
+            <View style={loaderStyles.overlay}>
+              <View style={loaderStyles.box}>
+                <ActivityIndicator size="large" color={Theme.colors.secondary} />
+                <NativeText style={loaderStyles.text}>Saving expense...</NativeText>
+              </View>
+            </View>
+          </Modal>
 
           <SuccessModal
             visible={showSuccessModal}
             onClose={() => {
               setShowSuccessModal(false);
-              navigation.replace('Home'); // Navigate to Home on modal close
+              navigation.navigate('Home'); // Navigate to Home on modal close
             }}
             title="Added Successfully"
             message="Your expense has been added successfully. You can now view it in your transaction history."
@@ -226,5 +242,26 @@ const formatDate = date => {
   const year = date.getFullYear();
   return `${month}/${day}/${year}`;
 };
+
+const loaderStyles = StyleSheet.create({
+  overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  box: {
+    backgroundColor: Theme.colors.primary,
+    padding: 24,
+    borderRadius: 16,
+    alignItems: 'center',
+    minWidth: 200,
+  },
+  text: {
+    color: Theme.colors.text,
+    fontSize: 14,
+    marginTop: 12,
+  },
+});
 
 export default AddExpenseForm;

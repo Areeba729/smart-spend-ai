@@ -8,9 +8,13 @@ const styles = StyleSheet.create({
     backgroundColor: Theme.colors.black,
     paddingHorizontal: scale(16),
   },
+  ListContainer:{
+    flex: 1,
+  },
 
   list: {
     paddingBottom: scale(80),
+  
   },
 
   calendarContainer: {

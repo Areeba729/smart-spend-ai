@@ -1,58 +1,60 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   Image,
   Modal,
   ScrollView,
-  StatusBar,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
-import { images } from '../../../assets/images';
 import SimpleHeader from '../../../components/SimpleHeader/SimpleHeader';
 import { Theme } from '../../../libs';
 import { logout, selectUser } from '../../../redux/slices/userSlice';
-import styles from './style'; // Separate style file
-
-// Placeholder profile image - replace with your actual image
-// const PROFILE_IMAGE = require('../../../assets/profile.jpg'); // Or use { uri: 'https://...' }
+import { useProfileImage } from '../../../hooks/useProfileImage';
+import styles from './style';
 
 const Profile = ({ navigation }) => {
   const [isLogoutModalVisible, setLogoutModalVisible] = useState(false);
   const user = useSelector(selectUser);
   const dispatch = useDispatch();
+  const { profileImageUrl, refreshProfileImage } = useProfileImage();
+
+  useFocusEffect(
+    useCallback(() => {
+      refreshProfileImage();
+    }, [refreshProfileImage])
+  );
 
   const handleLogout = () => {
     dispatch(logout());
-    console.log('User logged out');
     setLogoutModalVisible(false);
-    // Navigate to login screen or perform other actions
   };
 
   const handleCancelLogout = () => {
     setLogoutModalVisible(false);
   };
 
+  const firstLetter = (user?.fullName || user?.email || '?').charAt(0).toUpperCase();
+
   return (
     <View style={styles.container}>
-      <StatusBar
-        barStyle="light-content"
-        backgroundColor={Theme.colors.black}
-      />
-
       <SimpleHeader title="Profile" />
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        {/* Profile Info */}
+        {/* Profile Info - image is display only; update from Edit Profile */}
         <View style={styles.profileSection}>
           <View style={styles.profileImageContainer}>
-            <Image source={images.profile} style={styles.profileImage} />
-            <View style={styles.verifiedBadge}>
-              <Text style={styles.verifiedIcon}>✎</Text>
-            </View>
+            {profileImageUrl ? (
+              <Image source={{ uri: profileImageUrl }} style={styles.profileImage} />
+            ) : (
+              <View style={[styles.profileImage, styles.profileImagePlaceholder]}>
+                <Text style={styles.profilePlaceholderText}>{firstLetter}</Text>
+              </View>
+            )}
           </View>
 
           <Text style={styles.userName}>

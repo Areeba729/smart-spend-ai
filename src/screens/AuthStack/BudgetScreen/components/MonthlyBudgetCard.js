@@ -31,36 +31,42 @@ const MonthlyBudgetCard = () => {
     return null; // Skip unsupported formats
   };
 
-  useEffect(() => {
-    // Fetch expenses when the component is mounted
-    const fetchExpenses = async () => {
-      const fetchedExpenses = await getExpensesFromFirestore();
-      const today = new Date();
-      const filteredExpenses = fetchedExpenses.filter(expense => {
-        const expenseDate = parseDate(expense.date); // Parse the date field
-        return (
-          expenseDate &&
-          expenseDate.getDate() === today.getDate() &&
-          expenseDate.getMonth() === today.getMonth() &&
-          expenseDate.getFullYear() === today.getFullYear()
-        );
-      });
-      setExpenses(filteredExpenses.slice(0, 2)); // Limit to first 2 expenses
+useEffect(() => {
+  const fetchExpenses = async () => {
+    const fetchedExpenses = await getExpensesFromFirestore();
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = today.getMonth();
 
-      // Calculate total spent
-      const total = fetchedExpenses.reduce((sum, expense) => {
-        return sum + (parseFloat(expense.amount) || 0);
-      }, 0);
-      setTotalSpent(total);
-    };
+    const monthlyExpenses = fetchedExpenses.filter(expense => {
+      const expenseDate = parseDate(expense.date);
+      return (
+        expenseDate &&
+        expenseDate.getMonth() === month &&
+        expenseDate.getFullYear() === year
+      );
+    });
 
-    fetchExpenses();
-  }, []); // Empty dependency array
+    setExpenses(monthlyExpenses.slice(0, 2));
+
+    const total = monthlyExpenses.reduce((sum, expense) => {
+      return sum + (parseFloat(expense.amount) || 0);
+    }, 0);
+
+    setTotalSpent(total);
+  };
+
+  fetchExpenses();
+}, []);
 
   const monthlyBudget = Number(user?.monthlyBudget || 0);
   const remainingBudget = monthlyBudget - totalSpent; // Calculate remaining budget
-  const spentPercentage = Math.min((totalSpent / monthlyBudget) * 100, 100); // Ensure percentage does not exceed 100
-
+const spentPercentage = monthlyBudget
+  ? Math.min((totalSpent / monthlyBudget) * 100, 100)
+  : 0;
+  console.log('Monthly Budget:', monthlyBudget);
+console.log('Total Spent This Month:', totalSpent);
+console.log('Spent %:', spentPercentage);
   return (
     <View style={[styles.card, styles.monthlyBudgetCard]}>
       <View style={styles.cardHeader}>
@@ -70,9 +76,9 @@ const MonthlyBudgetCard = () => {
           </View>
           <NativeText style={styles.label}>Monthly Budget</NativeText>
         </View>
-        <TouchableOpacity>
+        {/* <TouchableOpacity>
           <NativeText style={styles.ellipsis}>•••</NativeText>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
 
       <View style={styles.amountRow}>
@@ -96,14 +102,14 @@ const MonthlyBudgetCard = () => {
           </NativeText>
         </View>
       </View>
-
-      <View style={styles.progressContainer}>
-        <View style={styles.progressBar}>
-          <View
-            style={[styles.progressFill, { width: `${spentPercentage}%` }]} // Dynamically set width based on spentPercentage
-          />
-        </View>
-      </View>
+<View style={styles.progressContainer}>
+  <View
+    style={[
+      styles.progressFill,
+      { width: `${spentPercentage}%` },
+    ]}
+  />
+</View>
 
       <NativeText style={styles.progressText}>
         {spentPercentage.toFixed(0)}% Used

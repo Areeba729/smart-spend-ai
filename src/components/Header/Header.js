@@ -26,6 +26,7 @@ const HomeHeader = ({
       <TouchableOpacity
         style={styles.notificationButton}
         onPress={onNotificationPress}
+        hitSlop={20} 
       >
         <NativeText style={styles.notificationIcon}>🔔</NativeText>
       </TouchableOpacity>

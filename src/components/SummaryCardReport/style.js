@@ -5,9 +5,11 @@ import { scale } from 'react-native-size-matters';
 export default StyleSheet.create({
   container: {
     width: '48%',
+    minWidth: 0,
     backgroundColor: '#111',
     borderRadius: 16,
     padding: 16,
+    marginTop: 20,
   },
   iconWrapper: {
     width: 36,
@@ -19,12 +21,15 @@ export default StyleSheet.create({
   },
   svgContainer: {
     flexDirection: 'row',
+    flex: 1,
+    minWidth: 0,
   },
   title: {
     color: '#777',
     fontSize: 12,
     marginTop: scale(10),
-    // letterSpacing: 0.6,
+    flex: 1,
+    flexShrink: 1,
   },
 
   value: {
@@ -32,6 +37,7 @@ export default StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
     marginTop: 6,
+    flexShrink: 1,
   },
 
   expenseValue: {
@@ -41,6 +47,7 @@ export default StyleSheet.create({
   subtitle: {
     marginTop: 4,
     fontSize: 12,
+    flexShrink: 1,
   },
 
   expenseSubtitle: {

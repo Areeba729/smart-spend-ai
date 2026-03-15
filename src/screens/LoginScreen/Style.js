@@ -25,10 +25,10 @@ const styles = colors =>
       marginBottom: moderateScale(40),
     },
     logoContainer: {
-      width: moderateScale(64),
-      height: moderateScale(64),
+      width: moderateScale(88),
+      height: moderateScale(88),
       backgroundColor: '#1E1E1E',
-      borderRadius: moderateScale(16),
+      borderRadius: moderateScale(20),
       justifyContent: 'center',
       alignItems: 'center',
       marginBottom: moderateScale(24),
@@ -36,10 +36,9 @@ const styles = colors =>
       borderColor: '#333',
     },
     logo: {
-      width: moderateScale(32),
-      height: moderateScale(32),
+      width: moderateScale(56),
+      height: moderateScale(56),
       resizeMode: 'contain',
-      tintColor: colors.secondary,
     },
     title: {
       fontSize: moderateScale(28),

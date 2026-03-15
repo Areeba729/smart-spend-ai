@@ -6,6 +6,7 @@ import NativeText from '../../../components/NativeText/NativeText';
 import { calendarIcon } from '../../../assets/icons';
 import { styles } from './style';
 import SimpleHeader from '../../../components/SimpleHeader/SimpleHeader';
+import ScreenLoader from '../../../components/ScreenLoader/ScreenLoader';
 import { useSelector } from 'react-redux';
 import { selectUser } from '../../../redux/slices/userSlice';
 import { getExpensesFromFirestore } from '../../../hooks/ExpenseFunction';
@@ -18,7 +19,7 @@ const DailyExpenses = ({ navigation }) => {
   const [selectedDate, setSelectedDate] = useState(new Date().getDate());
   const [loading, setLoading] = useState(true); // Loading state to show while fetching
   const [expenses, setExpenses] = useState([]);
-
+  const [allExpenses, setAllExpenses] = useState([]);
   const parseDate = dateField => {
     if (!dateField) return null; // Skip invalid or undefined date fields
 
@@ -35,26 +36,12 @@ const DailyExpenses = ({ navigation }) => {
 
     return null; // Skip unsupported formats
   };
-
   useEffect(() => {
     const fetchExpenses = async () => {
       try {
         setLoading(true);
-        const fetchedExpenses = await getExpensesFromFirestore(); // Fetch expenses from Firestore
-        console.log('Fetched Expenses:', fetchedExpenses); // Debugging log
-        const today = new Date();
-        const filteredExpenses = fetchedExpenses.filter(expense => {
-          const expenseDate = parseDate(expense.date); // Parse the date field
-          console.log('Parsed Expense Date:', expenseDate); // Log parsed date
-          return (
-            expenseDate &&
-            expenseDate.getDate() === today.getDate() &&
-            expenseDate.getMonth() === today.getMonth() &&
-            expenseDate.getFullYear() === today.getFullYear()
-          );
-        });
-        console.log('Filtered Expenses:', filteredExpenses); // Debugging log
-        setExpenses(filteredExpenses); // Set filtered expenses data to state
+        const fetchedExpenses = await getExpensesFromFirestore();
+        setAllExpenses(fetchedExpenses);
       } catch (error) {
         console.error('Error fetching expenses:', error);
       } finally {
@@ -64,7 +51,26 @@ const DailyExpenses = ({ navigation }) => {
 
     fetchExpenses();
   }, []);
+  useEffect(() => {
+    if (!allExpenses.length) return;
 
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = today.getMonth();
+
+    const filtered = allExpenses.filter(expense => {
+      const expenseDate = parseDate(expense.date);
+
+      return (
+        expenseDate &&
+        expenseDate.getDate() === selectedDate &&
+        expenseDate.getMonth() === month &&
+        expenseDate.getFullYear() === year
+      );
+    });
+
+    setExpenses(filtered);
+  }, [selectedDate, allExpenses]);
   const dates = React.useMemo(() => {
     const today = new Date();
     const year = today.getFullYear();
@@ -104,31 +110,52 @@ const DailyExpenses = ({ navigation }) => {
   const selectedDateInfo =
     dates.find(d => d.date === selectedDate) || dates[today - 1];
 
-  const renderDateItem = ({ item }) => {
-    const isActive = selectedDate === item.date;
-    return (
-      <TouchableOpacity
-        onPress={() => setSelectedDate(item.date)}
-        style={[styles.dateCard, isActive && styles.activeDateCard]}
-      >
-        <NativeText style={[styles.dayText, isActive && styles.activeDayText]}>
-          {item.day}
-        </NativeText>
-        <NativeText
-          style={[styles.dateNumber, isActive && styles.activeDateNumber]}
-        >
-          {item.date}
-        </NativeText>
-      </TouchableOpacity>
-    );
-  };
+const renderDateItem = ({ item }) => {
+  const isActive = selectedDate === item.date;
+  const isFuture = item.date > today; // 🔥 check future date
 
+  return (
+    <TouchableOpacity
+      disabled={isFuture} // 🔥 disable press
+      onPress={() => setSelectedDate(item.date)}
+      style={[
+        styles.dateCard,
+        isActive && styles.activeDateCard,
+        isFuture && { opacity: 0.4 }, // 🔥 grey out future dates
+      ]}
+    >
+      <NativeText
+        style={[
+          styles.dayText,
+          isActive && styles.activeDayText,
+          isFuture && { color: '#999' },
+        ]}
+      >
+        {item.day}
+      </NativeText>
+
+      <NativeText
+        style={[
+          styles.dateNumber,
+          isActive && styles.activeDateNumber,
+          isFuture && { color: '#999' },
+        ]}
+      >
+        {item.date}
+      </NativeText>
+    </TouchableOpacity>
+  );
+};
   return (
     <View style={styles.container}>
       <SimpleHeader
         title="Expense Detail"
         onBackPress={() => navigation.goBack()}
       />
+      {loading ? (
+        <ScreenLoader />
+      ) : (
+      <>
       <View style={styles.summarySection}>
         <View style={styles.dateRow}>
           <SvgXml
@@ -172,9 +199,9 @@ const DailyExpenses = ({ navigation }) => {
       <TouchableOpacity
         onPress={() => navigation.navigate('AllMonthlyExpenses')}
       >
-        <NativeText style={styles.viewAllText}>
+        {/* <NativeText style={styles.viewAllText}>
           View All Monthly Expenses
-        </NativeText>
+        </NativeText> */}
       </TouchableOpacity>
       {/* Dynamically render ExpenseItems */}
 
@@ -200,6 +227,8 @@ const DailyExpenses = ({ navigation }) => {
           </NativeText>
         )}
       </ScrollView>
+      </>
+      )}
     </View>
   );
 };

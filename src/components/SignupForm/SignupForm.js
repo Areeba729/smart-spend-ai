@@ -1,11 +1,5 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  Alert,
-  ActivityIndicator,
-} from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 import Toast from 'react-native-toast-message';
 import {
   useSmartForm,
@@ -28,7 +22,7 @@ import { login } from '../../redux/slices/userSlice';
 import { useDispatch } from 'react-redux';
 import useAuth from '../../hooks/useAuth';
 
-const SignupForm = ({ onSubmit }) => {
+const SignupForm = ({ onSubmit, onLoadingChange }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [agreeToTerms, setAgreeToTerms] = useState(false);
@@ -74,6 +68,7 @@ const SignupForm = ({ onSubmit }) => {
 
   const handleSubmit = async () => {
     setLoading(true);
+    onLoadingChange?.(true);
     try {
       // 1️⃣ Validate form
       await form.submitForm();
@@ -84,7 +79,6 @@ const SignupForm = ({ onSubmit }) => {
           text1: 'Form Invalid',
           text2: 'Please fix the errors in the form.',
         });
-        setLoading(false);
         return;
       }
       if (!agreeToTerms) {
@@ -93,14 +87,11 @@ const SignupForm = ({ onSubmit }) => {
           text1: 'Agreement Required',
           text2: 'Please agree to the Terms & Privacy.',
         });
-        setLoading(false);
         return;
       }
       // 2️⃣ Signup with validated values
       const userData = await signup(form.values);
       console.log('Redux Login Dispatched:', userData);
-
-      // 3️⃣ Save to Redux
 
       Toast.show({
         type: 'success',
@@ -123,6 +114,7 @@ const SignupForm = ({ onSubmit }) => {
       });
     } finally {
       setLoading(false);
+      onLoadingChange?.(false);
     }
   };
 
@@ -256,11 +248,7 @@ const SignupForm = ({ onSubmit }) => {
           onPress={handleSubmit}
           disabled={loading}
         >
-          {loading ? (
-            <ActivityIndicator size="small" color="#0000" />
-          ) : (
-            <Text style={styles.signupButtonText}>Sign Up</Text>
-          )}
+          <Text style={styles.signupButtonText}>Sign Up</Text>
         </TouchableOpacity>
       </View>
     </FormProvider>

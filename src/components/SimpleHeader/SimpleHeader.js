@@ -1,9 +1,10 @@
 import React from 'react';
-import { View, TouchableOpacity } from 'react-native';
+import { SafeAreaView, View, TouchableOpacity, StatusBar } from 'react-native';
 import NativeText from '../NativeText/NativeText';
 import styles from './style';
 import { SvgXml } from 'react-native-svg';
 import { BackArrowIcon } from '../../assets/icons';
+import { Theme } from '../../libs';
 
 const SimpleHeader = ({
   title = 'Title',
@@ -11,22 +12,28 @@ const SimpleHeader = ({
   showBack = !!onBackPress,
 }) => {
   return (
-    <View style={styles.header}>
-      {/* Left: Back Arrow or Placeholder */}
-      {showBack ? (
-        <TouchableOpacity style={styles.backButton} onPress={onBackPress}>
-          <SvgXml xml={BackArrowIcon} />
-        </TouchableOpacity>
-      ) : (
-        <View style={styles.backButton} />
-      )}
+    <>
+      {/* 🔥 STATUS BAR */}
+      <StatusBar
+        backgroundColor={Theme.colors.primary} // same as header
+        barStyle="light-content" // white text
+      />
 
-      {/* Center: Title */}
-      <NativeText style={styles.title}>{title}</NativeText>
+      <View style={[styles.container, { backgroundColor: Theme.colors.primary }]}>
+        <View style={styles.header}>
+          {showBack ? (
+            <TouchableOpacity hitSlop={20} style={styles.backButton} onPress={onBackPress}>
+              <SvgXml xml={BackArrowIcon} />
+            </TouchableOpacity>
+          ) : (
+            <View style={styles.backButton} />
+          )}
 
-      {/* Right: Empty space to keep title centered */}
-      <View style={styles.rightSpace} />
-    </View>
+          <NativeText style={styles.title}>{title}</NativeText>
+          <View style={styles.rightSpace} />
+        </View>
+      </View>
+    </>
   );
 };
 

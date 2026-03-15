@@ -57,6 +57,22 @@ const styles = StyleSheet.create({
     height: moderateScale(100),
     borderRadius: moderateScale(50),
   },
+  profileImagePlaceholder: {
+    backgroundColor: Theme.colors.tertiary,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  profilePlaceholderText: {
+    fontSize: moderateScale(40),
+    fontWeight: 'bold',
+    color: Theme.colors.white,
+  },
+  profileErrorText: {
+    fontSize: moderateScale(11),
+    color: Theme.colors.error,
+    marginTop: moderateScale(4),
+    textAlign: 'center',
+  },
   verifiedBadge: {
     position: 'absolute',
     right: 0,

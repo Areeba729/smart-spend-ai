@@ -6,6 +6,7 @@ import NativeText from '../../../components/NativeText/NativeText';
 import { calendarIcon } from '../../../assets/icons';
 import { styles } from './style';
 import SimpleHeader from '../../../components/SimpleHeader/SimpleHeader';
+import ScreenLoader from '../../../components/ScreenLoader/ScreenLoader';
 import { useSelector } from 'react-redux';
 import { selectUser } from '../../../redux/slices/userSlice';
 import { getExpensesFromFirestore } from '../../../hooks/ExpenseFunction';
@@ -83,6 +84,10 @@ const DailyExpenses = ({ navigation }) => {
         title="All Monthly Expenses"
         onBackPress={() => navigation.goBack()}
       />
+      {loading ? (
+        <ScreenLoader />
+      ) : (
+      <>
       <View style={styles.summarySection}>
         <View style={styles.dateRow}>
           <SvgXml
@@ -134,7 +139,8 @@ const DailyExpenses = ({ navigation }) => {
           <NativeText>No expenses found for today.</NativeText>
         )}
       </ScrollView>
-      {/* Dynamically render ExpenseItems */}
+      </>
+      )}
     </View>
   );
 };

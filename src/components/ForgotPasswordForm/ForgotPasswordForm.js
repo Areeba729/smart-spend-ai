@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 import {
   useSmartForm,
   FormProvider,
@@ -9,7 +9,7 @@ import { SvgXml } from 'react-native-svg';
 import { styles } from './style';
 import { emailIcon } from '../../assets/icons';
 
-const ForgotPasswordForm = ({ onSubmit }) => {
+const ForgotPasswordForm = ({ onSubmit, onLoadingChange }) => {
   const [loading, setLoading] = useState(false);
   const form = useSmartForm({
     fields: {
@@ -21,11 +21,16 @@ const ForgotPasswordForm = ({ onSubmit }) => {
   });
 
   const handleSubmit = async () => {
-    await form.submitForm();
-    if (form.isValid) {
-      onSubmit(form.values);
-    } else {
-      // Alert.alert('Error', 'Please fix the errors in the form.');
+    setLoading(true);
+    onLoadingChange?.(true);
+    try {
+      await form.submitForm();
+      if (form.isValid) {
+        await onSubmit(form.values);
+      }
+    } finally {
+      setLoading(false);
+      onLoadingChange?.(false);
     }
   };
 
@@ -50,11 +55,7 @@ const ForgotPasswordForm = ({ onSubmit }) => {
           onPress={handleSubmit}
           disabled={loading}
         >
-          {loading ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <Text style={styles.submitButtonText}>Send Reset Link</Text>
-          )}
+          <Text style={styles.submitButtonText}>Send Reset Link</Text>
         </TouchableOpacity>
       </View>
     </FormProvider>

@@ -1,20 +1,22 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
-  ActivityIndicator,
   Image,
   Modal,
+  Text,
   TouchableOpacity,
   View,
 } from 'react-native';
-import { launchImageLibrary } from 'react-native-image-picker';
+import { useFocusEffect } from '@react-navigation/native';
+import { useSelector } from 'react-redux';
 import { SvgXml } from 'react-native-svg';
 import { editIcon } from '../../../assets/icons';
-import { images } from '../../../assets/images';
 import NativeInput from '../../../components/NativeInput/NativeInput';
 import NativeText from '../../../components/NativeText/NativeText';
 import PageHeader from '../../../components/PageHeader/PageHeader';
 import PrimaryButton from '../../../components/PrimaryButton/PrimaryButton';
 import { Theme } from '../../../libs';
+import { selectUser } from '../../../redux/slices/userSlice';
+import { useProfileImage } from '../../../hooks/useProfileImage';
 import getStyles from './Style';
 
 const { colors } = Theme;
@@ -44,26 +46,19 @@ const ModalCard = ({ visible, onClose, children }) => (
 );
 
 const AccountDetail = ({ navigation }) => {
-  // Mock user data - replace with your actual data source
-  const user = {
-    uid: 'mock-uid',
-    firstName: 'John',
-    surname: 'Doe',
-    fullName: 'John Doe',
-    phonenumber: '+1234567890',
-    companyName: 'Sample Company',
-    employmentType: 'full-time',
-    profile: null,
-  };
+  const user = useSelector(selectUser);
+  const { profileImageUrl, refreshProfileImage } = useProfileImage();
 
-  // UI state
+  useFocusEffect(
+    useCallback(() => {
+      refreshProfileImage();
+    }, [refreshProfileImage])
+  );
+
   const [editNameOpen, setEditNameOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-
-  // Form state
   const [nameValue, setNameValue] = useState(user?.fullName ?? '');
 
-  // Mounted ref to avoid state updates after unmount during async ops
   const mountedRef = useRef(true);
   useEffect(
     () => () => {
@@ -72,55 +67,32 @@ const AccountDetail = ({ navigation }) => {
     [],
   );
 
+  useEffect(() => {
+    setNameValue(user?.fullName ?? '');
+  }, [user?.fullName]);
+
   const displayName = useMemo(() => user?.fullName ?? '', [user?.fullName]);
 
-  const handleUpdate = useCallback(async fields => {
+  const handleUpdate = useCallback(async (fields) => {
     setLoading(true);
     try {
-      // TODO: Update local state or context with new user data
+      // TODO: Update Firestore user document with fields (e.g. fullName)
       console.log('User updated:', fields);
     } catch (e) {
-      // You can plug in a toast/snackbar here
       console.warn('Failed to update user:', e);
     } finally {
       if (mountedRef.current) setLoading(false);
     }
   }, []);
 
-  const pickImage = useCallback(() => {
-    launchImageLibrary(
-      { mediaType: 'photo', selectionLimit: 1 },
-      async response => {
-        if (response?.didCancel || response?.errorCode) return;
-        const asset = response?.assets?.[0];
-        if (!asset?.uri) return;
-
-        setLoading(true);
-        try {
-          const path = `users/profile/${user.uid}_${Date.now()}.jpg`;
-          console.log(path);
-
-          // const url = await uploadImageToFirebase(asset.uri, path);
-
-          await handleUpdate({ profile: 'url' });
-        } catch (e) {
-          console.warn('Image upload failed:', e);
-        } finally {
-          if (mountedRef.current) setLoading(false);
-        }
-      },
-    );
-  }, [handleUpdate, user?.uid]);
-
   const saveName = useCallback(async () => {
     const trimmed = (nameValue ?? '').trim();
     if (!trimmed) return;
-
-    let fields;
-    fields = { fullName: trimmed };
-    await handleUpdate(fields);
+    await handleUpdate({ fullName: trimmed });
     if (mountedRef.current) setEditNameOpen(false);
   }, [handleUpdate, nameValue]);
+
+  const firstLetter = (user?.fullName || user?.email || '?').charAt(0).toUpperCase();
 
   return (
     <View style={styles.container}>
@@ -130,26 +102,15 @@ const AccountDetail = ({ navigation }) => {
         onBackPress={() => navigation?.goBack?.()}
       />
 
-      {/* Avatar */}
+      {/* Avatar - display only; change photo in Edit Profile */}
       <View style={styles.avatarContainer}>
-        {loading ? (
-          <ActivityIndicator color={colors.primary} style={styles.avatar} />
+        {profileImageUrl ? (
+          <Image source={{ uri: profileImageUrl }} style={styles.avatar} />
         ) : (
-          <Image
-            source={user?.profile ? { uri: user.profile } : images.profile}
-            style={styles.avatar}
-          />
+          <View style={styles.avatarPlaceholder}>
+            <Text style={styles.avatarPlaceholderText}>{firstLetter}</Text>
+          </View>
         )}
-        <View style={styles.editIconPos}>
-          <TouchableOpacity style={styles.editIconWrapper} onPress={pickImage}>
-            <SvgXml
-              xml={editIcon}
-              width={26}
-              height={26}
-              color={colors.primary}
-            />
-          </TouchableOpacity>
-        </View>
       </View>
 
       {/* Full name */}

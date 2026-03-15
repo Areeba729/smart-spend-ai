@@ -1,18 +1,22 @@
-import React, { useEffect, useState } from 'react';
-import { View, FlatList, Text, ActivityIndicator } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { View, FlatList, Text } from 'react-native';
 import MyCalendar from '../../../components/MyCalendar/MyCalendar';
 import SimpleHeader from '../../../components/SimpleHeader/SimpleHeader';
+import ScreenLoader from '../../../components/ScreenLoader/ScreenLoader';
 import { fetchUserEvents } from '../../../hooks/fetchUserEvents';
 import styles from './style';
 import { Theme } from '../../../libs';
+import { useFocusEffect } from '@react-navigation/native';
 
 const AddEvents = ({ navigation }) => {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+useFocusEffect(
+  useCallback(() => {
     loadEvents();
-  }, []);
+  }, [])
+);
 
   const loadEvents = async () => {
     setLoading(true);
@@ -52,15 +56,16 @@ const AddEvents = ({ navigation }) => {
         onBackPress={() => navigation.goBack()}
       />
 
+      {loading ? (
+        <ScreenLoader color={Theme.colors.secondary} />
+      ) : (
+      <>
       <View style={styles.calendarContainer}>
-        <MyCalendar />
+        <MyCalendar events={events} setEvents={setEvents} />
       </View>
       <View style={styles.ListContainer}>
         <Text style={styles.listTitle}>Events</Text>
-        {loading ? (
-          <ActivityIndicator size="small" color={Theme.colors.secondary} />
-        ) : (
-          <FlatList
+        <FlatList
             data={events}
             keyExtractor={(_, index) => index.toString()}
             renderItem={renderItem}
@@ -70,8 +75,9 @@ const AddEvents = ({ navigation }) => {
               <Text style={styles.emptyText}>No events found</Text>
             }
           />
-        )}
       </View>
+      </>
+      )}
     </View>
   );
 };

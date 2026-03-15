@@ -1,11 +1,11 @@
 import { useNavigation } from '@react-navigation/native';
 import React, { useEffect } from 'react';
-import { Text, View } from 'react-native';
+import { Text, View, Image } from 'react-native';
 import CustomStatusBar from '../../components/CustomStatusBar/CustomStatusBar';
 import { useOnboardingStatus } from '../../hooks/useOnboardingStatus';
 import { Theme } from '../../libs';
+import { images } from '../../assets/images';
 import getStyles from './style';
-import { Image } from 'react-native-svg';
 
 const Splash = () => {
   const navigation = useNavigation();
@@ -26,10 +26,7 @@ const Splash = () => {
       <CustomStatusBar barStyle="light-content" />
       <View style={styles.container}>
         <View style={styles.logoContainer}>
-          {/* <Image
-            source={require('../../assets/images/logo.png')}
-            style={{ height: 50, width: 50 }}
-          /> */}
+          <Image source={images.logo} style={styles.logo} resizeMode="contain" />
           <Text style={styles.logoText}>SmartSpendAI</Text>
         </View>
       </View>

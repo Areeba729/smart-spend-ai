@@ -1,9 +1,10 @@
 // SignupScreen.js
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Image,
   Platform,
   StatusBar,
+  StyleSheet,
   Text,
   TouchableOpacity,
   View,
@@ -12,6 +13,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import Toast from 'react-native-toast-message';
 import { images } from '../../assets/images';
 import SignupForm from '../../components/SignupForm/SignupForm';
+import ScreenLoader from '../../components/ScreenLoader/ScreenLoader';
 import { Theme } from '../../libs';
 import styleGenerator from './style';
 import { SvgXml } from 'react-native-svg';
@@ -81,66 +83,85 @@ const SignupScreen = ({ navigation }) => {
         barStyle="light-content"
         backgroundColor={Theme.colors.black}
       />
-      <KeyboardAwareScrollView
-        contentContainerStyle={styles.container}
-        showsVerticalScrollIndicator={false}
-        enableOnAndroid={true}
-        extraScrollHeight={120}
-        keyboardShouldPersistTaps="handled"
-      >
-        <View>
-          <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            style={styles.backButton}
-          >
-            <Text style={styles.backButtonText}>←</Text>
-          </TouchableOpacity>
+      <View>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={styles.backButton}
+        >
+          <Text style={styles.backButtonText}>←</Text>
+        </TouchableOpacity>
 
-          <View style={styles.header}>
-            <View style={styles.logoContainer}>
-              <Image source={images.logo} style={styles.logo} />
-            </View>
-            <Text style={styles.title}>Create Account</Text>
-            <Text style={styles.subtitle}>Track your spending, save more.</Text>
+        <View style={styles.header}>
+          <View style={styles.logoContainer}>
+            <Image source={images.logo} style={styles.logo} />
           </View>
+          <Text style={styles.title}>Create Account</Text>
+          <Text style={styles.subtitle}>Track your spending, save more.</Text>
         </View>
+      </View>
 
-        <SignupForm onSubmit={handleSignup} />
+      <View style={localStyles.contentWrap}>
+        <KeyboardAwareScrollView
+          contentContainerStyle={styles.container}
+          showsVerticalScrollIndicator={false}
+          enableOnAndroid={true}
+          extraScrollHeight={120}
+          keyboardShouldPersistTaps="handled"
+        >
+          <SignupForm onSubmit={handleSignup} onLoadingChange={setLoading} />
 
-        <View style={styles.socialSection}>
-          <View style={styles.dividerContainer}>
-            <View style={styles.dividerLine} />
-            <Text style={styles.dividerText}>OR SIGN UP WITH</Text>
-            <View style={styles.dividerLine} />
-          </View>
+          <View style={styles.socialSection}>
+            <View style={styles.dividerContainer}>
+              <View style={styles.dividerLine} />
+              <Text style={styles.dividerText}>OR SIGN UP WITH</Text>
+              <View style={styles.dividerLine} />
+            </View>
 
-          <View style={styles.socialButtons}>
-            <SocialButton
-              // text="Google"
-              icon={<SvgXml xml={Google} width={20} height={20} />}
-              onPress={() => {}}
-              styles={styles}
-            />
-            {Platform.OS === 'ios' && (
+            <View style={styles.socialButtons}>
               <SocialButton
-                // text="Apple"
-                icon={<SvgXml xml={Apple} width={20} height={20} />}
+                icon={<SvgXml xml={Google} width={20} height={20} />}
                 onPress={() => {}}
                 styles={styles}
               />
-            )}
+              {Platform.OS === 'ios' && (
+                <SocialButton
+                  icon={<SvgXml xml={Apple} width={20} height={20} />}
+                  onPress={() => {}}
+                  styles={styles}
+                />
+              )}
+            </View>
           </View>
-        </View>
 
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>Already have an account? </Text>
-          <TouchableOpacity onPress={() => navigation.navigate('LoginScreen')}>
-            <Text style={styles.loginText}>Login</Text>
-          </TouchableOpacity>
-        </View>
-      </KeyboardAwareScrollView>
+          <View style={styles.footer}>
+            <Text style={styles.footerText}>Already have an account? </Text>
+            <TouchableOpacity onPress={() => navigation.navigate('LoginScreen')}>
+              <Text style={styles.loginText}>Login</Text>
+            </TouchableOpacity>
+          </View>
+        </KeyboardAwareScrollView>
+
+        {loading && (
+          <View style={localStyles.loaderOverlay}>
+            <ScreenLoader color={Theme.colors.secondary} />
+          </View>
+        )}
+      </View>
     </View>
   );
 };
+
+const localStyles = StyleSheet.create({
+  contentWrap: {
+    flex: 1,
+    position: 'relative',
+  },
+  loaderOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: Theme.colors.black,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+});
 
 export default SignupScreen;

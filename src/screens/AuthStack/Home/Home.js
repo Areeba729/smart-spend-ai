@@ -1,10 +1,12 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import {
   View,
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
   RefreshControl,
+  StatusBar,
 } from 'react-native';
 import NativeText from '../../../components/NativeText/NativeText';
 import BudgetCard from '../../../components/HomeComponents/BudgetCard/BudgetCard';
@@ -25,6 +27,7 @@ import { SvgXml } from 'react-native-svg';
 import { calendarIcon } from '../../../assets/icons';
 import { getExpensesFromFirestore } from '../../../hooks/ExpenseFunction';
 import BudgetDateRange from '../../../components/BudgetDateRange/BudgetDateRange';
+import ScreenLoader from '../../../components/ScreenLoader/ScreenLoader';
 import { fetchUserEvents } from '../../../hooks/fetchUserEvents';
 import firestore from '@react-native-firebase/firestore';
 
@@ -172,11 +175,19 @@ const Home = ({ navigation }) => {
   };
 
   useEffect(() => {
-    // Fetch expenses when the component is mounted
     fetchExpenses();
     loadEvents();
     fetchUserDates();
-  }, []); // Empty dependency array
+  }, []);
+
+  // Refetch when Home screen is focused (e.g. after adding an expense)
+  useFocusEffect(
+    useCallback(() => {
+      fetchExpenses();
+      loadEvents();
+      fetchUserDates();
+    }, [])
+  );
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -224,22 +235,21 @@ const Home = ({ navigation }) => {
   const remainingDays = daysRemaining();
   const isBudgetAtRisk = remainingBudget < dailyLimit * remainingDays;
 
-  if (loading) {
-    return (
-      <View style={[styles.loaderContainer]}>
-        <ActivityIndicator size="small" color={Theme.colors.primary} />
-      </View>
-    );
-  }
-
   return (
     <View style={styles.container}>
+      <StatusBar
+        barStyle="light-content"
+        backgroundColor={Theme.colors.secondary}
+      />
       <HomeHeader
         initial={name.charAt(0).toUpperCase()}
-        greeting={greeting} // dynamic greeting
+        greeting={greeting}
         userName={name}
         onNotificationPress={() => navigation.navigate('Notifications')}
       />
+      {loading ? (
+        <ScreenLoader color={Theme.colors.secondary} />
+      ) : (
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
@@ -249,16 +259,16 @@ const Home = ({ navigation }) => {
         }
       >
         {/* Calendar Week */}
-        <CalendarWeek
+        {/* <CalendarWeek
           selectedDate={selectedDate}
           onDateSelect={handleDateSelect}
-        />
+        /> */}
         {/* Budget Card */}
-        <BudgetCard
+        {/* <BudgetCard
           totalBudget={user?.monthlyBudget}
           spentPercentage={(totalSpent / (user?.monthlyBudget || 1)) * 100}
           currency="PKR"
-        />
+        /> */}
         {/* Budget Date Range - Added here */}
         <BudgetDateRange onDateChange={handleDateChange} />
         {/* Daily Limit Display */}
@@ -368,51 +378,16 @@ const Home = ({ navigation }) => {
           />
         </View>
         {/* AI Smart Insight */}
-        <AIInsightCard
+        {/* <AIInsightCard
           title="AI Smart Insight"
           message={`You can still spend ${remainingBudget.toFixed(
             0,
           )} PKR comfortably this month based on your spending habits.`}
           actionLabel="View Details"
           onActionPress={() => navigation.navigate('Calendar')}
-        />
-        {/* Expense Chart Section */}
-        <View style={styles.sectionHeader}>
-          <NativeText style={styles.sectionTitle}>EXPENSE CHART</NativeText>
-        </View>
-        <ExpenseChart
-          monthlyBudget={user?.monthlyBudget || 0}
-          totalSpent={totalSpent}
-          remainingBudget={remainingBudget}
-          isBudgetAtRisk={isBudgetAtRisk}
-        />
-
-        {isBudgetAtRisk && (
-          <View style={[styles.alertContainer, { backgroundColor: 'red' }]}>
-            {' '}
-            {/* Red background for alert */}
-            <NativeText style={styles.alertText}>
-              Warning: Only {remainingDays} days left, and your budget is at
-              risk of being exceeded! If you don’t control your spending, it
-              will be difficult to manage within the budget.
-            </NativeText>
-          </View>
-        )}
-        {remainingBudget >= dailyLimit * remainingDays && (
-          <View
-            style={[
-              styles.alertContainer,
-              { backgroundColor: Theme.colors.secondary },
-            ]}
-          >
-            {' '}
-            {/* Green background for success */}
-            <NativeText style={styles.alertText}>
-              Great job! You are on track with your budget. Keep it up!
-            </NativeText>
-          </View>
-        )}
+        /> */}
       </ScrollView>
+      )}
     </View>
   );
 };
