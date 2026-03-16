@@ -8,8 +8,7 @@ import {
   TextInput,
   StatusBar,
 } from 'react-native';
-import { moderateScale } from 'react-native-size-matters';
-import { Theme } from '../../../libs';
+
 import styles from './style'; // We'll create this below
 import CircularProgress from '../../../components/CircularProgress/CircularProgress';
 const BudgetGoalScreen = ({ navigation }) => {
