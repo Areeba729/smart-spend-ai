@@ -7,6 +7,7 @@ const styles = colors =>
     safeArea: {
       flex: 1,
       backgroundColor: colors.black,
+      // paddingHorizontal: moderateScale(24),
     },
     scrollView: {
       flex: 1,
@@ -21,10 +22,20 @@ const styles = colors =>
     },
     header: {
       marginBottom: moderateScale(24),
+      paddingHorizontal: moderateScale(24),
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    headerContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: scale(70),
+      marginTop: scale(40),
     },
     backButton: {
       marginBottom: moderateScale(16),
-      marginTop: scale(10),
+      // marginTop: scale(10),
+      paddingHorizontal: moderateScale(24),
     },
     backButtonText: {
       color: colors.white,
@@ -41,6 +52,7 @@ const styles = colors =>
       marginBottom: moderateScale(16),
       borderWidth: 1,
       borderColor: '#333',
+      alignSelf: 'center',
     },
     logo: {
       width: moderateScale(24),

@@ -1,5 +1,6 @@
 // screens/Reports/style.js
 import { StyleSheet } from 'react-native';
+import { Theme } from '../../../libs';
 
 export default StyleSheet.create({
   container: {
@@ -61,5 +62,9 @@ export default StyleSheet.create({
     fontWeight: '700',
     marginTop: 20,
     marginBottom: 4,
+  },
+  previewButton: {
+    marginTop: 20,
+    backgroundColor: Theme.colors.secondary,
   },
 });

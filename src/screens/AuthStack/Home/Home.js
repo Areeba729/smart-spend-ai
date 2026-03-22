@@ -1,35 +1,31 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import firestore from '@react-native-firebase/firestore';
 import { useFocusEffect } from '@react-navigation/native';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
-  View,
-  ScrollView,
-  TouchableOpacity,
   ActivityIndicator,
   RefreshControl,
+  ScrollView,
   StatusBar,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import NativeText from '../../../components/NativeText/NativeText';
-import BudgetCard from '../../../components/HomeComponents/BudgetCard/BudgetCard';
-import CalendarWeek from '../../../components/HomeComponents/CalendarWeek/CalendarWeek';
-import StatCard from '../../../components/HomeComponents/StatCard/StatCard';
-import ExpenseItem from '../../../components/HomeComponents/ExpenseItem/ExpenseItem';
-import AlertCard from '../../../components/HomeComponents/AlertCard/AlertCard';
-import QuickActionButton from '../../../components/HomeComponents/QuickActionButton/QuickActionButton';
-import AIInsightCard from '../../../components/HomeComponents/AIInsightCard/AIInsightCard';
-import ExpenseChart from '../../../components/ExpenseChart/ExpenseChart';
-import { Theme } from '../../../libs';
-import styles from './style';
-import HomeHeader from '../../../components/Header/Header';
-import { useUserGreeting } from '../../../libs/getUserGreetings';
-import { useSelector } from 'react-redux';
-import { selectUser } from '../../../redux/slices/userSlice';
 import { SvgXml } from 'react-native-svg';
+import { useSelector } from 'react-redux';
 import { calendarIcon } from '../../../assets/icons';
-import { getExpensesFromFirestore } from '../../../hooks/ExpenseFunction';
 import BudgetDateRange from '../../../components/BudgetDateRange/BudgetDateRange';
+import HomeHeader from '../../../components/Header/Header';
+import AlertCard from '../../../components/HomeComponents/AlertCard/AlertCard';
+import ExpenseItem from '../../../components/HomeComponents/ExpenseItem/ExpenseItem';
+import QuickActionButton from '../../../components/HomeComponents/QuickActionButton/QuickActionButton';
+import StatCard from '../../../components/HomeComponents/StatCard/StatCard';
+import NativeText from '../../../components/NativeText/NativeText';
 import ScreenLoader from '../../../components/ScreenLoader/ScreenLoader';
+import { getExpensesFromFirestore } from '../../../hooks/ExpenseFunction';
 import { fetchUserEvents } from '../../../hooks/fetchUserEvents';
-import firestore from '@react-native-firebase/firestore';
+import { Theme } from '../../../libs';
+import { useUserGreeting } from '../../../libs/getUserGreetings';
+import { selectUser } from '../../../redux/slices/userSlice';
+import styles from './style';
 
 const Home = ({ navigation }) => {
   const { name, greeting } = useUserGreeting();
@@ -186,7 +182,7 @@ const Home = ({ navigation }) => {
       fetchExpenses();
       loadEvents();
       fetchUserDates();
-    }, [])
+    }, []),
   );
 
   const onRefresh = useCallback(async () => {
@@ -250,135 +246,135 @@ const Home = ({ navigation }) => {
       {loading ? (
         <ScreenLoader color={Theme.colors.secondary} />
       ) : (
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-      >
-        {/* Calendar Week */}
-        {/* <CalendarWeek
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        >
+          {/* Calendar Week */}
+          {/* <CalendarWeek
           selectedDate={selectedDate}
           onDateSelect={handleDateSelect}
         /> */}
-        {/* Budget Card */}
-        {/* <BudgetCard
+          {/* Budget Card */}
+          {/* <BudgetCard
           totalBudget={user?.monthlyBudget}
           spentPercentage={(totalSpent / (user?.monthlyBudget || 1)) * 100}
           currency="PKR"
         /> */}
-        {/* Budget Date Range - Added here */}
-        <BudgetDateRange onDateChange={handleDateChange} />
-        {/* Daily Limit Display */}
-        <View style={styles.dailyLimitContainer}>
-          <NativeText style={styles.dailyLimitText}>
-            Daily Spending Limit: {dailyLimit.toFixed(2)} PKR
-          </NativeText>
-          <NativeText style={styles.dailyLimitExplanation}>
-            (If you spend within this limit daily, your monthly budget will last
-            the entire month without exceeding it.)
-          </NativeText>
-        </View>
+          {/* Budget Date Range - Added here */}
+          <BudgetDateRange onDateChange={handleDateChange} />
+          {/* Daily Limit Display */}
+          <View style={styles.dailyLimitContainer}>
+            <NativeText style={styles.dailyLimitText}>
+              Daily Spending Limit: {dailyLimit.toFixed(2)} PKR
+            </NativeText>
+            <NativeText style={styles.dailyLimitExplanation}>
+              (If you spend within this limit daily, your monthly budget will
+              last the entire month without exceeding it.)
+            </NativeText>
+          </View>
 
-        <View style={styles.statsRow}>
-          <StatCard
-            icon="💸"
-            label="Spent"
-            amount={`${totalSpent.toFixed(0)} PKR`}
-            iconColor="#FF6B6B"
-          />
-          <StatCard
-            icon="💰"
-            label="Remaining"
-            amount={`${remainingBudget.toFixed(0)} PKR`}
-            iconColor={Theme.colors.secondary}
-          />
-        </View>
-        {/* Today's Expense Section */}
-        <View style={styles.sectionHeader}>
-          <NativeText style={styles.sectionTitle}>TODAY'S EXPENSE</NativeText>
-          <TouchableOpacity
-            onPress={() => navigation.navigate('DailyExpenses')}
-          >
-            <NativeText style={styles.viewAll}>View All</NativeText>
-          </TouchableOpacity>
-        </View>
-        {/* Dynamically render ExpenseItems */}
-        {expenses.length > 0 ? (
-          expenses.map((expense, index) => (
-            <ExpenseItem
-              key={index}
-              icon={expense.icon || '💸'} // Default icon if not provided
-              category={expense.category}
-              title={expense.title}
-              amount={`${expense.amount} PKR`}
+          <View style={styles.statsRow}>
+            <StatCard
+              icon="💸"
+              label="Spent"
+              amount={`${totalSpent.toFixed(0)} PKR`}
+              iconColor="#FF6B6B"
             />
-          ))
-        ) : (
-          <NativeText style={styles.noExpensesText}>
-            No expenses found for today.
-          </NativeText>
-        )}
-        {/* Upcoming Alerts Section */}
-        <View style={styles.sectionHeader}>
-          <NativeText style={styles.sectionTitle}>UPCOMING ALERTS</NativeText>
-        </View>
-        {/* <View style={styles.alertsGrid}> */}
-        <View style={styles.alertsGrid}>
-          {loadingEvents ? (
-            <ActivityIndicator size="small" color={Theme.colors.primary} />
-          ) : events.length > 0 ? (
-            events.map((event, index) => (
-              <AlertCard
+            <StatCard
+              icon="💰"
+              label="Remaining"
+              amount={`${remainingBudget.toFixed(0)} PKR`}
+              iconColor={Theme.colors.secondary}
+            />
+          </View>
+          {/* Today's Expense Section */}
+          <View style={styles.sectionHeader}>
+            <NativeText style={styles.sectionTitle}>TODAY'S EXPENSE</NativeText>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('DailyExpenses')}
+            >
+              <NativeText style={styles.viewAll}>View All</NativeText>
+            </TouchableOpacity>
+          </View>
+          {/* Dynamically render ExpenseItems */}
+          {expenses.length > 0 ? (
+            expenses.map((expense, index) => (
+              <ExpenseItem
                 key={index}
-                icon="🔔"
-                title={event.title}
-                description={event.description}
-                status={new Date(event.start).toLocaleDateString()}
-                statusColor="#4CD964"
-                onPress={() => console.log(`Event pressed: ${event.title}`)}
+                icon={expense.icon || '💸'} // Default icon if not provided
+                category={expense.category}
+                title={expense.title}
+                amount={`${expense.amount} PKR`}
               />
             ))
           ) : (
-            <>
-              {/* Optionally keep your existing static alerts here */}
-              <AlertCard
-                icon="🔔"
-                status="No upcoming events"
-                statusColor={Theme.colors.secondary}
-                title="No Events"
-                description="You have no scheduled events."
-              />
-            </>
+            <NativeText style={styles.noExpensesText}>
+              No expenses found for today.
+            </NativeText>
           )}
-        </View>
-        {/* </View> */}
-        {/* Quick Actions Section */}
-        <View style={styles.sectionHeader}>
-          <NativeText style={styles.sectionTitle}>QUICK ACTIONS</NativeText>
-        </View>
-        <View style={styles.quickActionsRow}>
-          <QuickActionButton
-            icon="+"
-            label="Add Expense"
-            onPress={handleAddExpense}
-          />
-          <QuickActionButton
-            icon="📄"
-            label="Scan Bill"
-            onPress={handleScanBill}
-            isPrimary
-          />
-          <QuickActionButton
-            icon={<SvgXml xml={calendarIcon} />}
-            label="Add Events"
-            onPress={handleAddEvent}
-          />
-        </View>
-        {/* AI Smart Insight */}
-        {/* <AIInsightCard
+          {/* Upcoming Alerts Section */}
+          <View style={styles.sectionHeader}>
+            <NativeText style={styles.sectionTitle}>UPCOMING ALERTS</NativeText>
+          </View>
+          {/* <View style={styles.alertsGrid}> */}
+          <View style={styles.alertsGrid}>
+            {loadingEvents ? (
+              <ActivityIndicator size="small" color={Theme.colors.primary} />
+            ) : events.length > 0 ? (
+              events.map((event, index) => (
+                <AlertCard
+                  key={index}
+                  icon="🔔"
+                  title={event.title}
+                  description={event.description}
+                  status={new Date(event.start).toLocaleDateString()}
+                  statusColor="#4CD964"
+                  onPress={() => console.log(`Event pressed: ${event.title}`)}
+                />
+              ))
+            ) : (
+              <>
+                {/* Optionally keep your existing static alerts here */}
+                <AlertCard
+                  icon="🔔"
+                  status="No upcoming events"
+                  statusColor={Theme.colors.secondary}
+                  title="No Events"
+                  description="You have no scheduled events."
+                />
+              </>
+            )}
+          </View>
+          {/* </View> */}
+          {/* Quick Actions Section */}
+          <View style={styles.sectionHeader}>
+            <NativeText style={styles.sectionTitle}>QUICK ACTIONS</NativeText>
+          </View>
+          <View style={styles.quickActionsRow}>
+            <QuickActionButton
+              icon="+"
+              label="Add Expense"
+              onPress={handleAddExpense}
+            />
+            <QuickActionButton
+              icon="📄"
+              label="Scan Bill"
+              onPress={handleScanBill}
+              isPrimary
+            />
+            <QuickActionButton
+              icon={<SvgXml xml={calendarIcon} />}
+              label="Add Events"
+              onPress={handleAddEvent}
+            />
+          </View>
+          {/* AI Smart Insight */}
+          {/* <AIInsightCard
           title="AI Smart Insight"
           message={`You can still spend ${remainingBudget.toFixed(
             0,
@@ -386,7 +382,7 @@ const Home = ({ navigation }) => {
           actionLabel="View Details"
           onActionPress={() => navigation.navigate('Calendar')}
         /> */}
-      </ScrollView>
+        </ScrollView>
       )}
     </View>
   );

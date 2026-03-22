@@ -7,13 +7,7 @@ import {
 } from 'react-native-fn-forms';
 import { styles } from './style';
 import { SvgXml } from 'react-native-svg';
-import {
-  closeIcon,
-  emailIcon,
-  eyeIcon,
-  eyeOffIcon,
-  lockIcon,
-} from '../../assets/icons';
+import { emailIcon, eyeIcon, eyeOffIcon, lockIcon } from '../../assets/icons';
 
 const LoginForm = ({ onSubmit, navigation, onLoadingChange }) => {
   const [showPassword, setShowPassword] = React.useState(false);

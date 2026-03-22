@@ -14,6 +14,7 @@ import BudgetGoalScreen from '../screens/AuthStack/BudgetGoalScreen/BudgetGoalSc
 import Settings from '../screens/AuthStack/Settings/Settings';
 import Notifications from '../screens/AuthStack/Notifications/Notifications';
 import HelpAndSupport from '../screens/AuthStack/HelpAndSupport/HelpAndSupport';
+import ReportPreview from '../screens/AuthStack/ReportPreview/ReportPreview';
 function AuthStack() {
   const Stack = createNativeStackNavigator();
 
@@ -32,6 +33,7 @@ function AuthStack() {
     Settings,
     Notifications,
     HelpAndSupport,
+    ReportPreview,
   };
 
   return (

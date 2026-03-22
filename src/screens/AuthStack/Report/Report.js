@@ -1,7 +1,8 @@
 // screens/Reports/Report.js
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
-import { View, ScrollView } from 'react-native';
+import { View, ScrollView, Button } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import styles from './style';
 
 import ReportTabs from '../../../components/ReportTab/ReportTab';
@@ -29,8 +30,10 @@ import {
   getWeeklyBudget,
   getBudgetUsedPercent,
 } from '../../../utils/reportCalculationUtils';
+import PrimaryButton from '../../../components/PrimaryButton/PrimaryButton';
 
 const Report = () => {
+  const navigation = useNavigation();
   const [activeTab, setActiveTab] = useState('Daily');
   const user = useSelector(selectUser);
   const [rawExpenses, setRawExpenses] = useState([]);
@@ -55,78 +58,104 @@ const Report = () => {
   useFocusEffect(
     useCallback(() => {
       fetchExpenses();
-    }, [fetchExpenses])
+    }, [fetchExpenses]),
   );
 
   const monthlyBudget = Number(user?.monthlyBudget || 0);
 
   const transactions = useMemo(
     () => normalizeTransactions(rawExpenses),
-    [rawExpenses]
+    [rawExpenses],
   );
 
   const dailyTransactions = useMemo(
     () => getDailyTransactions(transactions),
-    [transactions]
+    [transactions],
   );
 
   const weeklyTransactions = useMemo(
     () => getWeeklyTransactions(transactions),
-    [transactions]
+    [transactions],
   );
 
   const dailyTotal = useMemo(
     () => getTotalAmount(dailyTransactions),
-    [dailyTransactions]
+    [dailyTransactions],
   );
 
   const weeklyTotal = useMemo(
     () => getTotalAmount(weeklyTransactions),
-    [weeklyTransactions]
+    [weeklyTransactions],
   );
 
   const dailyCategoryTotals = useMemo(
     () => groupByCategory(dailyTransactions),
-    [dailyTransactions]
+    [dailyTransactions],
   );
 
   const weeklyCategoryTotals = useMemo(
     () => groupByCategory(weeklyTransactions),
-    [weeklyTransactions]
+    [weeklyTransactions],
   );
 
   const weeklyDayTotals = useMemo(
     () => groupByDay(weeklyTransactions),
-    [weeklyTransactions]
+    [weeklyTransactions],
   );
 
   const dailyBudgetAmount = useMemo(
     () => getDailyBudget(monthlyBudget),
-    [monthlyBudget]
+    [monthlyBudget],
   );
 
   const weeklyBudgetAmount = useMemo(
     () => getWeeklyBudget(monthlyBudget),
-    [monthlyBudget]
+    [monthlyBudget],
   );
 
   const dailyBudgetPercent = useMemo(
     () => getBudgetUsedPercent(dailyTotal, dailyBudgetAmount),
-    [dailyTotal, dailyBudgetAmount]
+    [dailyTotal, dailyBudgetAmount],
   );
 
   const weeklyBudgetPercent = useMemo(
     () => getBudgetUsedPercent(weeklyTotal, weeklyBudgetAmount),
-    [weeklyTotal, weeklyBudgetAmount]
+    [weeklyTotal, weeklyBudgetAmount],
   );
 
-  const isDailyOverBudget = dailyBudgetAmount > 0 && dailyTotal > dailyBudgetAmount;
-  const isWeeklyOverBudget = weeklyBudgetAmount > 0 && weeklyTotal > weeklyBudgetAmount;
+  const isDailyOverBudget =
+    dailyBudgetAmount > 0 && dailyTotal > dailyBudgetAmount;
+  const isWeeklyOverBudget =
+    weeklyBudgetAmount > 0 && weeklyTotal > weeklyBudgetAmount;
   const isDaily = activeTab === 'Daily';
-  const totalSpent = isDaily ? dailyTotal : weeklyTotal;
-  const budgetPercent = isDaily ? dailyBudgetPercent : weeklyBudgetPercent;
-  const budgetLabel = isDaily ? 'Daily budget' : 'Weekly budget';
+
+  // Redefine isOverBudget
   const isOverBudget = isDaily ? isDailyOverBudget : isWeeklyOverBudget;
+
+  const dailyBudgetExceededMessage = `You have exceeded your daily budget by PKR ${(
+    dailyTotal - dailyBudgetAmount
+  ).toFixed(0)}.`;
+  const weeklyBudgetExceededMessage = `You have exceeded your weekly budget by PKR ${(
+    weeklyTotal - weeklyBudgetAmount
+  ).toFixed(0)}.`;
+
+  const handlePreviewReport = tab => {
+    const selectedTransactions =
+      tab === 'Daily' ? dailyTransactions : weeklyTransactions;
+    const reportData = selectedTransactions.map(transaction => ({
+      category: transaction.category,
+      title: transaction.title,
+      price: transaction.amount,
+      date: transaction.date,
+    }));
+
+    const reportType = tab === 'Daily' ? 'Daily' : 'Weekly';
+
+    navigation.navigate('ReportPreview', {
+      reportData,
+      reportType,
+    });
+  };
 
   return (
     <View style={styles.container}>
@@ -135,45 +164,55 @@ const Report = () => {
       {loading ? (
         <ScreenLoader color={Theme.colors.secondary} />
       ) : (
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-        bounces={true}
-      >
-        <ReportTabs activeTab={activeTab} onChange={setActiveTab} />
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          bounces={true}
+        >
+          <ReportTabs activeTab={activeTab} onChange={setActiveTab} />
 
-        {/* Statistics graph - shown first so user sees it immediately */}
-        <NativeText style={styles.statisticsTitle}>Statistics</NativeText>
-        {isDaily ? (
-          <DailyCategoryChart categoryTotals={dailyCategoryTotals} />
-        ) : (
-          <WeeklyBarChart dayTotals={weeklyDayTotals} />
-        )}
+          {/* Statistics graph - shown first so user sees it immediately */}
+          <NativeText style={styles.statisticsTitle}>Statistics</NativeText>
+          {isDaily ? (
+            <DailyCategoryChart categoryTotals={dailyCategoryTotals} />
+          ) : (
+            <WeeklyBarChart dayTotals={weeklyDayTotals} />
+          )}
 
-        {isDaily ? (
-          <>
-            <SummaryCard
-              title="TODAY'S SPENDING"
-              value={`PKR ${dailyTotal.toFixed(0)}`}
-              subtitle={`${dailyBudgetPercent.toFixed(1)}% of daily budget`}
-              type="expense"
-            />
-            <View style={styles.cardRow}>
+          <PrimaryButton
+            title={`Preview ${activeTab} Report`}
+            onPress={() => handlePreviewReport(activeTab)}
+            containerStyle={styles.previewButton}
+            titleStyle={{ fontWeight: 'bold' }}
+          />
+
+          {isDaily ? (
+            <>
               <SummaryCard
-                title="DAILY BUDGET"
-                value={`PKR ${dailyBudgetAmount.toFixed(0)}`}
-                subtitle="Your daily limit"
-                type="category"
+                title="TODAY'S SPENDING"
+                value={`PKR ${dailyTotal.toFixed(0)}`}
+                subtitle={`${dailyBudgetPercent.toFixed(1)}% of daily budget`}
+                type="expense"
               />
-              <SummaryCard
-                title="REMAINING"
-                value={`PKR ${Math.max(0, dailyBudgetAmount - dailyTotal).toFixed(0)}`}
-                subtitle="Left for today"
-                type="category"
-              />
-            </View>
-            {/* {Object.keys(dailyCategoryTotals).length > 0 && (
+              <View style={styles.cardRow}>
+                <SummaryCard
+                  title="DAILY BUDGET"
+                  value={`PKR ${dailyBudgetAmount.toFixed(0)}`}
+                  subtitle="Your daily limit"
+                  type="category"
+                />
+                <SummaryCard
+                  title="REMAINING"
+                  value={`PKR ${Math.max(
+                    0,
+                    dailyBudgetAmount - dailyTotal,
+                  ).toFixed(0)}`}
+                  subtitle="Left for today"
+                  type="category"
+                />
+              </View>
+              {/* {Object.keys(dailyCategoryTotals).length > 0 && (
               <>
                 <NativeText style={styles.sectionTitle}>By category today</NativeText>
                 {Object.entries(dailyCategoryTotals).map(([cat, amount]) => (
@@ -186,77 +225,92 @@ const Report = () => {
                 ))}
               </>
             )} */}
-            {isDailyOverBudget && (
-              <View style={[styles.alertContainer, { backgroundColor: Theme.colors.error }]}>
-                <NativeText style={styles.alertText}>
-                  You have exceeded your daily budget by PKR {(dailyTotal - dailyBudgetAmount).toFixed(0)}.
-                </NativeText>
+              {isDailyOverBudget && (
+                <View
+                  style={[
+                    styles.alertContainer,
+                    { backgroundColor: Theme.colors.error },
+                  ]}
+                >
+                  <NativeText style={styles.alertText}>
+                    {dailyBudgetExceededMessage}
+                  </NativeText>
+                </View>
+              )}
+            </>
+          ) : (
+            <>
+              <SummaryCard
+                title="WEEK'S SPENDING"
+                value={`PKR ${weeklyTotal.toFixed(0)}`}
+                subtitle={`${weeklyBudgetPercent.toFixed(1)}% of weekly budget`}
+                type="expense"
+              />
+              <View style={styles.cardRow}>
+                <SummaryCard
+                  title="WEEKLY BUDGET"
+                  value={`PKR ${weeklyBudgetAmount.toFixed(0)}`}
+                  subtitle="Mon–Sun limit"
+                  type="category"
+                />
+                <SummaryCard
+                  title="REMAINING"
+                  value={`PKR ${Math.max(
+                    0,
+                    weeklyBudgetAmount - weeklyTotal,
+                  ).toFixed(0)}`}
+                  subtitle="Left this week"
+                  type="category"
+                />
               </View>
-            )}
-          </>
-        ) : (
-          <>
-            <SummaryCard
-              title="WEEK'S SPENDING"
-              value={`PKR ${weeklyTotal.toFixed(0)}`}
-              subtitle={`${weeklyBudgetPercent.toFixed(1)}% of weekly budget`}
-              type="expense"
-            />
-            <View style={styles.cardRow}>
-              <SummaryCard
-                title="WEEKLY BUDGET"
-                value={`PKR ${weeklyBudgetAmount.toFixed(0)}`}
-                subtitle="Mon–Sun limit"
-                type="category"
-              />
-              <SummaryCard
-                title="REMAINING"
-                value={`PKR ${Math.max(0, weeklyBudgetAmount - weeklyTotal).toFixed(0)}`}
-                subtitle="Left this week"
-                type="category"
-              />
+              {Object.keys(weeklyCategoryTotals).length > 0 && (
+                <>
+                  <NativeText style={styles.sectionTitle}>
+                    By category this week
+                  </NativeText>
+                  {Object.entries(weeklyCategoryTotals).map(([cat, amount]) => (
+                    <View key={cat} style={styles.categoryRow}>
+                      <NativeText style={styles.categoryName} numberOfLines={2}>
+                        {cat}
+                      </NativeText>
+                      <NativeText style={styles.categoryAmount}>
+                        PKR {amount.toFixed(0)}
+                      </NativeText>
+                    </View>
+                  ))}
+                </>
+              )}
+              {isWeeklyOverBudget && (
+                <View
+                  style={[
+                    styles.alertContainer,
+                    { backgroundColor: Theme.colors.error },
+                  ]}
+                >
+                  <NativeText style={styles.alertText}>
+                    {weeklyBudgetExceededMessage}
+                  </NativeText>
+                </View>
+              )}
+            </>
+          )}
+
+          {!isOverBudget && (isDaily ? dailyTotal > 0 : weeklyTotal > 0) && (
+            <View
+              style={[
+                styles.alertContainer,
+                { backgroundColor: Theme.colors.secondary },
+              ]}
+            >
+              <NativeText style={styles.alertText}>
+                {isDaily ? "Today's" : "This week's"} spending is within budget.
+              </NativeText>
             </View>
-            {Object.keys(weeklyCategoryTotals).length > 0 && (
-              <>
-                <NativeText style={styles.sectionTitle}>By category this week</NativeText>
-                {Object.entries(weeklyCategoryTotals).map(([cat, amount]) => (
-                  <View key={cat} style={styles.categoryRow}>
-                    <NativeText style={styles.categoryName} numberOfLines={2}>
-                      {cat}
-                    </NativeText>
-                    <NativeText style={styles.categoryAmount}>
-                      PKR {amount.toFixed(0)}
-                    </NativeText>
-                  </View>
-                ))}
-              </>
-            )}
-            {isWeeklyOverBudget && (
-              <View style={[styles.alertContainer, { backgroundColor: Theme.colors.error }]}>
-                <NativeText style={styles.alertText}>
-                  You have exceeded your weekly budget by PKR {(weeklyTotal - weeklyBudgetAmount).toFixed(0)}.
-                </NativeText>
-              </View>
-            )}
-          </>
-        )}
+          )}
 
-        {!isOverBudget && (isDaily ? dailyTotal > 0 : weeklyTotal > 0) && (
-          <View
-            style={[
-              styles.alertContainer,
-              { backgroundColor: Theme.colors.secondary },
-            ]}
-          >
-            <NativeText style={styles.alertText}>
-              {isDaily ? "Today's" : "This week's"} spending is within budget.
-            </NativeText>
-          </View>
-        )}
-
-        <AIInsightCard />
-        <RecentList mode={activeTab} rawExpenses={rawExpenses} />
-      </ScrollView>
+          <AIInsightCard />
+          <RecentList mode={activeTab} rawExpenses={rawExpenses} />
+        </ScrollView>
       )}
     </View>
   );

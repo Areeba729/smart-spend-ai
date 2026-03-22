@@ -33,6 +33,7 @@ const SignupScreen = ({ navigation }) => {
   const styles = styleGenerator(Theme.colors);
   const dispatch = useDispatch();
   const { signup } = useAuth();
+  const [loading, setLoading] = useState(false);
 
   // const handleSignup = formValues => {
   //   // console.log('Signup Data:', formValues);
@@ -84,17 +85,18 @@ const SignupScreen = ({ navigation }) => {
         backgroundColor={Theme.colors.black}
       />
       <View>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={styles.backButton}
-        >
-          <Text style={styles.backButtonText}>←</Text>
-        </TouchableOpacity>
-
-        <View style={styles.header}>
+        <View style={styles.headerContainer}>
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={styles.backButton}
+          >
+            <Text style={styles.backButtonText}>←</Text>
+          </TouchableOpacity>
           <View style={styles.logoContainer}>
             <Image source={images.logo} style={styles.logo} />
           </View>
+        </View>
+        <View style={styles.header}>
           <Text style={styles.title}>Create Account</Text>
           <Text style={styles.subtitle}>Track your spending, save more.</Text>
         </View>
@@ -135,7 +137,9 @@ const SignupScreen = ({ navigation }) => {
 
           <View style={styles.footer}>
             <Text style={styles.footerText}>Already have an account? </Text>
-            <TouchableOpacity onPress={() => navigation.navigate('LoginScreen')}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('LoginScreen')}
+            >
               <Text style={styles.loginText}>Login</Text>
             </TouchableOpacity>
           </View>
