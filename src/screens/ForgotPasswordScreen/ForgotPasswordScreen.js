@@ -64,36 +64,36 @@ const ForgotPasswordScreen = () => {
       />
       {/* Header */}
       <View style={styles.header}>
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => navigation.goBack()}
-          >
-            <SvgXml
-              xml={arrowIcons}
-              width="24"
-              height="24"
-              fill={Theme.colors.white}
-            />
-          </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <SvgXml
+            xml={arrowIcons}
+            width="24"
+            height="24"
+            fill={Theme.colors.white}
+          />
+        </TouchableOpacity>
       </View>
 
       <View style={localStyles.contentWrap}>
         <ScrollView contentContainerStyle={styles.container}>
           <View style={styles.contentContainer}>
-          <View style={styles.iconContainer}>
-            <SvgXml
-              xml={lockIcon}
-              width="28"
-              height="28"
-              color={Theme.colors.secondary}
-            />
-          </View>
+            <View style={styles.iconContainer}>
+              <SvgXml
+                xml={lockIcon}
+                width="28"
+                height="28"
+                color={Theme.colors.secondary}
+              />
+            </View>
 
-          <Text style={styles.title}>Forgot Password?</Text>
-          <Text style={styles.subtitle}>
-            Don’t worry! It happens. Please enter the email associated with your
-            account to reset it.
-          </Text>
+            <Text style={styles.title}>Forgot Password?</Text>
+            <Text style={styles.subtitle}>
+              Don’t worry! It happens. Please enter the email associated with
+              your account to reset it.
+            </Text>
 
             <ForgotPasswordForm
               onSubmit={handleSendLink}
@@ -102,10 +102,12 @@ const ForgotPasswordScreen = () => {
           </View>
 
           <View style={styles.footer}>
-          <Text style={styles.footerText}>Remember password?</Text>
-          <TouchableOpacity onPress={() => navigation.navigate('LoginScreen')}>
-            <Text style={styles.loginText}>Log in</Text>
-          </TouchableOpacity>
+            <Text style={styles.footerText}>Remember password?</Text>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('LoginScreen')}
+            >
+              <Text style={styles.loginText}>Log in</Text>
+            </TouchableOpacity>
           </View>
         </ScrollView>
 

@@ -13,7 +13,7 @@ import auth from '@react-native-firebase/auth';
 import SimpleHeader from '../../../components/SimpleHeader/SimpleHeader';
 import { Theme } from '../../../libs';
 import { moderateScale } from 'react-native-size-matters';
-import { PDFDocument, PDFPage, rgb } from 'react-native-pdf-lib';
+// import { PDFDocument, PDFPage, rgb } from 'react-native-pdf-lib';
 import RNFS from 'react-native-fs';
 import PrimaryButton from '../../../components/PrimaryButton/PrimaryButton';
 
@@ -100,44 +100,44 @@ const ReportPreview = ({ route }) => {
       item.date && !isNaN(item.date) ? format(item.date, 'dd/MM/yyyy') : 'N/A',
   }));
 
-  const generatePDF = async () => {
-    try {
-      const pdfPath = `${RNFS.DownloadDirectoryPath}/${reportType}_Report.pdf`;
+  // const generatePDF = async () => {
+  //   try {
+  //     const pdfPath = `${RNFS.DownloadDirectoryPath}/${reportType}_Report.pdf`;
 
-      // 1️⃣ Create a new PDF page
-      const page1 = PDFPage.create()
-        .setMediaBox(612, 792)
-        .drawText(`${reportType} Expense Report`, {
-          x: 50,
-          y: 750,
-          color: rgb(0, 0, 0),
-          fontSize: 18,
-        });
+  //     // 1️⃣ Create a new PDF page
+  //     const page1 = PDFPage.create()
+  //       .setMediaBox(612, 792)
+  //       .drawText(`${reportType} Expense Report`, {
+  //         x: 50,
+  //         y: 750,
+  //         color: rgb(0, 0, 0),
+  //         fontSize: 18,
+  //       });
 
-      let yPosition = 700;
-      formattedData.forEach(item => {
-        page1.drawText(
-          `Category: ${item.category}, Title: ${item.title}, Note: ${item.note}, Price: ${item.price}, Date: ${item.date}`,
-          { x: 50, y: yPosition, color: rgb(0, 0, 0), fontSize: 12 },
-        );
-        yPosition -= 20;
-      });
+  //     let yPosition = 700;
+  //     formattedData.forEach(item => {
+  //       page1.drawText(
+  //         `Category: ${item.category}, Title: ${item.title}, Note: ${item.note}, Price: ${item.price}, Date: ${item.date}`,
+  //         { x: 50, y: yPosition, color: rgb(0, 0, 0), fontSize: 12 },
+  //       );
+  //       yPosition -= 20;
+  //     });
 
-      // 2️⃣ Create PDF document and add the page
-      const pdf = PDFDocument.create(pdfPath).addPages([page1]);
+  //     // 2️⃣ Create PDF document and add the page
+  //     const pdf = PDFDocument.create(pdfPath).addPages([page1]);
 
-      // 3️⃣ Write PDF to file
-      await pdf.write(); // automatically writes to pdfPath
+  //     // 3️⃣ Write PDF to file
+  //     await pdf.write(); // automatically writes to pdfPath
 
-      ToastAndroid.show(
-        `PDF saved to Downloads: ${pdfPath}`,
-        ToastAndroid.LONG,
-      );
-    } catch (error) {
-      console.error(error);
-      ToastAndroid.show('Failed to save PDF. Try again.', ToastAndroid.LONG);
-    }
-  };
+  //     ToastAndroid.show(
+  //       `PDF saved to Downloads: ${pdfPath}`,
+  //       ToastAndroid.LONG,
+  //     );
+  //   } catch (error) {
+  //     console.error(error);
+  //     ToastAndroid.show('Failed to save PDF. Try again.', ToastAndroid.LONG);
+  //   }
+  // };
 
   return (
     <>
@@ -151,7 +151,7 @@ const ReportPreview = ({ route }) => {
         <Text style={styles.title}>{reportType} Expense Report</Text>
         <PrimaryButton
           title="Download PDF"
-          onPress={generatePDF}
+          // onPress={generatePDF}
           containerStyle={styles.downloadButton}
         />
         <ScrollView horizontal>
