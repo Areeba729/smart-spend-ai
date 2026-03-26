@@ -13,8 +13,6 @@ import auth from '@react-native-firebase/auth';
 import SimpleHeader from '../../../components/SimpleHeader/SimpleHeader';
 import { Theme } from '../../../libs';
 import { moderateScale } from 'react-native-size-matters';
-// import { PDFDocument, PDFPage, rgb } from 'react-native-pdf-lib';
-import RNFS from 'react-native-fs';
 import PrimaryButton from '../../../components/PrimaryButton/PrimaryButton';
 
 const ReportPreview = ({ route }) => {
