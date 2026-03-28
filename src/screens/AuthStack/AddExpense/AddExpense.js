@@ -1,9 +1,9 @@
 import React from 'react';
-import { View, ScrollView, Text } from 'react-native';
-import SimpleHeader from '../../../components/SimpleHeader/SimpleHeader';
-import AddExpenseForm from '../../../components/AddExpenseForm/AddExpenseForm';
-import styles from './style';
+import { Text, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import AddExpenseForm from '../../../components/AddExpenseForm/AddExpenseForm';
+import SimpleHeader from '../../../components/SimpleHeader/SimpleHeader';
+import styles from './style';
 
 const AddExpense = ({ navigation, route }) => {
   const prefillData = route?.params?.prefillData;

@@ -1,23 +1,22 @@
 import React, { useRef, useState } from 'react';
 import {
-  View,
-  TouchableOpacity,
-  StyleSheet,
   ActivityIndicator,
   Alert,
   StatusBar,
+  StyleSheet,
+  TouchableOpacity,
+  View,
 } from 'react-native';
+import { SvgXml } from 'react-native-svg';
 import {
   Camera,
   useCameraDevice,
   useCameraPermission,
 } from 'react-native-vision-camera';
-import { TextRecognition } from '@react-native-ml-kit/text-recognition';
-import { SvgXml } from 'react-native-svg';
-import NativeText from '../../../components/NativeText/NativeText';
 import { BackArrowIcon } from '../../../assets/icons';
+import NativeText from '../../../components/NativeText/NativeText';
 import { Theme } from '../../../libs';
-import { parseReceiptText } from '../../../utils/parseReceiptText';
+import { scanReceiptWithMindee } from '../../../utils/scanReceiptWithMindee';
 import styles from './style';
 
 const ReceiptScannerScreen = ({ navigation }) => {
@@ -62,29 +61,30 @@ const ReceiptScannerScreen = ({ navigation }) => {
   // ── Capture & process ───────────────────────────────────────────────────
   const handleCapture = async () => {
     if (!camera.current || scanning) return;
-    setScanning(true);
 
     try {
       const photo = await camera.current.takePhoto();
-      const imagePath = `file://${photo.path}`;
+      setScanning(true);
 
-      const result = await TextRecognition.recognize(imagePath);
+      const { title, amount, date, category, note, currency } =
+        await scanReceiptWithMindee(photo.path);
 
-      const fullText = result.blocks.map(block => block.text).join('\n');
-      const { merchant, amount, date } = parseReceiptText(fullText);
-
-      navigation.navigate('AddExpense', {
-        prefillData: { title: merchant, amount, date },
+      navigation.navigate('TabNavigator', {
+        screen: 'AddExpense',
+        params: {
+          prefillData: { title: title, amount, date, note, category, currency },
+        },
       });
     } catch (error) {
-      console.error('Receipt scan error:', error);
+      console.log('Receipt scan error:', error);
       Alert.alert(
         'Scan Failed',
         'Could not read the receipt. Please fill in the details manually.',
         [
           {
             text: 'OK',
-            onPress: () => navigation.navigate('AddExpense', {}),
+            onPress: () =>
+              navigation.navigate('TabNavigator', { screen: 'AddExpense' }),
           },
         ],
       );
@@ -107,7 +107,7 @@ const ReceiptScannerScreen = ({ navigation }) => {
         ref={camera}
         style={StyleSheet.absoluteFill}
         device={device}
-        isActive={!scanning}
+        isActive
         photo
       />
 

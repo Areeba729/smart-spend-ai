@@ -71,3 +71,6 @@ export default function App() {
     </SafeAreaView>
   );
 }
+
+
+// jr_live_ENQ1W7IzUCmI7gpFFY22VSmrpfCaoTeo

@@ -19,14 +19,33 @@ import { styles } from './style';
 import { saveExpenseToFirestore } from '../../hooks/ExpenseFunction';
 import { useNavigation } from '@react-navigation/native';
 import { Theme } from '../../libs';
+import firestore from '@react-native-firebase/firestore';
+import { ScrollView } from 'react-native-gesture-handler';
 
 const AddExpenseForm = ({ onSubmit, prefillData }) => {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const navigation = useNavigation();
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(
-    prefillData?.date instanceof Date ? prefillData.date : new Date(),
-  );
+  const [selectedDate, setSelectedDate] = useState(() => {
+    const dateValue = prefillData?.date;
+
+    if (dateValue instanceof Date) {
+      return dateValue; // Already a JS Date
+    }
+
+    // Firestore Timestamp
+    if (dateValue?.seconds != null && dateValue?.nanoseconds != null) {
+      return new firestore.Timestamp(
+        dateValue.seconds,
+        dateValue.nanoseconds,
+      ).toDate();
+    }
+
+    // Fallback to current date
+    return new Date();
+  });
+  console.log(prefillData);
+
   const [loading, setLoading] = useState(false); // State for loader
 
   // Sync selectedDate when navigated from the receipt scanner with a detected date
@@ -37,10 +56,11 @@ const AddExpenseForm = ({ onSubmit, prefillData }) => {
   }, [prefillData?.date]);
 
   const categories = [
-    { id: 1, name: 'Shopping', icon: '🛒', color: '#86AE12' },
-    { id: 2, name: 'Food', icon: '🍴', color: '#1C1C1E' },
-    { id: 3, name: 'Transport', icon: '🚗', color: '#1C1C1E' },
-    { id: 4, name: 'Medical', icon: '💊', color: '#1C1C1E' },
+    { id: 5, name: 'others', icon: '📦', color: '#1C1C1E' },
+    { id: 1, name: 'shopping', icon: '🛒', color: '#86AE12' },
+    { id: 2, name: 'food', icon: '🍴', color: '#1C1C1E' },
+    { id: 3, name: 'transport', icon: '🚗', color: '#1C1C1E' },
+    { id: 4, name: 'medical', icon: '💊', color: '#1C1C1E' },
   ];
 
   const validationSchema = Yup.object().shape({
@@ -69,6 +89,7 @@ const AddExpenseForm = ({ onSubmit, prefillData }) => {
       category: values.category,
       date: values.date,
       note: values.note,
+      currency: values.currency || 'PKR',
     };
 
     try {
@@ -88,9 +109,9 @@ const AddExpenseForm = ({ onSubmit, prefillData }) => {
       initialValues={{
         amount: prefillData?.amount || '',
         title: prefillData?.title || '',
-        category: 'Shopping',
+        category: prefillData?.category?.toLowerCase() || 'others',
         date: prefillData?.date instanceof Date ? prefillData.date : new Date(),
-        note: '',
+        note: prefillData?.note || '',
       }}
       validationSchema={validationSchema}
       onSubmit={handleSave}
@@ -142,8 +163,12 @@ const AddExpenseForm = ({ onSubmit, prefillData }) => {
             <View style={styles.sectionHeader}>
               <NativeText style={styles.label}>Category</NativeText>
             </View>
-            <View style={styles.categoryGrid}>
-              {categories.map(cat => (
+            <ScrollView
+              style={styles.categoryGrid}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+            >
+              {categories.map((cat, i) => (
                 <TouchableOpacity
                   key={cat.name}
                   style={[
@@ -151,6 +176,10 @@ const AddExpenseForm = ({ onSubmit, prefillData }) => {
                     values.category === cat.name
                       ? styles.categoryItemActive
                       : styles.categoryItemInactive,
+                    i === 0 ? { marginLeft: 0 } : { marginLeft: 4 }, // Remove left margin for the first item
+                    i === categories.length - 1
+                      ? { marginRight: 0 }
+                      : { marginRight: 4 }, // Remove right margin for the last item
                   ]}
                   onPress={() => setFieldValue('category', cat.name)}
                 >
@@ -165,11 +194,11 @@ const AddExpenseForm = ({ onSubmit, prefillData }) => {
                         : styles.categoryNameInactive,
                     ]}
                   >
-                    {cat.name}
+                    {cat.name.charAt(0).toUpperCase() + cat.name.slice(1)}
                   </NativeText>
                 </TouchableOpacity>
               ))}
-            </View>
+            </ScrollView>
           </View>
 
           {/* Date Field */}
@@ -207,17 +236,20 @@ const AddExpenseForm = ({ onSubmit, prefillData }) => {
             onPress={handleSubmit}
             disabled={loading}
           >
-            <NativeText style={styles.saveButtonText}>
-              Save Expense
-            </NativeText>
+            <NativeText style={styles.saveButtonText}>Save Expense</NativeText>
           </TouchableOpacity>
 
           {/* Full-screen loader while saving */}
           <Modal visible={loading} transparent animationType="fade">
             <View style={loaderStyles.overlay}>
               <View style={loaderStyles.box}>
-                <ActivityIndicator size="large" color={Theme.colors.secondary} />
-                <NativeText style={loaderStyles.text}>Saving expense...</NativeText>
+                <ActivityIndicator
+                  size="large"
+                  color={Theme.colors.secondary}
+                />
+                <NativeText style={loaderStyles.text}>
+                  Saving expense...
+                </NativeText>
               </View>
             </View>
           </Modal>

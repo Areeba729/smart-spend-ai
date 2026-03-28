@@ -1,9 +1,39 @@
 /**
+ * Fixes common OCR character substitutions inside a string that is
+ * expected to represent a number (e.g. "72o" → "720").
+ */
+function fixOcrNumber(str) {
+  return str
+    .replace(/[oO]/g, '0')
+    .replace(/[lI|]/g, '1')
+    .replace(/[zZ]/g, '2')
+    .replace(/[sS]/g, '5');
+}
+
+/**
+ * Returns true when a line looks like a printed receipt label rather than
+ * meaningful content (e.g. the word "Amount" or "Merchant" on its own).
+ */
+function isLabelLine(line) {
+  // Single-word common labels, optionally followed by a colon
+  return /^(amount|g[a-z]?mount|merchant|m[o0]rchant|total|subtotal|date|tax|gst|vat|qty|item|price|receipt|invoice|bill|cashier|change|cash|card|paid)\s*:?\s*$/i.test(
+    line,
+  );
+}
+
+/**
+ * Returns true when a line is (almost) entirely a price / number.
+ */
+function isPriceLine(line) {
+  return /^[Rs.\sPKR]*[0-9oOlI\/]+([.,][0-9oOlI]{1,2})?\/?\s*$/i.test(line);
+}
+
+/**
  * Parses raw OCR text extracted from a receipt.
  *
  * Returns:
- *   merchant {string}  - first non-empty line (assumed to be the store name)
- *   amount   {string}  - numeric string near a "total" keyword (e.g. "10.00")
+ *   merchant {string}    - best-guess store / merchant name
+ *   amount   {string}    - numeric string for the total (e.g. "720.00")
  *   date     {Date|null} - first valid date found in the text
  */
 export function parseReceiptText(rawText) {
@@ -16,19 +46,35 @@ export function parseReceiptText(rawText) {
     return { merchant: '', amount: '', date: null };
   }
 
+  const dateLineRegex = /\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4}/;
+
   // ── Merchant ─────────────────────────────────────────────────────────────
-  const merchant = lines[0];
+  // Skip label lines, price-only lines, and date lines.
+  // Take the first line that looks like an actual name.
+  let merchant = '';
+  for (const line of lines) {
+    if (
+      !isLabelLine(line) &&
+      !isPriceLine(line) &&
+      !dateLineRegex.test(line) &&
+      line.length >= 3 &&
+      /[a-zA-Z]{2,}/.test(line)
+    ) {
+      merchant = line;
+      break;
+    }
+  }
 
   // ── Amount ────────────────────────────────────────────────────────────────
-  // Look for a line that contains a "total" keyword, then grab the number after it.
   let amount = '';
+
+  // Pass 1 – keyword on the same line (tolerant of OCR misreads like "T0tal")
   const totalKeywordRegex =
-    /(?:grand\s?total|total\s?amount|amount\s?due|total|subtotal)\s*[:\-]?\s*/i;
+    /(?:grand\s?total|total\s?amount|amount\s?due|t[o0]tal|sub\s?total|net\s?amount|payable|to\s?pay|g?mount)\s*[:\-]?\s*/i;
 
   for (const line of lines) {
     if (totalKeywordRegex.test(line)) {
-      // Extract the first number-like value on this line
-      const numMatch = line.match(/([0-9]+(?:[.,][0-9]{1,2})?)/);
+      const numMatch = fixOcrNumber(line).match(/([0-9]+(?:[.,][0-9]{1,2})?)/);
       if (numMatch) {
         amount = numMatch[1].replace(',', '.');
         break;
@@ -36,10 +82,41 @@ export function parseReceiptText(rawText) {
     }
   }
 
+  // Pass 2 – value is on the next line after a standalone label
+  if (!amount) {
+    for (let i = 0; i < lines.length - 1; i++) {
+      if (
+        /^(amount|g[a-z]?mount|total|payable|due)\s*:?\s*$/i.test(lines[i])
+      ) {
+        const numMatch = fixOcrNumber(lines[i + 1]).match(
+          /([0-9]+(?:[.,][0-9]{1,2})?)/,
+        );
+        if (numMatch) {
+          amount = numMatch[1].replace(',', '.');
+          break;
+        }
+      }
+    }
+  }
+
+  // Pass 3 – fallback: largest numeric value on the receipt
+  if (!amount) {
+    let maxVal = 0;
+    for (const line of lines) {
+      const nums = fixOcrNumber(line).match(/\b([0-9]{2,}(?:[.,][0-9]{1,2})?)\b/g);
+      if (nums) {
+        for (const n of nums) {
+          const val = parseFloat(n.replace(',', '.'));
+          if (val > maxVal) {
+            maxVal = val;
+            amount = n.replace(',', '.');
+          }
+        }
+      }
+    }
+  }
+
   // ── Date ─────────────────────────────────────────────────────────────────
-  // Supported formats (in order of priority):
-  //   YYYY-MM-DD  (ISO)
-  //   DD/MM/YYYY, DD-MM-YYYY, DD.MM.YYYY  (Pakistan convention)
   let date = null;
 
   const isoRegex = /\b(\d{4})[\/\-\.](\d{1,2})[\/\-\.](\d{1,2})\b/;
@@ -48,7 +125,6 @@ export function parseReceiptText(rawText) {
   for (const line of lines) {
     let m;
 
-    // ISO: YYYY-MM-DD
     m = line.match(isoRegex);
     if (m) {
       const candidate = new Date(
@@ -60,7 +136,6 @@ export function parseReceiptText(rawText) {
       }
     }
 
-    // DD/MM/YYYY (Pakistan standard)
     m = line.match(dmy4Regex);
     if (m) {
       const candidate = new Date(
