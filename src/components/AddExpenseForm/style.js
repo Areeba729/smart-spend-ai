@@ -88,7 +88,7 @@ export const styles = StyleSheet.create({
   },
   categoryGrid: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    // justifyContent: 'space-between',
     marginBottom: moderateScale(24),
     width: scale(325),
     alignSelf: 'center',

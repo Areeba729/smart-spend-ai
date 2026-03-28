@@ -3,12 +3,17 @@ import { useFocusEffect } from '@react-navigation/native';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
+  Modal,
   RefreshControl,
   ScrollView,
   StatusBar,
+  StyleSheet,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   View,
 } from 'react-native';
+import { launchImageLibrary } from 'react-native-image-picker';
+import { scanReceiptWithMindee } from '../../../utils/scanReceiptWithMindee';
 import { SvgXml } from 'react-native-svg';
 import { useSelector } from 'react-redux';
 import { calendarIcon } from '../../../assets/icons';
@@ -209,9 +214,37 @@ const Home = ({ navigation }) => {
     navigation.navigate('AddExpense');
   };
 
+  const [showScanModal, setShowScanModal] = useState(false);
+  const [scanningGallery, setScanningGallery] = useState(false);
+
   const handleScanBill = () => {
-    // Navigate to scan bill screen
-    console.log('Scan Bill');
+    setShowScanModal(true);
+  };
+
+  const handleOpenCamera = () => {
+    setShowScanModal(false);
+    navigation.navigate('ReceiptScannerScreen');
+  };
+
+  const handleOpenGallery = () => {
+    launchImageLibrary({ mediaType: 'photo', quality: 1 }, async response => {
+      if (response.didCancel || response.errorCode) return;
+      const asset = response.assets?.[0];
+      if (!asset?.uri) return;
+
+      const imagePath = asset.uri.replace('file://', '');
+      setScanningGallery(true);
+      try {
+        const prefillData = await scanReceiptWithMindee(imagePath);
+        setShowScanModal(false);
+        navigation.navigate('AddExpense', { prefillData });
+      } catch {
+        setShowScanModal(false);
+        navigation.navigate('AddExpense');
+      } finally {
+        setScanningGallery(false);
+      }
+    });
   };
 
   const handleAddEvent = () => {
@@ -385,8 +418,137 @@ const Home = ({ navigation }) => {
         /> */}
         </ScrollView>
       )}
+
+      {/* Scan Receipt Source Picker */}
+      <Modal
+        visible={showScanModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowScanModal(false)}
+      >
+        <TouchableWithoutFeedback onPress={() => setShowScanModal(false)}>
+          <View style={scanModalStyles.overlay}>
+            <TouchableWithoutFeedback>
+              <View style={scanModalStyles.sheet}>
+                <NativeText style={scanModalStyles.title}>
+                  Scan Receipt
+                </NativeText>
+                <NativeText style={scanModalStyles.subtitle}>
+                  Choose how you'd like to scan your receipt
+                </NativeText>
+
+                <TouchableOpacity
+                  style={scanModalStyles.option}
+                  onPress={handleOpenCamera}
+                >
+                  <NativeText style={scanModalStyles.optionIcon}>📷</NativeText>
+                  <View>
+                    <NativeText style={scanModalStyles.optionLabel}>
+                      Use Camera
+                    </NativeText>
+                    <NativeText style={scanModalStyles.optionSub}>
+                      Take a photo of your receipt
+                    </NativeText>
+                  </View>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={scanModalStyles.option}
+                  onPress={handleOpenGallery}
+                  disabled={scanningGallery}
+                >
+                  <NativeText style={scanModalStyles.optionIcon}>🖼️</NativeText>
+                  <View style={{ flex: 1 }}>
+                    <NativeText style={scanModalStyles.optionLabel}>
+                      Choose from Gallery
+                    </NativeText>
+                    <NativeText style={scanModalStyles.optionSub}>
+                      {scanningGallery
+                        ? 'AI Scanning Receipt...'
+                        : 'Pick an existing receipt photo'}
+                    </NativeText>
+                  </View>
+                  {scanningGallery && (
+                    <ActivityIndicator
+                      size="small"
+                      color={Theme.colors.secondary}
+                    />
+                  )}
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={scanModalStyles.cancelButton}
+                  onPress={() => setShowScanModal(false)}
+                >
+                  <NativeText style={scanModalStyles.cancelText}>
+                    Cancel
+                  </NativeText>
+                </TouchableOpacity>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
     </View>
   );
 };
+
+const scanModalStyles = StyleSheet.create({
+  overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'flex-end',
+  },
+  sheet: {
+    backgroundColor: '#1C1C1E',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 24,
+    paddingBottom: 36,
+  },
+  title: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: '700',
+    marginBottom: 4,
+  },
+  subtitle: {
+    color: '#999',
+    fontSize: 13,
+    marginBottom: 20,
+  },
+  option: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#2C2C2E',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    gap: 14,
+  },
+  optionIcon: {
+    fontSize: 26,
+  },
+  optionLabel: {
+    color: '#fff',
+    fontSize: 15,
+    fontWeight: '600',
+  },
+  optionSub: {
+    color: '#999',
+    fontSize: 12,
+    marginTop: 2,
+  },
+  cancelButton: {
+    alignItems: 'center',
+    marginTop: 4,
+    padding: 14,
+  },
+  cancelText: {
+    color: '#FF453A',
+    fontSize: 15,
+    fontWeight: '600',
+  },
+});
 
 export default Home;
