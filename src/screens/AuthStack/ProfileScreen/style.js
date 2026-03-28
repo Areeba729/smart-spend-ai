@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { moderateScale } from 'react-native-size-matters';
+import { moderateScale, scale, verticalScale } from 'react-native-size-matters';
 import { Theme } from '../../../libs';
 
 const styles = StyleSheet.create({
@@ -270,6 +270,63 @@ const styles = StyleSheet.create({
   logoutButtonText: {
     color: Theme.colors.white,
     fontWeight: 'bold',
+  },
+  deleteText: {
+    flex: 1,
+    fontSize: moderateScale(15),
+    color: '#FF3B30',
+    marginLeft: moderateScale(26),
+  },
+  passwordInput: {
+    borderWidth: 1,
+    borderColor: Theme.colors.grey,
+    borderRadius: moderateScale(6),
+    paddingHorizontal: moderateScale(12),
+    paddingVertical: verticalScale(16),
+    fontSize: moderateScale(10),
+    marginBottom: verticalScale(12),
+    backgroundColor: Theme.colors.grayExtraLight,
+    width: scale(250),
+    color: Theme.colors.grey,
+  },
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: Theme.colors.lightGrey,
+    borderRadius: 8,
+    marginVertical: 10,
+    paddingHorizontal: 10,
+    // backgroundColor: Theme.colors.white,
+  },
+
+  eyeIconContainer: {
+    padding: 5,
+  },
+  passwordWrapper: {
+    width: scale(250),
+    position: 'relative',
+    marginBottom: verticalScale(12),
+  },
+
+  passwordInputField: {
+    width: '100%',
+    paddingHorizontal: moderateScale(12),
+    paddingVertical: verticalScale(10),
+    borderWidth: 1,
+    borderColor: Theme.colors.grey,
+    borderRadius: moderateScale(6),
+    color: Theme.colors.grey,
+    fontSize: moderateScale(10),
+    backgroundColor: Theme.colors.grayExtraLight,
+  },
+
+  eyeIconInside: {
+    position: 'absolute',
+    right: moderateScale(10),
+    top: '50%',
+    transform: [{ translateY: -12 }], // half of icon height
+    padding: 5,
   },
 });
 

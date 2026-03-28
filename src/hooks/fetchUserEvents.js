@@ -9,9 +9,10 @@ export const fetchUserEvents = async (uidParam = null) => {
 
     const docSnap = await firestore().collection('usersEvents').doc(uid).get();
 
-    if (!docSnap.exists) return [];
+    if (!docSnap.exists()) return [];
 
-    const { events = [] } = docSnap.data();
+    const data = docSnap.data();
+    const events = data?.events || [];
 
     // Normalize timestamps (if stored as Firestore Timestamp)
     return events.map(event => ({
