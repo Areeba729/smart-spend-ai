@@ -5,7 +5,9 @@ import AddExpenseForm from '../../../components/AddExpenseForm/AddExpenseForm';
 import styles from './style';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
-const AddExpense = ({ navigation }) => {
+const AddExpense = ({ navigation, route }) => {
+  const prefillData = route?.params?.prefillData;
+
   const handleSave = values => {
     navigation.goBack();
   };
@@ -27,6 +29,7 @@ const AddExpense = ({ navigation }) => {
         <AddExpenseForm
           onSubmit={handleSave}
           onCancel={() => navigation.goBack()}
+          prefillData={prefillData}
         />
       </KeyboardAwareScrollView>
     </View>

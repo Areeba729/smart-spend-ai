@@ -209,8 +209,7 @@ const Home = ({ navigation }) => {
   };
 
   const handleScanBill = () => {
-    // Navigate to scan bill screen
-    console.log('Scan Bill');
+    navigation.navigate('ReceiptScannerScreen');
   };
 
   const handleAddEvent = () => {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   TouchableOpacity,
@@ -20,12 +20,21 @@ import { saveExpenseToFirestore } from '../../hooks/ExpenseFunction';
 import { useNavigation } from '@react-navigation/native';
 import { Theme } from '../../libs';
 
-const AddExpenseForm = ({ onSubmit }) => {
+const AddExpenseForm = ({ onSubmit, prefillData }) => {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const navigation = useNavigation();
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(
+    prefillData?.date instanceof Date ? prefillData.date : new Date(),
+  );
   const [loading, setLoading] = useState(false); // State for loader
+
+  // Sync selectedDate when navigated from the receipt scanner with a detected date
+  useEffect(() => {
+    if (prefillData?.date instanceof Date) {
+      setSelectedDate(prefillData.date);
+    }
+  }, [prefillData?.date]);
 
   const categories = [
     { id: 1, name: 'Shopping', icon: '🛒', color: '#86AE12' },
@@ -75,11 +84,12 @@ const AddExpenseForm = ({ onSubmit }) => {
 
   return (
     <Formik
+      enableReinitialize
       initialValues={{
-        amount: '',
-        title: '',
+        amount: prefillData?.amount || '',
+        title: prefillData?.title || '',
         category: 'Shopping',
-        date: new Date(),
+        date: prefillData?.date instanceof Date ? prefillData.date : new Date(),
         note: '',
       }}
       validationSchema={validationSchema}
