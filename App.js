@@ -90,6 +90,7 @@ import {
 // 🔥 FCM Imports
 import messaging from '@react-native-firebase/messaging';
 import { Alert, Platform, PermissionsAndroid } from 'react-native';
+import firestore from '@react-native-firebase/firestore';
 
 export default function App() {
   const [isConnectedModal, setIsConnectedModal] = useState(false);
@@ -141,11 +142,24 @@ export default function App() {
   async function getFcmToken() {
     try {
       const token = await messaging().getToken();
-      console.log('🔥 FCM Token:', token);
+      if (token) {
+        console.log('🔥 FCM Token generated successfully:', token);
 
-      // 👉 TODO: Save token to Firestore / Backend
+        // 👉 Save token to Firestore / Backend
+        const userUid = store.getState().user?.uid; // Assuming user UID is stored in Redux
+        if (userUid) {
+          await firestore().collection('users').doc(userUid).update({
+            fcmToken: token,
+          });
+          console.log('✅ FCM Token saved to Firestore successfully.');
+        } else {
+          console.log('⚠️ User UID not found. Cannot save FCM Token.');
+        }
+      } else {
+        console.log('⚠️ FCM Token is null or undefined.');
+      }
     } catch (error) {
-      console.log('Token Error:', error);
+      console.log('❌ Error generating or saving FCM Token:', error);
     }
   }
 

@@ -30,6 +30,7 @@ import styles from './style';
 const Home = ({ navigation }) => {
   const { name, greeting } = useUserGreeting();
   const user = useSelector(selectUser);
+  console.log('user', user);
   const [events, setEvents] = useState([]);
   const [loadingEvents, setLoadingEvents] = useState(false);
   const [startDate, setStartDate] = useState(null);
