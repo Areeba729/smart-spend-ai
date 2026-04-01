@@ -31,7 +31,11 @@ const ActionGrid = ({ navigation }) => {
         label="Edit Budget"
         onPress={() => navigation.navigate('EditBudget')}
       />
-      <ActionItem icon="🧠" label="AI Advice" />
+      <ActionItem
+        icon="🧠"
+        label="AI Advice"
+        onPress={() => navigation.navigate('AIAdvice')}
+      />
     </View>
   );
 };
