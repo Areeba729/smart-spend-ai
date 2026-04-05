@@ -2,7 +2,7 @@ import RNFS from 'react-native-fs';
 
 // ── Config ──────────────────────────────────────────────────────────────────
 // Replace with your free key from https://aistudio.google.com/app/apikey
-const GEMINI_API_KEY = '';
+const GEMINI_API_KEY = 'AIzaSyCdNtiUQffgeOs9QWhN-NZC96PAosoin2M';
 
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=${GEMINI_API_KEY}`;
 
