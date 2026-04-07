@@ -66,6 +66,24 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
   },
+  expensesLoader: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  typingBubble: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+  },
+  dot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: Theme.colors.black,
+    marginHorizontal: 3,
+  },
 });
 
 export default styles;

@@ -8,6 +8,8 @@ const { OLLAMA_BASE_URL, OLLAMA_MODEL, SYSTEM_PROMPT } = require('../config/olla
  * The system prompt is always prepended server-side.
  */
 async function chat(req, res) {
+  console.log('request received');
+  
   const { messages } = req.body;
 
   if (!Array.isArray(messages) || messages.length === 0) {

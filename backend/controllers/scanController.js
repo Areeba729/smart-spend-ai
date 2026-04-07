@@ -44,19 +44,19 @@ async function scanReceipt(req, res) {
   }
 
   try {
-    // const inputSource = new mindee.PathInput({ inputPath: req.file.path });
+    const inputSource = new mindee.PathInput({ inputPath: req.file.path });
 
-    // const response = await mindeeClient.enqueueAndGetResult(
-    //   mindee.product.Extraction,
-    //   inputSource,
-    //   productParams,
-    // );
+    const response = await mindeeClient.enqueueAndGetResult(
+      mindee.product.Extraction,
+      inputSource,
+      productParams,
+    );
 
-    // const fields = response.inference.result.fields;
-    // const result = mapMindeeReceipt(fields);
-    // return res.json({ data: result });
+    const fields = response.inference.result.fields;
+    const result = mapMindeeReceipt(fields);
+    return res.json({ data: result });
 
-    res.json({ data: dummyResponse });
+    // res.json({ data: dummyResponse });
   } catch (error) {
     console.log('Receipt scan error:', error);
     res.status(500).json({ error: 'Failed to process receipt.' });

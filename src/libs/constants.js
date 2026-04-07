@@ -21,3 +21,5 @@ export const onboardingSteps = [
     description: 'Your journey to a greener life starts here.',
   },
 ];
+
+export const SERVER_URL = 'http://192.168.1.27:8080';
