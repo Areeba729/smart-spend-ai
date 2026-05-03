@@ -19,7 +19,7 @@ export const checkMonthAndCreateSnapshot = async userId => {
       .doc(`${currentYear}-${currentMonth.toString().padStart(2, '0')}`)
       .get();
 
-    if (currentMonthDoc.exists) {
+    if (currentMonthDoc.exists()) {
       // Snapshot for the current month already exists, no action needed
       return;
     }
