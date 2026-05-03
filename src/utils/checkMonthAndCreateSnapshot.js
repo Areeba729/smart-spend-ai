@@ -5,7 +5,7 @@ export const checkMonthAndCreateSnapshot = async userId => {
   console.log('USER ID:', userId);
   try {
     const now = new Date();
-    const currentMonth = now.getMonth() + 1; // Months are 0-indexed
+    const currentMonth = now.getMonth() + 1;
     const currentYear = now.getFullYear();
 
     // Reference to the user's expenseHistory collection
