@@ -1,65 +1,11 @@
-// import React from 'react';
-// import { View, ScrollView, TouchableOpacity, SafeAreaView } from 'react-native';
-// import { styles } from './style';
-// import NativeText from '../../../components/NativeText/NativeText';
-// import BudgetSlider from '../../../components/BudgetSlider/BudgetSlider';
-// import RecommendationCard from '../../../components/RecommendationCard/RecommendationCard';
-// import ImpactCard from '../../../components/ImpactCard/ImpactCard';
-// import SimpleHeader from '../../../components/SimpleHeader/SimpleHeader';
-
-// const EditBudget = ({ navigation }) => {
-//   return (
-//     <View style={styles.container}>
-//       <SimpleHeader
-//         title="Edit Budget"
-//         showBack
-//         onBackPress={() => navigation.goBack()}
-//       />
-
-//       <ScrollView
-//         showsVerticalScrollIndicator={false}
-//         contentContainerStyle={styles.scrollContent}
-//       >
-//         <BudgetSlider />
-
-//         <RecommendationCard
-//           onApply={() => console.log('Recommendation applied')}
-//         />
-
-//         <View style={styles.sectionHeader}>
-//           <NativeText style={styles.sectionTitle}>Projected Impact</NativeText>
-//           <View style={styles.badge}>
-//             <NativeText style={styles.badgeText}>This Month</NativeText>
-//           </View>
-//         </View>
-
-//         <View style={styles.impactRow}>
-//           <ImpactCard label="CURRENT" amount="142k" fillPercentage={40} />
-//           <ImpactCard
-//             label="NEW GOAL"
-//             amount="150k"
-//             isNewGoal
-//             fillPercentage={70}
-//           />
-//         </View>
-//       </ScrollView>
-
-//       <View style={styles.footer}>
-//         <TouchableOpacity
-//           style={styles.updateButton}
-//           onPress={() => navigation.goBack()}
-//         >
-//           <NativeText style={styles.updateButtonText}>Update Budget</NativeText>
-//         </TouchableOpacity>
-//       </View>
-//     </View>
-//   );
-// };
-
-// export default EditBudget;
-
 import React, { useEffect, useState } from 'react';
-import { View, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import {
+  View,
+  ScrollView,
+  TouchableOpacity,
+  Alert,
+  ToastAndroid,
+} from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import { useSelector } from 'react-redux';
 
@@ -70,9 +16,11 @@ import RecommendationCard from '../../../components/RecommendationCard/Recommend
 import ImpactCard from '../../../components/ImpactCard/ImpactCard';
 import SimpleHeader from '../../../components/SimpleHeader/SimpleHeader';
 import { selectUser } from '../../../redux/slices/userSlice';
+import Toast from 'react-native-toast-message';
 
 const EditBudget = ({ navigation }) => {
   const user = useSelector(selectUser);
+  console.log('User in EditBudget:', user);
   const [monthlyBudget, setMonthlyBudget] = useState(0);
   const [isUpdating, setIsUpdating] = useState(false);
 
@@ -100,17 +48,29 @@ const EditBudget = ({ navigation }) => {
       Alert.alert('Invalid Budget', 'Please set a budget greater than 0.');
       return;
     }
+
     setIsUpdating(true);
+
     try {
       await firestore()
         .collection('users')
         .doc(user.uid)
-        .update({ monthlyBudget: monthlyBudget.toString() });
-      Alert.alert('Success', 'Monthly budget updated successfully!');
+        .update({ monthlyBudget });
+
+      Toast.show({
+        type: 'success',
+        text1: 'Success',
+        text2: 'Budget updated successfully!',
+      });
+
       navigation.goBack();
     } catch (error) {
       console.error('Error updating budget:', error);
-      Alert.alert('Error', 'Failed to update budget. Please try again.');
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Failed to update budget',
+      });
     } finally {
       setIsUpdating(false);
     }
@@ -137,18 +97,18 @@ const EditBudget = ({ navigation }) => {
           step={500}
         />
 
-        <RecommendationCard
+        {/* <RecommendationCard
           onApply={() => console.log('Recommendation applied')}
-        />
+        /> */}
 
-        <View style={styles.sectionHeader}>
+        {/* <View style={styles.sectionHeader}>
           <NativeText style={styles.sectionTitle}>Projected Impact</NativeText>
           <View style={styles.badge}>
             <NativeText style={styles.badgeText}>This Month</NativeText>
           </View>
-        </View>
+        </View> */}
 
-        <View style={styles.impactRow}>
+        {/* <View style={styles.impactRow}>
           <ImpactCard
             label="CURRENT"
             amount={`${monthlyBudget}`}
@@ -160,7 +120,7 @@ const EditBudget = ({ navigation }) => {
             isNewGoal
             fillPercentage={70}
           />
-        </View>
+        </View> */}
       </ScrollView>
 
       <View style={styles.footer}>

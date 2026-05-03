@@ -4,8 +4,8 @@ import { Theme } from '../../libs';
 
 const styles = StyleSheet.create({
   container: {
-  backgroundColor: Theme.colors.primary,
-},
+    backgroundColor: Theme.colors.primary,
+  },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',

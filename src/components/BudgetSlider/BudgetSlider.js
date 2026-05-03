@@ -3,15 +3,18 @@ import { View, TouchableOpacity } from 'react-native';
 import NativeText from '../NativeText/NativeText';
 import { styles } from './style';
 
-const BudgetSlider = ({ initialValue = 150000, min = 50000, max = 300000 }) => {
-  const [value, setValue] = useState(initialValue);
-
+const BudgetSlider = ({
+  value,
+  onValueChange,
+  min = 50000,
+  max = 300000,
+  step = 5000,
+}) => {
   const handleAdjust = delta => {
     const newValue = Math.min(Math.max(value + delta, min), max);
-    setValue(newValue);
+    onValueChange(newValue); // 🔥 parent ko update bhejo
   };
 
-  // Mock percentage for slider representation
   const percentage = ((value - min) / (max - min)) * 100;
 
   return (
@@ -43,7 +46,7 @@ const BudgetSlider = ({ initialValue = 150000, min = 50000, max = 300000 }) => {
       <View style={styles.adjustRow}>
         <TouchableOpacity
           style={styles.adjustButton}
-          onPress={() => handleAdjust(-5000)}
+          onPress={() => handleAdjust(-step)}
         >
           <NativeText style={styles.buttonText}>−</NativeText>
         </TouchableOpacity>
@@ -52,7 +55,7 @@ const BudgetSlider = ({ initialValue = 150000, min = 50000, max = 300000 }) => {
 
         <TouchableOpacity
           style={styles.adjustButton}
-          onPress={() => handleAdjust(5000)}
+          onPress={() => handleAdjust(step)}
         >
           <NativeText style={styles.buttonText}>+</NativeText>
         </TouchableOpacity>
@@ -60,5 +63,4 @@ const BudgetSlider = ({ initialValue = 150000, min = 50000, max = 300000 }) => {
     </View>
   );
 };
-
 export default BudgetSlider;

@@ -40,13 +40,35 @@ import { aiAssistant } from '../../../utils/aiAssistant';
 import { getExpensesFromFirestore } from '../../../hooks/ExpenseFunction';
 import { useSelector } from 'react-redux';
 import { selectUser } from '../../../redux/slices/userSlice';
+import { useFocusEffect } from '@react-navigation/native';
+import { useCallback } from 'react';
+import firestore from '@react-native-firebase/firestore';
 
 const BudgetScreen = ({ navigation }) => {
   const user = useSelector(selectUser);
-  const monthlyBudget = Number(user?.monthlyBudget || 0);
-
+  // const monthlyBudget = Number(user?.monthlyBudget || 0);
+  const [monthlyBudget, setMonthlyBudget] = useState(0);
   const [totalSpent, setTotalSpent] = useState(0);
   const [todaySpent, setTodaySpent] = useState(0);
+
+  useFocusEffect(
+    useCallback(() => {
+      const fetchUserBudget = async () => {
+        try {
+          const doc = await firestore().collection('users').doc(user.uid).get();
+
+          if (doc.exists) {
+            const data = doc.data();
+            setMonthlyBudget(Number(data.monthlyBudget) || 0);
+          }
+        } catch (error) {
+          console.log('Error fetching updated budget:', error);
+        }
+      };
+
+      fetchUserBudget();
+    }, [user.uid]),
+  );
 
   useEffect(() => {
     const fetchExpenses = async () => {
@@ -105,11 +127,11 @@ const BudgetScreen = ({ navigation }) => {
         /> */}
 
         <ActionGrid navigation={navigation} />
-
+        {/* 
         <InsightCard
           title={aiResult.insightTitle}
           description={aiResult.insightDescription}
-        />
+        /> */}
       </ScrollView>
     </View>
   );

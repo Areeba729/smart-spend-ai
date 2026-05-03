@@ -7,13 +7,13 @@ export const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Theme.colors.black,
   },
-  header: {
-    paddingHorizontal: moderateScale(20),
-    paddingVertical: moderateScale(16),
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
+  // header: {
+  //   paddingHorizontal: moderateScale(20),
+  //   paddingVertical: moderateScale(16),
+  //   flexDirection: 'row',
+  //   justifyContent: 'space-between',
+  //   alignItems: 'center',
+  // },
   cancelBtn: {
     fontSize: moderateScale(14),
     color: '#A0A0A0',
@@ -29,6 +29,8 @@ export const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: moderateScale(20),
     paddingBottom: moderateScale(100),
+    flexGrow: 1,
+    marginTop: moderateScale(20),
   },
   sectionHeader: {
     flexDirection: 'row',
