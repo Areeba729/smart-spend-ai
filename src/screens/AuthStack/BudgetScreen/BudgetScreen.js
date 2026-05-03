@@ -28,7 +28,7 @@
 
 // export default BudgetScreen;
 import React, { useEffect, useState } from 'react';
-import { ScrollView, View } from 'react-native';
+import { ScrollView, View, Text, Button } from 'react-native';
 import { styles } from './style';
 import MonthlyBudgetCard from './components/MonthlyBudgetCard';
 import LimitCard from './components/LimitCard';
@@ -43,29 +43,45 @@ import { selectUser } from '../../../redux/slices/userSlice';
 import { useFocusEffect } from '@react-navigation/native';
 import { useCallback } from 'react';
 import firestore from '@react-native-firebase/firestore';
+import BudgetModal from '../../../components/BudgetModal';
+import PrimaryButton from '../../../components/PrimaryButton/PrimaryButton';
 
 const BudgetScreen = ({ navigation }) => {
   const user = useSelector(selectUser);
   // const monthlyBudget = Number(user?.monthlyBudget || 0);
-  const [monthlyBudget, setMonthlyBudget] = useState(0);
+  const [monthlyBudget, setMonthlyBudget] = useState(null); // null means not set
   const [totalSpent, setTotalSpent] = useState(0);
   const [todaySpent, setTodaySpent] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [showBudgetModal, setShowBudgetModal] = useState(false);
+  const [newBudget, setNewBudget] = useState('');
 
   useFocusEffect(
     useCallback(() => {
       const fetchUserBudget = async () => {
+        setLoading(true);
         try {
           const doc = await firestore().collection('users').doc(user.uid).get();
-
           if (doc.exists) {
             const data = doc.data();
-            setMonthlyBudget(Number(data.monthlyBudget) || 0);
+            // budgets: { '2026-05': 1000, ... }
+            const budgets = data.budgets || {};
+            const now = new Date();
+            const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+            if (budgets[currentMonth] !== undefined) {
+              setMonthlyBudget(Number(budgets[currentMonth]));
+            } else {
+              setMonthlyBudget(null);
+            }
+          } else {
+            setMonthlyBudget(null);
           }
         } catch (error) {
           console.log('Error fetching updated budget:', error);
+          setMonthlyBudget(null);
         }
+        setLoading(false);
       };
-
       fetchUserBudget();
     }, [user.uid]),
   );
@@ -101,10 +117,35 @@ const BudgetScreen = ({ navigation }) => {
 
   // 🤖 AI uses REAL data
   const aiResult = aiAssistant({
-    monthlyBudget,
+    monthlyBudget: monthlyBudget || 0,
     totalSpent,
     todaySpent,
   });
+
+  // Set budget for current month
+  const handleSetBudget = async () => {
+    if (!newBudget) return;
+    setLoading(true);
+    try {
+      const docRef = firestore().collection('users').doc(user.uid);
+      const doc = await docRef.get();
+      let budgets = {};
+      if (doc.exists) {
+        const data = doc.data();
+        budgets = data.budgets || {};
+      }
+      const now = new Date();
+      const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+      budgets[currentMonth] = Number(newBudget);
+      await docRef.update({ budgets });
+      setMonthlyBudget(Number(newBudget));
+      setShowBudgetModal(false);
+      setNewBudget('');
+    } catch (error) {
+      console.log('Error setting budget:', error);
+    }
+    setLoading(false);
+  };
 
   return (
     <View style={styles.container}>
@@ -113,12 +154,21 @@ const BudgetScreen = ({ navigation }) => {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        <MonthlyBudgetCard
-          monthlyBudget={monthlyBudget}
-          totalSpent={totalSpent}
-        />
+        {loading ? (
+          <Text>Loading...</Text>
+        ) : monthlyBudget === null ? (
+          <View style={{ alignItems: 'center', marginVertical: 24 }}>
+            <Text>No budget set for this month.</Text>
+            <PrimaryButton containerStyle={{backgroundColor: '#86AE12'}} title="Set Budget Now" onPress={() => setShowBudgetModal(true)} />
+          </View>
+        ) : (
+          <MonthlyBudgetCard
+            monthlyBudget={monthlyBudget}
+            totalSpent={totalSpent}
+          />
+        )}
 
-        <LimitCard dailyLimit={aiResult.dailyLimit} />
+        {monthlyBudget !== null && <LimitCard dailyLimit={aiResult.dailyLimit} />}
 
         {/* <HealthCard
           status={aiResult.health}
@@ -133,6 +183,17 @@ const BudgetScreen = ({ navigation }) => {
           description={aiResult.insightDescription}
         /> */}
       </ScrollView>
+      <BudgetModal
+        visible={showBudgetModal}
+        value={newBudget}
+        onChange={setNewBudget}
+        onSave={handleSetBudget}
+        onCancel={() => {
+          setShowBudgetModal(false);
+          setNewBudget('');
+        }}
+        loading={loading}
+      />
     </View>
   );
 };

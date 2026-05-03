@@ -24,7 +24,7 @@ const EditBudget = ({ navigation }) => {
   const [monthlyBudget, setMonthlyBudget] = useState(0);
   const [isUpdating, setIsUpdating] = useState(false);
 
-  // Fetch current budget from Firestore
+  // Fetch current month's budget from Firestore
   useEffect(() => {
     const fetchBudget = async () => {
       try {
@@ -34,7 +34,10 @@ const EditBudget = ({ navigation }) => {
           .get();
         if (userDoc.exists) {
           const data = userDoc.data();
-          setMonthlyBudget(Number(data.monthlyBudget) || 0);
+          const budgets = data.budgets || {};
+          const now = new Date();
+          const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+          setMonthlyBudget(Number(budgets[currentMonth]) || 0);
         }
       } catch (error) {
         console.error('Error fetching user budget:', error);
@@ -52,10 +55,17 @@ const EditBudget = ({ navigation }) => {
     setIsUpdating(true);
 
     try {
-      await firestore()
-        .collection('users')
-        .doc(user.uid)
-        .update({ monthlyBudget });
+      const docRef = firestore().collection('users').doc(user.uid);
+      const doc = await docRef.get();
+      let budgets = {};
+      if (doc.exists) {
+        const data = doc.data();
+        budgets = data.budgets || {};
+      }
+      const now = new Date();
+      const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+      budgets[currentMonth] = Number(monthlyBudget);
+      await docRef.update({ budgets });
 
       Toast.show({
         type: 'success',

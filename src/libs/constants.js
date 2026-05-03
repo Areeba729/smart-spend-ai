@@ -22,4 +22,4 @@ export const onboardingSteps = [
   },
 ];
 
-export const SERVER_URL = 'http://192.168.1.27:8080';
+export const SERVER_URL = 'http://192.168.1.25:8080';
