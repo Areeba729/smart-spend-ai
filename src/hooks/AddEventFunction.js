@@ -35,7 +35,7 @@ export const fetchUserEvents = async () => {
     const userDocRef = firestore().collection('usersEvents').doc(user.uid);
     const docSnapshot = await userDocRef.get();
 
-    if (!docSnapshot.exists) {
+    if (!docSnapshot.exists()) {
       return []; // No events yet
     }
 

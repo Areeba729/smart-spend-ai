@@ -146,7 +146,9 @@ export default function App() {
         console.log('🔥 FCM Token generated successfully:', token);
 
         // 👉 Save token to Firestore / Backend
-        const userUid = store.getState().user?.uid; // Assuming user UID is stored in Redux
+        const user = store.getState().userReducer?.user;
+
+        const userUid = user?.uid; // Assuming user UID is stored in Redux
         if (userUid) {
           await firestore().collection('users').doc(userUid).update({
             fcmToken: token,
@@ -169,10 +171,11 @@ export default function App() {
 
     // Foreground Notification
     const unsubscribe = messaging().onMessage(async remoteMessage => {
-      Alert.alert(
-        remoteMessage.notification?.title || 'Notification',
-        remoteMessage.notification?.body || '',
-      );
+      Toast.show({
+        type: 'info',
+        text1: remoteMessage.notification?.title || 'Notification',
+        text2: remoteMessage.notification?.body || '',
+      })
     });
 
     // App opened from background
