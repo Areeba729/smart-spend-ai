@@ -17,6 +17,8 @@ import HelpAndSupport from '../screens/AuthStack/HelpAndSupport/HelpAndSupport';
 import ReportPreview from '../screens/AuthStack/ReportPreview/ReportPreview';
 import ReceiptScannerScreen from '../screens/AuthStack/ReceiptScanner/ReceiptScannerScreen';
 import AIAdvice from '../screens/AuthStack/AIAdvice/AIAdvice';
+import History from '../screens/AuthStack/History/History';
+
 function AuthStack() {
   const Stack = createNativeStackNavigator();
 
@@ -38,6 +40,7 @@ function AuthStack() {
     ReportPreview,
     ReceiptScannerScreen,
     AIAdvice,
+    History,
   };
 
   return (

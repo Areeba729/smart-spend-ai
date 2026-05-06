@@ -51,9 +51,11 @@ const Home = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const [loadingEvents, setLoadingEvents] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [loadingSummary, setLoadingSummary] = useState(true);
   const [monthlyBudget, setMonthlyBudget] = useState(null); // null means not set
   const [showBudgetModal, setShowBudgetModal] = useState(false);
   const [newBudget, setNewBudget] = useState('');
+  const [lastMonthSummary, setLastMonthSummary] = useState({});
 
   // Budget dates
   const [startDate, setStartDate] = useState(null);
@@ -107,7 +109,6 @@ const Home = ({ navigation }) => {
     const diffTime = endDate - today;
     return Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
   };
-
 
   const dailyLimit = useMemo(() => {
     if (!monthlyBudget || !startDate || !endDate) return 0;
@@ -219,7 +220,9 @@ const Home = ({ navigation }) => {
 
         // Budget for current month
         const now = new Date();
-        const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+        const currentMonth = `${now.getFullYear()}-${String(
+          now.getMonth() + 1,
+        ).padStart(2, '0')}`;
         const budgets = userData.budgets || {};
         if (budgets[currentMonth] !== undefined) {
           setMonthlyBudget(Number(budgets[currentMonth]));
@@ -231,43 +234,35 @@ const Home = ({ navigation }) => {
       console.error('Error fetching user dates:', error);
     }
   };
-    // Set budget for current month
-    const handleSetBudget = async () => {
-      if (!newBudget) return;
-      try {
-        const firebaseUser = auth().currentUser;
-        if (!firebaseUser?.uid) return;
-        const docRef = firestore().collection('users').doc(firebaseUser.uid);
-        const doc = await docRef.get();
-        let budgets = {};
-        if (doc.exists) {
-          const data = doc.data();
-          budgets = data.budgets || {};
-        }
-        const now = new Date();
-        const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-        budgets[currentMonth] = Number(newBudget);
-        await docRef.update({ budgets });
-        setMonthlyBudget(Number(newBudget));
-        setShowBudgetModal(false);
-        setNewBudget('');
-      } catch (error) {
-        console.log('Error setting budget:', error);
+  // Set budget for current month
+  const handleSetBudget = async () => {
+    if (!newBudget) return;
+    try {
+      const firebaseUser = auth().currentUser;
+      if (!firebaseUser?.uid) return;
+      const docRef = firestore().collection('users').doc(firebaseUser.uid);
+      const doc = await docRef.get();
+      let budgets = {};
+      if (doc.exists) {
+        const data = doc.data();
+        budgets = data.budgets || {};
       }
-    };
+      const now = new Date();
+      const currentMonth = `${now.getFullYear()}-${String(
+        now.getMonth() + 1,
+      ).padStart(2, '0')}`;
+      budgets[currentMonth] = Number(newBudget);
+      await docRef.update({ budgets });
+      setMonthlyBudget(Number(newBudget));
+      setShowBudgetModal(false);
+      setNewBudget('');
+    } catch (error) {
+      console.log('Error setting budget:', error);
+    }
+  };
   // ----------------------
   // Effects
   // ----------------------
-  // useEffect(() => {
-  //   const initialize = async () => {
-  //     if (user?.uid) {
-  //       await checkMonthAndCreateSnapshot(user.uid);
-  //     }
-  //   };
-
-  //   initialize();
-  // }, [user?.uid]);
-
   useEffect(() => {
     const initialize = async () => {
       const firebaseUser = auth().currentUser;
@@ -278,8 +273,10 @@ const Home = ({ navigation }) => {
         console.log('❌ No Firebase Auth user found');
         return;
       }
-
-      await checkMonthAndCreateSnapshot(firebaseUser.uid);
+      setLoadingSummary(true)
+      const doc = await checkMonthAndCreateSnapshot(firebaseUser.uid);
+      setLastMonthSummary(doc);
+      setLoadingSummary(false)
     };
 
     initialize();
@@ -288,7 +285,7 @@ const Home = ({ navigation }) => {
   useFocusEffect(
     useCallback(() => {
       fetchUserDates();
-    }, [])
+    }, []),
   );
 
   // Refetch expenses when budget changes
@@ -369,6 +366,12 @@ const Home = ({ navigation }) => {
     });
   };
 
+  const onHistoryPress = () => {
+    navigation.navigate('History', {
+      historyData: lastMonthSummary?.previousMonthExpenses || [],
+    });
+  };
+
   // ----------------------
   // Render
   // ----------------------
@@ -397,7 +400,12 @@ const Home = ({ navigation }) => {
           }
         >
           {/* Budget Date Range */}
-          <BudgetDateRange onDateChange={handleDateChange} />
+          <BudgetDateRange
+            onDateChange={handleDateChange}
+            historyDoc={lastMonthSummary?.historyDoc || {}}
+            onPress={onHistoryPress}
+            loading={loadingSummary}
+          />
 
           {/* Budget Modal Trigger if no budget for current month */}
           {monthlyBudget === null && (
@@ -405,7 +413,11 @@ const Home = ({ navigation }) => {
               <NativeText style={{ fontSize: 16, marginBottom: 8 }}>
                 No budget set for this month.
               </NativeText>
-              <PrimaryButton containerStyle={{backgroundColor: '#86AE12'}} title="Set Budget Now" onPress={() => setShowBudgetModal(true)} />
+              <PrimaryButton
+                containerStyle={{ backgroundColor: '#86AE12' }}
+                title="Set Budget Now"
+                onPress={() => setShowBudgetModal(true)}
+              />
             </View>
           )}
 

@@ -1,8 +1,6 @@
 import firestore from '@react-native-firebase/firestore';
 
 export const checkMonthAndCreateSnapshot = async userId => {
-  console.log('checkMonthAndCreateSnapshot triggered');
-  console.log('USER ID:', userId);
   try {
     const now = new Date();
     const currentMonth = now.getMonth() + 1;
@@ -29,42 +27,51 @@ export const checkMonthAndCreateSnapshot = async userId => {
     const previousYear = currentMonth === 1 ? currentYear - 1 : currentYear;
 
     // Fetch all expenses for the previous month from userExpenses
-    const userExpensesRef = firestore()
+    const userExpensesDoc = await firestore()
       .collection('userExpenses')
       .doc(userId)
-      .collection('expenses');
-    const snapshot = await userExpensesRef
-      .where('date', '>=', new Date(previousYear, previousMonth - 1, 1))
-      .where('date', '<', new Date(currentYear, currentMonth - 1, 1))
       .get();
 
+    const allExpenses = userExpensesDoc.data()?.expenses || [];
+
+    const rangeStart = new Date(previousYear, previousMonth - 1, 1).getTime();
+    const rangeEnd = new Date(currentYear, currentMonth - 1, 1).getTime();
+
+    const previousMonthExpenses = allExpenses.filter(expense => {
+      const expenseDate = expense.date?.toDate
+        ? expense.date.toDate().getTime()
+        : new Date(expense.date).getTime();
+      return expenseDate >= rangeStart && expenseDate < rangeEnd;
+    });
+
     let totalExpenses = 0;
-    snapshot.forEach(doc => {
-      const data = doc.data();
-      totalExpenses += parseFloat(data.amount) || 0;
+    previousMonthExpenses.forEach(expense => {
+      totalExpenses += parseFloat(expense.amount) || 0;
     });
 
     // Fetch user's budget for the previous month
     const userDoc = await firestore().collection('users').doc(userId).get();
     const userData = userDoc.data();
-    const totalBudget = userData?.monthlyBudget || 0;
+    const datePath = `${previousYear}-${previousMonth
+      .toString()
+      .padStart(2, '0')}`;
+    const totalBudget = userData?.budgets[datePath] || 0;
 
     // Calculate savings
     const savings = totalBudget - totalExpenses;
+    const historyDoc = {
+      totalExpenses,
+      totalBudget,
+      savings,
+      month: previousMonth,
+      year: previousYear,
+      createdAt: firestore.FieldValue.serverTimestamp(),
+    };
 
     // Create the snapshot for the previous month
-    await expenseHistoryRef
-      .doc(`${previousYear}-${previousMonth.toString().padStart(2, '0')}`)
-      .set({
-        totalExpenses,
-        totalBudget,
-        savings,
-        month: previousMonth,
-        year: previousYear,
-        createdAt: firestore.FieldValue.serverTimestamp(),
-      });
+    await expenseHistoryRef.doc(datePath).set(historyDoc);
 
-    console.log('Monthly snapshot created successfully.');
+    return {historyDoc, previousMonthExpenses};
   } catch (error) {
     console.error('Error creating monthly snapshot:', error);
   }
