@@ -392,8 +392,7 @@ const Profile = ({ navigation }) => {
             {user ? user.phone : '+92 300 1234567'}
           </Text>
         </View>
-
-        {/* Budget & Saving Goal Cards */}
+        {/* Budget & Saving Goal Cards
         <View style={styles.cardsRow}>
           <View style={styles.budgetCard}>
             <Text style={styles.cardIcon}>💳</Text>
@@ -408,8 +407,7 @@ const Profile = ({ navigation }) => {
             <Text style={styles.cardLabel}>SAVING GOAL</Text>
             <Text style={styles.cardAmount}>PKR 50,000</Text>
           </View>
-        </View>
-
+        </View> */}
         {/* Menu */}
         <View style={styles.menuContainer}>
           <TouchableOpacity

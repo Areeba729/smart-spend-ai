@@ -7,30 +7,83 @@ import {
   TouchableOpacity,
   StyleSheet,
   FlatList,
+  ActivityIndicator,
 } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Theme } from '../../libs';
 import { scale } from 'react-native-size-matters';
 import Toast from 'react-native-toast-message';
-import { saveEventToFirestore } from '../../hooks/AddEventFunction';
+import {
+  saveEventToFirestore,
+  updateEventInFirestore,
+} from '../../hooks/AddEventFunction';
 import { fetchUserEvents } from '../../hooks/fetchUserEvents';
 import { useFocusEffect } from '@react-navigation/native';
 
 /* ================= HELPERS ================= */
 
-const formatTime = date =>
-  date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+const parseCalendarDate = dateString => {
+  const [year, month, day] = dateString.split('-').map(Number);
+  return new Date(year, month - 1, day);
+};
 
-const mergeDateAndTime = (date, time) => {
+const startOfDay = date => {
   const d = new Date(date);
-  d.setHours(time.getHours(), time.getMinutes(), 0, 0);
+  d.setHours(0, 0, 0, 0);
   return d;
 };
 
+const endOfDay = date => {
+  const d = new Date(date);
+  d.setHours(23, 59, 59, 999);
+  return d;
+};
+
+const formatDisplayDate = date => date.toLocaleDateString('en-GB');
+
+const parseEventDate = value => {
+  if (!value) return null;
+  if (typeof value.toDate === 'function') return value.toDate();
+  return new Date(value);
+};
+
+const toDateString = date => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+const buildMarkedDates = eventsList =>
+  eventsList.reduce((acc, event, index) => {
+    if (!event?.start) return acc;
+
+    const d = parseEventDate(event.start);
+    if (!d || Number.isNaN(d.getTime())) return acc;
+
+    const formattedDate = toDateString(d);
+
+    if (!acc[formattedDate]) {
+      acc[formattedDate] = { dots: [] };
+    }
+
+    acc[formattedDate].dots.push({
+      key: event.id || `event-${index}`,
+      color: Theme.colors.secondary,
+    });
+
+    return acc;
+  }, {});
+
 /* ================= COMPONENT ================= */
 
-export default function MyCalendar({ events, setEvents }) {
+export default function MyCalendar({
+  events,
+  setEvents,
+  eventToEdit,
+  onEditModalClose,
+}) {
   // const [events, setEvents] = useState({});
   const [selectedDate, setSelectedDate] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
@@ -38,15 +91,15 @@ export default function MyCalendar({ events, setEvents }) {
   const [eventTitle, setEventTitle] = useState('');
   const [eventDescription, setEventDescription] = useState('');
 
-  const [startDate, setStartDate] = useState(new Date());
-  const [endDate, setEndDate] = useState(new Date());
-  const [startTime, setStartTime] = useState(null);
-  const [endTime, setEndTime] = useState(null);
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
 
   const [showStartDatePicker, setShowStartDatePicker] = useState(false);
-  const [showStartTimePicker, setShowStartTimePicker] = useState(false);
   const [showEndDatePicker, setShowEndDatePicker] = useState(false);
-  const [showEndTimePicker, setShowEndTimePicker] = useState(false);
+
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editingEventIndex, setEditingEventIndex] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   // useFocusEffect(
   //   useCallback(() => {
   //     const loadEvents = async () => {
@@ -58,11 +111,7 @@ export default function MyCalendar({ events, setEvents }) {
   //   }, []),
   // );
   const isFormValid =
-    eventTitle.trim().length > 0 &&
-    startTime !== null &&
-    endTime !== null &&
-    startDate !== null &&
-    endDate !== null;
+    eventTitle.trim().length > 0 && startDate !== null && endDate !== null;
 
   /* ================= ADD EVENT ================= */
 
@@ -103,7 +152,7 @@ export default function MyCalendar({ events, setEvents }) {
   //     setModalVisible(false);
   //   };
 
-  const addEvent = async () => {
+  const submitEvent = async () => {
     if (!isFormValid) {
       Toast.show({
         type: 'error',
@@ -114,79 +163,121 @@ export default function MyCalendar({ events, setEvents }) {
       return;
     }
 
-    const start = mergeDateAndTime(startDate, startTime);
-    const end = mergeDateAndTime(endDate, endTime);
+    if (isSubmitting) return;
 
-    const newEvent = {
+    const start = startOfDay(startDate);
+    const end = endOfDay(endDate);
+
+    const eventPayload = {
       title: eventTitle,
       description: eventDescription,
       start,
       end,
     };
 
-    await saveEventToFirestore(newEvent);
+    setIsSubmitting(true);
 
-    setEvents(prev => [...prev, newEvent]);
+    try {
+      if (isEditMode && editingEventIndex !== null) {
+        await updateEventInFirestore(editingEventIndex, eventPayload);
 
-    Toast.show({
-      type: 'success',
-      text1: 'Event Added',
-      text2: 'Your event has been added successfully',
-      position: 'top',
-    });
+        setEvents(prev =>
+          prev.map((event, index) =>
+            index === editingEventIndex
+              ? { ...eventPayload, id: event.id }
+              : event,
+          ),
+        );
 
-    resetModalFields();
-    setModalVisible(false);
+        closeModal();
+        Toast.show({
+          type: 'success',
+          text1: 'Event Updated',
+          text2: 'Your event has been updated successfully',
+          position: 'top',
+        });
+      } else {
+        const savedEvent = await saveEventToFirestore(eventPayload);
+
+        setEvents(prev => [...prev, { ...eventPayload, id: savedEvent.id }]);
+
+        closeModal();
+        Toast.show({
+          type: 'success',
+          text1: 'Event Added',
+          text2: 'Your event has been added successfully',
+          position: 'top',
+        });
+      }
+    } catch {
+      Toast.show({
+        type: 'error',
+        text1: isEditMode ? 'Update Failed' : 'Save Failed',
+        text2: 'Please try again',
+        position: 'top',
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
   const resetModalFields = () => {
     setEventTitle('');
     setEventDescription('');
-    setStartDate(new Date());
-    setEndDate(new Date());
-    setStartTime(null);
-    setEndTime(null);
+    setStartDate(null);
+    setEndDate(null);
+    setIsEditMode(false);
+    setEditingEventIndex(null);
+    setSelectedDate('');
   };
+
+  const closeModal = () => {
+    if (isSubmitting) return;
+    resetModalFields();
+    setModalVisible(false);
+    onEditModalClose?.();
+  };
+
+  const openModalForDate = dateString => {
+    setIsEditMode(false);
+    setEditingEventIndex(null);
+    setSelectedDate(dateString);
+    setEventTitle('');
+    setEventDescription('');
+    setStartDate(parseCalendarDate(dateString));
+    setEndDate(null);
+    setModalVisible(true);
+  };
+
+  const openModalForEdit = (event, index) => {
+    const start = parseEventDate(event.start);
+    const end = parseEventDate(event.end);
+
+    setIsEditMode(true);
+    setEditingEventIndex(index);
+    setSelectedDate(start ? toDateString(start) : '');
+    setEventTitle(event.title || '');
+    setEventDescription(event.description || '');
+    setStartDate(start);
+    setEndDate(end);
+    setModalVisible(true);
+  };
+
+  useEffect(() => {
+    if (!eventToEdit) return;
+    openModalForEdit(eventToEdit.event, eventToEdit.index);
+  }, [eventToEdit]);
 
   /* ================= UI ================= */
 
   return (
-    <View style={{ flex: 1 }}>
+    <View>
       {/* CALENDAR */}
       <Calendar
-        onDayPress={day => {
-          setSelectedDate(day.dateString);
-          resetModalFields(); // 👈 clear previous data
-          setModalVisible(true);
-        }}
-        markedDates={events.reduce((acc, event) => {
-          if (!event?.start) return acc;
-
-          // 🔥 Convert Firestore Timestamp properly
-          const d =
-            typeof event.start.toDate === 'function'
-              ? event.start.toDate()
-              : new Date(event.start);
-
-          const year = d.getFullYear();
-          const month = String(d.getMonth() + 1).padStart(2, '0');
-          const day = String(d.getDate()).padStart(2, '0');
-
-          const formattedDate = `${year}-${month}-${day}`;
-
-          if (!acc[formattedDate]) {
-            acc[formattedDate] = {
-              marked: true,
-              dotColor: 'red',
-            };
-          }
-
-          return acc;
-        }, {})}
-        //        markedDates={events.reduce((acc, event) => {
-        //   const date = new Date(event.start).toISOString().split('T')[0];
-        //   acc[date] = { marked: true, dotColor: Theme.colors.secondary };
-        //   return acc;
-        // }, {})}
+        style={styles.calendar}
+        markingType="multi-dot"
+        onDayPress={day => openModalForDate(day.dateString)}
+        markedDates={buildMarkedDates(events)}
       />
       {/* MODAL */}
       <Modal
@@ -202,11 +293,13 @@ export default function MyCalendar({ events, setEvents }) {
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
-            <Text style={styles.modalTitle1}>Add Event for {selectedDate}</Text>
+            <Text style={styles.modalTitle1}>
+              {isEditMode ? 'Update Event' : 'Add Event'}
+            </Text>
             <Text style={styles.modalTitle}>Event Title</Text>
             <TextInput
               placeholder="Event Title"
-              placeholderTextColor={Theme.colors.text}
+              placeholderTextColor={Theme.colors.black}
               style={styles.input}
               value={eventTitle}
               onChangeText={setEventTitle}
@@ -214,7 +307,7 @@ export default function MyCalendar({ events, setEvents }) {
             <Text style={styles.modalTitle}>Event Description</Text>
             <TextInput
               placeholder="Event Description"
-              placeholderTextColor={Theme.colors.text}
+              placeholderTextColor={Theme.colors.black}
               style={styles.input}
               value={eventDescription}
               onChangeText={setEventDescription}
@@ -226,10 +319,13 @@ export default function MyCalendar({ events, setEvents }) {
               style={styles.dateButton}
               onPress={() => setShowStartDatePicker(true)}
             >
-              <Text>Start Date: {startDate.toDateString()}</Text>
+              <Text>
+                Start Date:{' '}
+                {startDate ? formatDisplayDate(startDate) : 'Select'}
+              </Text>
             </TouchableOpacity>
 
-            {showStartDatePicker && (
+            {showStartDatePicker && startDate && (
               <DateTimePicker
                 value={startDate}
                 mode="date"
@@ -241,41 +337,20 @@ export default function MyCalendar({ events, setEvents }) {
               />
             )}
 
-            {/* START TIME */}
-            <Text style={styles.modalTitle}>Start Time</Text>
-            <TouchableOpacity
-              style={styles.dateButton}
-              onPress={() => setShowStartTimePicker(true)}
-            >
-              <Text>
-                Start Time: {startTime ? formatTime(startTime) : 'Select'}
-              </Text>
-            </TouchableOpacity>
-
-            {showStartTimePicker && (
-              <DateTimePicker
-                value={startTime || new Date()}
-                mode="time"
-                onChange={(e, date) => {
-                  setShowStartTimePicker(false);
-                  if (!date) return;
-                  setStartTime(date);
-                }}
-              />
-            )}
-
             {/* END DATE */}
             <Text style={styles.modalTitle}>End Date</Text>
             <TouchableOpacity
               style={styles.dateButton}
               onPress={() => setShowEndDatePicker(true)}
             >
-              <Text>End Date: {endDate.toDateString()}</Text>
+              <Text>
+                End Date: {endDate ? formatDisplayDate(endDate) : 'Select'}
+              </Text>
             </TouchableOpacity>
 
             {showEndDatePicker && (
               <DateTimePicker
-                value={endDate}
+                value={endDate || startDate || new Date()}
                 mode="date"
                 onChange={(e, date) => {
                   setShowEndDatePicker(false);
@@ -285,41 +360,41 @@ export default function MyCalendar({ events, setEvents }) {
               />
             )}
 
-            {/* END TIME */}
-            <Text style={styles.modalTitle}>End Time</Text>
-            <TouchableOpacity
-              style={styles.dateButton}
-              onPress={() => setShowEndTimePicker(true)}
-            >
-              <Text style={styles.modalText}>
-                End Time: {endTime ? formatTime(endTime) : 'Select'}
-              </Text>
-            </TouchableOpacity>
-
-            {showEndTimePicker && (
-              <DateTimePicker
-                value={endTime || new Date()}
-                mode="time"
-                onChange={(e, date) => {
-                  setShowEndTimePicker(false);
-                  if (!date) return;
-                  setEndTime(date);
-                }}
-              />
-            )}
-
             {/* BUTTONS */}
             <View style={styles.modalButtons}>
-              <TouchableOpacity style={styles.button} onPress={addEvent}>
-                <Text style={styles.buttonText}>Add Event</Text>
+              <TouchableOpacity
+                style={[styles.button, isSubmitting && styles.buttonDisabled]}
+                onPress={submitEvent}
+                disabled={isSubmitting}
+              >
+                <View style={styles.buttonInner}>
+                  <Text
+                    style={[
+                      styles.buttonText,
+                      isSubmitting && styles.buttonTextHidden,
+                    ]}
+                  >
+                    {isEditMode ? 'Update Event' : 'Add Event'}
+                  </Text>
+                  {isSubmitting && (
+                    <View style={styles.loaderOverlay}>
+                      <ActivityIndicator
+                        color={Theme.colors.white}
+                        size="small"
+                      />
+                    </View>
+                  )}
+                </View>
               </TouchableOpacity>
 
               <TouchableOpacity
-                style={[styles.button, styles.cancelButton]}
-                onPress={() => {
-                  resetModalFields();
-                  setModalVisible(false);
-                }}
+                style={[
+                  styles.button,
+                  styles.cancelButton,
+                  isSubmitting && styles.buttonDisabled,
+                ]}
+                onPress={closeModal}
+                disabled={isSubmitting}
               >
                 <Text style={{ color: 'red' }}>Cancel</Text>
               </TouchableOpacity>
@@ -334,6 +409,9 @@ export default function MyCalendar({ events, setEvents }) {
 /* ================= STYLES ================= */
 
 const styles = StyleSheet.create({
+  calendar: {
+    paddingBottom: scale(8),
+  },
   eventsHeader: {
     fontSize: scale(12),
     fontWeight: '600',
@@ -391,20 +469,41 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: 10,
+    gap: scale(8),
   },
   modalTitle: { fontSize: scale(12), fontWeight: '600', marginBottom: 10 },
   button: {
+    flex: 1,
+    minHeight: scale(44),
     backgroundColor: Theme.colors.secondary,
-    padding: 10,
+    paddingVertical: scale(10),
+    paddingHorizontal: scale(10),
     borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   cancelButton: {
     backgroundColor: '#fff',
     borderWidth: 1,
     borderColor: 'red',
   },
+  buttonInner: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   buttonText: {
     color: '#fff',
     fontWeight: '600',
+  },
+  buttonTextHidden: {
+    opacity: 0,
+  },
+  loaderOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  buttonDisabled: {
+    opacity: 0.6,
   },
 });

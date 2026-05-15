@@ -1,19 +1,9 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  Switch,
-  SafeAreaView,
-} from 'react-native';
-import { moderateScale } from 'react-native-size-matters';
-import { Theme } from '../../../libs';
-import styles from './style';
-import SafeFlexView from '../../../components/SafeFlexView/SafeFlexView';
-import ProfileHeader from '../../../components/ProfileHeader/ProfileHeader';
+import { Text, TouchableOpacity, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
-import Toggle from '../../../components/Toggle/Toggle';
 import SimpleHeader from '../../../components/SimpleHeader/SimpleHeader';
+import Toggle from '../../../components/Toggle/Toggle';
+import styles from './style';
 const Settings = ({ navigation }) => {
   const [darkMode, setDarkMode] = React.useState(true);
   const [pushNotifications, setPushNotifications] = React.useState(true);

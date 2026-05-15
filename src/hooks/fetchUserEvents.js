@@ -15,8 +15,9 @@ export const fetchUserEvents = async (uidParam = null) => {
     const events = data?.events || [];
 
     // Normalize timestamps (if stored as Firestore Timestamp)
-    return events.map(event => ({
+    return events.map((event, index) => ({
       ...event,
+      id: event.id || `legacy-${index}`,
       start: event.start?.toDate ? event.start.toDate() : event.start,
       end: event.end?.toDate ? event.end.toDate() : event.end,
     }));

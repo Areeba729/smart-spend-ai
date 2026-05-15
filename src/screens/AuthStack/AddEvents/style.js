@@ -18,10 +18,12 @@ const styles = StyleSheet.create({
   },
 
   calendarContainer: {
-    height: 250,
-    marginBottom: scale(70),
+    marginBottom: scale(12),
   },
   eventCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     padding: 12,
     borderRadius: 8,
     backgroundColor: Theme.colors.primary,
@@ -29,11 +31,37 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginBottom: scale(12),
   },
+  eventCardContent: {
+    flex: 1,
+    paddingRight: scale(8),
+  },
+  eventCardActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: scale(8),
+  },
+  editButton: {
+    padding: scale(6),
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: Theme.colors.secondary,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  deleteButton: {
+    padding: scale(6),
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: Theme.colors.secondary,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   listTitle: {
     fontSize: scale(16),
     fontWeight: '600',
     color: Theme.colors.secondary,
     marginBottom: scale(12),
+    zIndex: 1,
   },
   title: {
     fontSize: scale(14),
