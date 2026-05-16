@@ -88,10 +88,42 @@ const Home = ({ navigation }) => {
     return null;
   };
 
-  const isBudgetActive = () => {
-    if (!startDate || !endDate) return false;
+  const getCurrentMonthKey = () => {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  };
+
+  const getCurrentMonthDateRange = () => {
+    const now = new Date();
+    const start = new Date(now.getFullYear(), now.getMonth(), 1);
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    end.setHours(23, 59, 59, 999);
+    return { startDate: start, endDate: end };
+  };
+
+  const isDateInRange = (date, start, end) => {
+    const d = new Date(date);
+    d.setHours(0, 0, 0, 0);
+    const s = new Date(start);
+    s.setHours(0, 0, 0, 0);
+    const e = new Date(end);
+    e.setHours(23, 59, 59, 999);
+    return d >= s && d <= e;
+  };
+
+  const getEffectiveBudgetRange = () => {
     const today = new Date();
-    return today >= startDate && today <= endDate;
+    if (startDate && endDate && isDateInRange(today, startDate, endDate)) {
+      return { startDate, endDate };
+    }
+    return getCurrentMonthDateRange();
+  };
+
+  const isBudgetActive = () => {
+    if (monthlyBudget === null || monthlyBudget <= 0) return false;
+    const { startDate: start, endDate: end } = getEffectiveBudgetRange();
+    return isDateInRange(new Date(), start, end);
   };
 
   // ----------------------
@@ -205,30 +237,47 @@ const Home = ({ navigation }) => {
 
       if (userDoc.exists()) {
         const userData = userDoc.data();
+        const currentMonth = getCurrentMonthKey();
+        const budgets = userData.budgets || {};
 
-        // Budget period
-        const start = userData.startDate?._seconds
+        let budgetAmount = null;
+        if (budgets[currentMonth] !== undefined) {
+          budgetAmount = Number(budgets[currentMonth]);
+        } else if (userData.monthlyBudget) {
+          budgetAmount = Number(userData.monthlyBudget);
+        }
+        setMonthlyBudget(budgetAmount);
+
+        let start = userData.startDate?._seconds
           ? new Date(userData.startDate._seconds * 1000)
           : null;
-
-        const end = userData.endDate?._seconds
+        let end = userData.endDate?._seconds
           ? new Date(userData.endDate._seconds * 1000)
           : null;
 
+        // When a monthly budget exists, ensure we have a valid period for this month
+        if (budgetAmount !== null && budgetAmount > 0) {
+          const today = new Date();
+          const needsDateMigration =
+            !start || !end || !isDateInRange(today, start, end);
+
+          if (needsDateMigration) {
+            const monthRange = getCurrentMonthDateRange();
+            start = monthRange.startDate;
+            end = monthRange.endDate;
+
+            await firestore()
+              .collection('users')
+              .doc(firebaseUser.uid)
+              .update({
+                startDate: firestore.Timestamp.fromDate(start),
+                endDate: firestore.Timestamp.fromDate(end),
+              });
+          }
+        }
+
         setStartDate(start);
         setEndDate(end);
-
-        // Budget for current month
-        const now = new Date();
-        const currentMonth = `${now.getFullYear()}-${String(
-          now.getMonth() + 1,
-        ).padStart(2, '0')}`;
-        const budgets = userData.budgets || {};
-        if (budgets[currentMonth] !== undefined) {
-          setMonthlyBudget(Number(budgets[currentMonth]));
-        } else {
-          setMonthlyBudget(null);
-        }
       }
     } catch (error) {
       console.error('Error fetching user dates:', error);
@@ -247,13 +296,20 @@ const Home = ({ navigation }) => {
         const data = doc.data();
         budgets = data.budgets || {};
       }
-      const now = new Date();
-      const currentMonth = `${now.getFullYear()}-${String(
-        now.getMonth() + 1,
-      ).padStart(2, '0')}`;
+      const currentMonth = getCurrentMonthKey();
+      const { startDate: monthStart, endDate: monthEnd } =
+        getCurrentMonthDateRange();
+
       budgets[currentMonth] = Number(newBudget);
-      await docRef.update({ budgets });
+      await docRef.update({
+        budgets,
+        startDate: firestore.Timestamp.fromDate(monthStart),
+        endDate: firestore.Timestamp.fromDate(monthEnd),
+        monthlyBudget: String(newBudget),
+      });
       setMonthlyBudget(Number(newBudget));
+      setStartDate(monthStart);
+      setEndDate(monthEnd);
       setShowBudgetModal(false);
       setNewBudget('');
     } catch (error) {
@@ -329,12 +385,14 @@ const Home = ({ navigation }) => {
       Toast.show({
         type: 'error',
         text1: 'Budget Blocked',
-        text2: 'Budget expired. Please create a new budget.',
+        text2: 'No budget set for this month. Please set your monthly budget.',
         position: 'top',
       });
       return;
     }
-    navigation.navigate('AddExpense', { budget: { startDate, endDate } });
+    navigation.navigate('AddExpense', {
+      budget: getEffectiveBudgetRange(),
+    });
   };
 
   const handleAddEvent = () => navigation.navigate('AddEvents');
@@ -370,6 +428,23 @@ const Home = ({ navigation }) => {
     navigation.navigate('History', {
       historyData: lastMonthSummary?.previousMonthExpenses || [],
     });
+  };
+
+  const getBudgetNavParams = () => {
+    const range = getEffectiveBudgetRange();
+    return {
+      startDate: range.startDate.getTime(),
+      endDate: range.endDate.getTime(),
+      monthlyBudget: monthlyBudget ?? 0,
+    };
+  };
+
+  const handleSpentPress = () => {
+    navigation.navigate('SpentExpenses', getBudgetNavParams());
+  };
+
+  const handleRemainingPress = () => {
+    navigation.navigate('RemainingBudget', getBudgetNavParams());
   };
 
   // ----------------------
@@ -439,12 +514,14 @@ const Home = ({ navigation }) => {
               label="Spent"
               amount={`${totalSpent.toFixed(0)} PKR`}
               iconColor="#FF6B6B"
+              onPress={handleSpentPress}
             />
             <StatCard
               icon="💰"
               label="Remaining"
               amount={`${remainingBudget.toFixed(0)} PKR`}
               iconColor={Theme.colors.secondary}
+              onPress={handleRemainingPress}
             />
           </View>
 

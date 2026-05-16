@@ -45,12 +45,22 @@ export const getWeekEnd = () => {
 export const parseExpenseDate = (dateField) => {
   if (!dateField) return null;
   if (dateField instanceof Date) return dateField;
-  if (typeof dateField === 'string') return new Date(dateField);
   if (typeof dateField === 'object' && typeof dateField.toDate === 'function') {
     return dateField.toDate();
   }
   if (typeof dateField === 'object' && dateField._seconds != null) {
     return new Date(dateField._seconds * 1000);
+  }
+  if (typeof dateField === 'object' && dateField.seconds != null) {
+    return new Date(dateField.seconds * 1000);
+  }
+  if (typeof dateField === 'string') {
+    const parts = dateField.split('-');
+    if (parts.length === 3 && parts[0].length <= 2) {
+      const [day, month, year] = parts;
+      return new Date(`${year}-${month}-${day}`);
+    }
+    return new Date(dateField);
   }
   return null;
 };

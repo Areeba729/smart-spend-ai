@@ -16,13 +16,17 @@ import NativeInput from '../NativeInput/NativeInput';
 import SuccessModal from '../SuccessModal/SuccessModal';
 import { calendarIcon } from '../../assets/icons';
 import { styles } from './style';
-import { saveExpenseToFirestore } from '../../hooks/ExpenseFunction';
+import {
+  saveExpenseToFirestore,
+  updateExpenseInFirestore,
+} from '../../hooks/ExpenseFunction';
 import { useNavigation } from '@react-navigation/native';
 import { Theme } from '../../libs';
 import firestore from '@react-native-firebase/firestore';
 import { ScrollView } from 'react-native-gesture-handler';
 
-const AddExpenseForm = ({ onSubmit, prefillData }) => {
+const AddExpenseForm = ({ onSubmit, prefillData, editExpense }) => {
+  const isEditing = !!editExpense;
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const navigation = useNavigation();
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
@@ -48,12 +52,15 @@ const AddExpenseForm = ({ onSubmit, prefillData }) => {
 
   const [loading, setLoading] = useState(false); // State for loader
 
-  // Sync selectedDate when navigated from the receipt scanner with a detected date
+  // Sync selectedDate when navigated from the receipt scanner or edit flow
   useEffect(() => {
-    if (prefillData?.date instanceof Date) {
+    const dateFromEdit = parseExpenseDateForForm(editExpense?.date);
+    if (dateFromEdit) {
+      setSelectedDate(dateFromEdit);
+    } else if (prefillData?.date instanceof Date) {
       setSelectedDate(prefillData.date);
     }
-  }, [prefillData?.date]);
+  }, [editExpense?.date, prefillData?.date]);
 
   const categories = [
     { id: 5, name: 'others', icon: '📦', color: '#1C1C1E' },
@@ -82,7 +89,7 @@ const AddExpenseForm = ({ onSubmit, prefillData }) => {
   };
 
   const handleSave = async (values, { resetForm }) => {
-    setLoading(true); // Show loader
+    setLoading(true);
     const expenseData = {
       amount: values.amount,
       title: values.title,
@@ -93,10 +100,14 @@ const AddExpenseForm = ({ onSubmit, prefillData }) => {
     };
 
     try {
-      await saveExpenseToFirestore(expenseData);
+      if (isEditing) {
+        await updateExpenseInFirestore(editExpense, expenseData);
+      } else {
+        await saveExpenseToFirestore(expenseData);
+      }
       setLoading(false);
       setShowSuccessModal(true);
-      resetForm();
+      if (!isEditing) resetForm();
     } catch (error) {
       console.error('Error saving expense:', error);
       setLoading(false);
@@ -107,11 +118,16 @@ const AddExpenseForm = ({ onSubmit, prefillData }) => {
     <Formik
       enableReinitialize
       initialValues={{
-        amount: prefillData?.amount || '',
-        title: prefillData?.title || '',
-        category: prefillData?.category?.toLowerCase() || 'others',
-        date: prefillData?.date instanceof Date ? prefillData.date : new Date(),
-        note: prefillData?.note || '',
+        amount: editExpense?.amount ?? prefillData?.amount ?? '',
+        title: editExpense?.title ?? prefillData?.title ?? '',
+        category:
+          editExpense?.category?.toLowerCase() ??
+          prefillData?.category?.toLowerCase() ??
+          'others',
+        date:
+          parseExpenseDateForForm(editExpense?.date) ??
+          (prefillData?.date instanceof Date ? prefillData.date : new Date()),
+        note: editExpense?.note ?? prefillData?.note ?? '',
       }}
       validationSchema={validationSchema}
       onSubmit={handleSave}
@@ -236,7 +252,9 @@ const AddExpenseForm = ({ onSubmit, prefillData }) => {
             onPress={handleSubmit}
             disabled={loading}
           >
-            <NativeText style={styles.saveButtonText}>Save Expense</NativeText>
+            <NativeText style={styles.saveButtonText}>
+              {isEditing ? 'Update Expense' : 'Save Expense'}
+            </NativeText>
           </TouchableOpacity>
 
           {/* Full-screen loader while saving */}
@@ -248,7 +266,7 @@ const AddExpenseForm = ({ onSubmit, prefillData }) => {
                   color={Theme.colors.secondary}
                 />
                 <NativeText style={loaderStyles.text}>
-                  Saving expense...
+                  {isEditing ? 'Updating expense...' : 'Saving expense...'}
                 </NativeText>
               </View>
             </View>
@@ -258,10 +276,18 @@ const AddExpenseForm = ({ onSubmit, prefillData }) => {
             visible={showSuccessModal}
             onClose={() => {
               setShowSuccessModal(false);
-              navigation.navigate('Home'); // Navigate to Home on modal close
+              if (isEditing) {
+                navigation.goBack();
+              } else {
+                navigation.navigate('Home');
+              }
             }}
-            title="Added Successfully"
-            message="Your expense has been added successfully. You can now view it in your transaction history."
+            title={isEditing ? 'Updated Successfully' : 'Added Successfully'}
+            message={
+              isEditing
+                ? 'Your expense has been updated successfully.'
+                : 'Your expense has been added successfully. You can now view it in your transaction history.'
+            }
           />
 
           {/* DateTimePickerModal */}
@@ -275,6 +301,26 @@ const AddExpenseForm = ({ onSubmit, prefillData }) => {
       )}
     </Formik>
   );
+};
+
+const parseExpenseDateForForm = dateField => {
+  if (!dateField) return null;
+  if (dateField instanceof Date) return dateField;
+  if (typeof dateField === 'object' && typeof dateField.toDate === 'function') {
+    return dateField.toDate();
+  }
+  if (typeof dateField === 'object' && dateField._seconds != null) {
+    return new Date(dateField._seconds * 1000);
+  }
+  if (typeof dateField === 'string') {
+    const parts = dateField.split('-');
+    if (parts.length === 3 && parts[0].length <= 2) {
+      const [day, month, year] = parts;
+      return new Date(`${year}-${month}-${day}`);
+    }
+    return new Date(dateField);
+  }
+  return null;
 };
 
 const formatDate = date => {

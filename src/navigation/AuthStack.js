@@ -18,6 +18,9 @@ import ReportPreview from '../screens/AuthStack/ReportPreview/ReportPreview';
 import ReceiptScannerScreen from '../screens/AuthStack/ReceiptScanner/ReceiptScannerScreen';
 import AIAdvice from '../screens/AuthStack/AIAdvice/AIAdvice';
 import History from '../screens/AuthStack/History/History';
+import SpentExpenses from '../screens/AuthStack/SpentExpenses/SpentExpenses';
+import RemainingBudget from '../screens/AuthStack/RemainingBudget/RemainingBudget';
+import AddExpense from '../screens/AuthStack/AddExpense/AddExpense';
 
 function AuthStack() {
   const Stack = createNativeStackNavigator();
@@ -41,6 +44,9 @@ function AuthStack() {
     ReceiptScannerScreen,
     AIAdvice,
     History,
+    SpentExpenses,
+    RemainingBudget,
+    AddExpense,
   };
 
   return (

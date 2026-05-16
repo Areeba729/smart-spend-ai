@@ -13,6 +13,13 @@ import { Theme } from '../../../libs';
 import { useFocusEffect } from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
 
+const formatDisplayDate = date => {
+  if (!date) return '—';
+  const d = date instanceof Date ? date : new Date(date);
+  if (Number.isNaN(d.getTime())) return '—';
+  return d.toLocaleDateString('en-GB');
+};
+
 const AddEvents = ({ navigation }) => {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -81,6 +88,10 @@ const AddEvents = ({ navigation }) => {
       <View style={styles.eventCardContent}>
         <Text style={styles.title}>Title: {item.title}</Text>
         <Text style={styles.description}>Description: {item.description}</Text>
+        <Text style={styles.date}>
+          Start Date: {formatDisplayDate(item.start)}
+        </Text>
+        <Text style={styles.date}>End Date: {formatDisplayDate(item.end)}</Text>
       </View>
       <View style={styles.eventCardActions}>
         <TouchableOpacity

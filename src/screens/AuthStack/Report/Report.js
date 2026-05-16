@@ -1,36 +1,34 @@
 // screens/Reports/Report.js
-import React, { useEffect, useState, useMemo, useCallback } from 'react';
-import { View, ScrollView, Button } from 'react-native';
-import { useFocusEffect } from '@react-navigation/native';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { ScrollView, View } from 'react-native';
 import styles from './style';
 
-import ReportTabs from '../../../components/ReportTab/ReportTab';
-import SummaryCard from '../../../components/SummaryCardReport/SummaryCardReport';
-import DailyCategoryChart from '../../../components/DailyCategoryChart/DailyCategoryChart';
-import WeeklyBarChart from '../../../components/WeeklyBarChart/WeeklyBarChart';
 import AIInsightCard from '../../../components/AIInsightard/AIInsightCard';
-import RecentList from '../../../components/RecentList/RecentList';
-import SimpleHeader from '../../../components/SimpleHeader/SimpleHeader';
-import ScreenLoader from '../../../components/ScreenLoader/ScreenLoader';
+import DailyCategoryChart from '../../../components/DailyCategoryChart/DailyCategoryChart';
 import NativeText from '../../../components/NativeText/NativeText';
+import RecentList from '../../../components/RecentList/RecentList';
+import ScreenLoader from '../../../components/ScreenLoader/ScreenLoader';
+import SimpleHeader from '../../../components/SimpleHeader/SimpleHeader';
+import SummaryCard from '../../../components/SummaryCardReport/SummaryCardReport';
+import WeeklyBarChart from '../../../components/WeeklyBarChart/WeeklyBarChart';
 
-import { selectUser } from '../../../redux/slices/userSlice';
 import { useSelector } from 'react-redux';
+import PrimaryButton from '../../../components/PrimaryButton/PrimaryButton';
 import { getExpensesFromFirestore } from '../../../hooks/ExpenseFunction';
 import { Theme } from '../../../libs';
+import { selectUser } from '../../../redux/slices/userSlice';
 import {
-  normalizeTransactions,
+  getBudgetUsedPercent,
+  getDailyBudget,
   getDailyTransactions,
-  getWeeklyTransactions,
   getTotalAmount,
+  getWeeklyBudget,
+  getWeeklyTransactions,
   groupByCategory,
   groupByDay,
-  getDailyBudget,
-  getWeeklyBudget,
-  getBudgetUsedPercent,
+  normalizeTransactions,
 } from '../../../utils/reportCalculationUtils';
-import PrimaryButton from '../../../components/PrimaryButton/PrimaryButton';
 
 const Report = () => {
   const navigation = useNavigation();
@@ -170,7 +168,7 @@ const Report = () => {
           showsVerticalScrollIndicator={false}
           bounces={true}
         >
-          <ReportTabs activeTab={activeTab} onChange={setActiveTab} />
+          {/* <ReportTabs activeTab={activeTab} onChange={setActiveTab} /> */}
 
           {/* Statistics graph - shown first so user sees it immediately */}
           <NativeText style={styles.statisticsTitle}>Statistics</NativeText>
@@ -181,7 +179,7 @@ const Report = () => {
           )}
 
           <PrimaryButton
-            title={`Preview ${activeTab} Report`}
+            title={`Preview Report`}
             onPress={() => handlePreviewReport(activeTab)}
             containerStyle={styles.previewButton}
             titleStyle={{ fontWeight: 'bold' }}
@@ -189,12 +187,12 @@ const Report = () => {
 
           {isDaily ? (
             <>
-              <SummaryCard
+              {/* <SummaryCard
                 title="TODAY'S SPENDING"
                 value={`PKR ${dailyTotal.toFixed(0)}`}
                 subtitle={`${dailyBudgetPercent.toFixed(1)}% of daily budget`}
                 type="expense"
-              />
+              /> */}
               <View style={styles.cardRow}>
                 <SummaryCard
                   title="DAILY BUDGET"
@@ -308,7 +306,7 @@ const Report = () => {
             </View>
           )}
 
-          <AIInsightCard />
+          {/* <AIInsightCard /> */}
           <RecentList mode={activeTab} rawExpenses={rawExpenses} />
         </ScrollView>
       )}

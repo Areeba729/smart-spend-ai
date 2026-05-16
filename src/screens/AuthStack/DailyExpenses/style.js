@@ -93,6 +93,12 @@ export const styles = StyleSheet.create({
   },
   dateSelector: {
     marginBottom: moderateScale(20),
+    borderRadius: moderateScale(20),
+    overflow: 'hidden',
+  },
+  calendar: {
+    borderRadius: moderateScale(20),
+    paddingBottom: moderateScale(8),
   },
   content: {
     paddingBottom: scale(40),

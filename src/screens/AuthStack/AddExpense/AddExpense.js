@@ -45,22 +45,29 @@ import AddExpenseForm from '../../../components/AddExpenseForm/AddExpenseForm';
 import SimpleHeader from '../../../components/SimpleHeader/SimpleHeader';
 import styles from './style';
 
+const isDateInRange = (date, start, end) => {
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0);
+  const s = new Date(start);
+  s.setHours(0, 0, 0, 0);
+  const e = new Date(end);
+  e.setHours(23, 59, 59, 999);
+  return d >= s && d <= e;
+};
+
 const AddExpense = ({ navigation, route }) => {
   const prefillData = route?.params?.prefillData;
-  const budget = route?.params?.budget; // 👈 pass budget from previous screen
+  const editExpense = route?.params?.editExpense;
+  const budget = route?.params?.budget;
 
-  // 🔹 Check if budget is active
   const isBudgetActive = () => {
-    if (!budget) return false;
-
-    const today = new Date();
-    const start = new Date(budget.startDate);
-    const end = new Date(budget.endDate);
-
-    return today >= start && today <= end;
+    if (!budget?.startDate || !budget?.endDate) return false;
+    return isDateInRange(new Date(), budget.startDate, budget.endDate);
   };
 
-  const isExpired = budget && new Date() > new Date(budget.endDate);
+  const isExpired =
+    budget?.endDate &&
+    !isDateInRange(new Date(), budget.startDate, budget.endDate);
 
   const handleSave = values => {
     if (!isBudgetActive()) {
@@ -72,8 +79,8 @@ const AddExpense = ({ navigation, route }) => {
     navigation.goBack();
   };
 
-  // ❌ No budget OR expired
-  if (!budget || isExpired) {
+  // ❌ No budget OR expired (skip when editing an existing expense)
+  if (!editExpense && (!budget || isExpired)) {
     return (
       <View style={styles.container}>
         <SimpleHeader
@@ -99,7 +106,7 @@ const AddExpense = ({ navigation, route }) => {
   return (
     <View style={styles.container}>
       <SimpleHeader
-        title="Add Expense"
+        title={editExpense ? 'Edit Expense' : 'Add Expense'}
         onBackPress={() => navigation.goBack()}
       />
 
@@ -110,17 +117,21 @@ const AddExpense = ({ navigation, route }) => {
         extraScrollHeight={120}
         keyboardShouldPersistTaps="handled"
       >
-        <Text style={styles.title}>Add Expense</Text>
-
-        {/* ✅ Optional: Show budget info */}
-        <Text style={{ marginBottom: 10 }}>
-          Budget valid till: {new Date(budget.endDate).toDateString()}
+        <Text style={styles.title}>
+          {editExpense ? 'Edit Expense' : 'Add Expense'}
         </Text>
+
+        {budget?.endDate && !editExpense ? (
+          <Text style={{ marginBottom: 10 }}>
+            Budget valid till: {new Date(budget.endDate).toDateString()}
+          </Text>
+        ) : null}
 
         <AddExpenseForm
           onSubmit={handleSave}
           onCancel={() => navigation.goBack()}
           prefillData={prefillData}
+          editExpense={editExpense}
         />
       </KeyboardAwareScrollView>
     </View>

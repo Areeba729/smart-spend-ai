@@ -1,5 +1,26 @@
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
+import { parseExpenseDate } from '../utils/reportDateUtils';
+
+const getExpenseDateKey = dateField => {
+  const d = parseExpenseDate(dateField);
+  return d ? d.getTime() : '';
+};
+
+export const expensesAreEqual = (a, b) => {
+  if (!a || !b) return false;
+  if (a.id && b.id) return a.id === b.id;
+  return (
+    String(a.amount) === String(b.amount) &&
+    a.title === b.title &&
+    a.category === b.category &&
+    (a.note || '') === (b.note || '') &&
+    getExpenseDateKey(a.date) === getExpenseDateKey(b.date)
+  );
+};
+
+const generateExpenseId = () =>
+  `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 
 export const saveExpenseToFirestore = async expenseData => {
   try {
@@ -19,6 +40,7 @@ export const saveExpenseToFirestore = async expenseData => {
     await userExpensesRef.set(
       {
         expenses: firestore.FieldValue.arrayUnion({
+          id: expenseData.id || generateExpenseId(),
           amount: expenseData.amount,
           title: expenseData.title,
           category: expenseData.category,
@@ -62,7 +84,12 @@ export const getExpensesFromFirestore = async () => {
     const expenses = doc.data().expenses || [];
     console.log('Expenses retrieved successfully:', expenses);
 
-    return expenses;
+    return expenses.map((expense, index) => ({
+      ...expense,
+      id:
+        expense.id ||
+        `legacy-${index}-${getExpenseDateKey(expense.date)}-${expense.amount}-${expense.title}`,
+    }));
   } catch (error) {
     console.error('Error retrieving expenses:', error.message);
     return [];
@@ -159,5 +186,62 @@ export const getTodayExpensesFromFirestore = async () => {
   } catch (error) {
     console.error('Error getting today expenses:', error.message);
     return [];
+  }
+};
+
+export const deleteExpenseFromFirestore = async expenseToDelete => {
+  try {
+    const user = auth().currentUser;
+    if (!user) throw new Error('User is not logged in');
+
+    const userExpensesRef = firestore()
+      .collection('userExpenses')
+      .doc(user.uid);
+
+    const doc = await userExpensesRef.get();
+    if (!doc.exists) return;
+
+    const expenses = doc.data().expenses || [];
+    const updatedExpenses = expenses.filter(
+      exp => !expensesAreEqual(exp, expenseToDelete),
+    );
+
+    await userExpensesRef.set({ expenses: updatedExpenses }, { merge: true });
+  } catch (error) {
+    console.error('Error deleting expense:', error.message);
+    throw error;
+  }
+};
+
+export const updateExpenseInFirestore = async (oldExpense, expenseData) => {
+  try {
+    const user = auth().currentUser;
+    if (!user) throw new Error('User is not logged in');
+
+    const userExpensesRef = firestore()
+      .collection('userExpenses')
+      .doc(user.uid);
+
+    const doc = await userExpensesRef.get();
+    if (!doc.exists) return;
+
+    const expenses = doc.data().expenses || [];
+    const updatedExpenses = expenses.map(exp => {
+      if (!expensesAreEqual(exp, oldExpense)) return exp;
+      return {
+        ...exp,
+        amount: expenseData.amount,
+        title: expenseData.title,
+        category: expenseData.category,
+        date: expenseData.date,
+        note: expenseData.note || '',
+        id: exp.id || oldExpense.id || generateExpenseId(),
+      };
+    });
+
+    await userExpensesRef.set({ expenses: updatedExpenses }, { merge: true });
+  } catch (error) {
+    console.error('Error updating expense:', error.message);
+    throw error;
   }
 };

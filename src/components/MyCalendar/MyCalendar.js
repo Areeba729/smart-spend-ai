@@ -100,57 +100,9 @@ export default function MyCalendar({
   const [isEditMode, setIsEditMode] = useState(false);
   const [editingEventIndex, setEditingEventIndex] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     const loadEvents = async () => {
-  //       const userEvents = await fetchUserEvents(); // Fetch events from Firestore
-  //       setEvents(userEvents);
-  //     };
 
-  //     loadEvents();
-  //   }, []),
-  // );
   const isFormValid =
     eventTitle.trim().length > 0 && startDate !== null && endDate !== null;
-
-  /* ================= ADD EVENT ================= */
-
-  //   const addEvent = () => {
-  //     if (!isFormValid) {
-  //       Toast.show({
-  //         type: 'error',
-  //         text1: 'Incomplete Event',
-  //         text2: 'Please fill all required fields',
-  //         position: 'top',
-  //       });
-  //       return;
-  //     }
-
-  //     const start = mergeDateAndTime(startDate, startTime);
-  //     const end = mergeDateAndTime(endDate, endTime);
-
-  //     const newEvent = {
-  //       title: eventTitle,
-  //       description: eventDescription,
-  //       start,
-  //       end,
-  //     };
-
-  //     setEvents(prev => ({
-  //       ...prev,
-  //       [selectedDate]: [...(prev[selectedDate] || []), newEvent],
-  //     }));
-
-  //     Toast.show({
-  //       type: 'success',
-  //       text1: 'Event Added',
-  //       text2: 'Your event has been added successfully',
-  //       position: 'top',
-  //     });
-
-  //     resetModalFields();
-  //     setModalVisible(false);
-  //   };
 
   const submitEvent = async () => {
     if (!isFormValid) {

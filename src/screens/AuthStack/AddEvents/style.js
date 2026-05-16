@@ -22,7 +22,7 @@ const styles = StyleSheet.create({
   },
   eventCard: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     justifyContent: 'space-between',
     padding: 12,
     borderRadius: 8,
