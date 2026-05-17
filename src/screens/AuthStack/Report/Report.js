@@ -26,7 +26,6 @@ import {
   getWeeklyBudget,
   getWeeklyTransactions,
   groupByCategory,
-  groupByDay,
   normalizeTransactions,
 } from '../../../utils/reportCalculationUtils';
 
@@ -96,11 +95,6 @@ const Report = () => {
     [weeklyTransactions],
   );
 
-  const weeklyDayTotals = useMemo(
-    () => groupByDay(weeklyTransactions),
-    [weeklyTransactions],
-  );
-
   const dailyBudgetAmount = useMemo(
     () => getDailyBudget(monthlyBudget),
     [monthlyBudget],
@@ -154,7 +148,6 @@ const Report = () => {
       reportType,
     });
   };
-console.log('---->',weeklyDayTotals);
 
   return (
     <View style={styles.container}>
@@ -176,7 +169,7 @@ console.log('---->',weeklyDayTotals);
           {isDaily ? (
             <DailyCategoryChart categoryTotals={dailyCategoryTotals} />
           ) : (
-            <WeeklyBarChart dayTotals={weeklyDayTotals} />
+            <WeeklyBarChart transactions={transactions} />
           )}
 
           <PrimaryButton

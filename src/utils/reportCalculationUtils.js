@@ -88,8 +88,8 @@ export const groupByCategory = (transactions) => {
  * Group transactions by day of week (Mon–Sun) for the current week.
  * Returns array of { dayLabel, date, total } for each day in the week.
  */
-export const groupByDay = (transactions) => {
-  const start = getWeekStart();
+export const groupByDay = (transactions, weekStart = null) => {
+  const start = weekStart || getWeekStart();
   const dayTotals = WEEK_DAY_LABELS.map((label, index) => {
     const d = new Date(start);
     d.setDate(d.getDate() + index);
