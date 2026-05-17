@@ -125,7 +125,7 @@ const Report = () => {
     dailyBudgetAmount > 0 && dailyTotal > dailyBudgetAmount;
   const isWeeklyOverBudget =
     weeklyBudgetAmount > 0 && weeklyTotal > weeklyBudgetAmount;
-  const isDaily = activeTab === 'Daily';
+  const isDaily = false; // Disabled daily view for now, can be re-enabled later if needed
 
   // Redefine isOverBudget
   const isOverBudget = isDaily ? isDailyOverBudget : isWeeklyOverBudget;
@@ -154,6 +154,7 @@ const Report = () => {
       reportType,
     });
   };
+console.log('---->',weeklyDayTotals);
 
   return (
     <View style={styles.container}>

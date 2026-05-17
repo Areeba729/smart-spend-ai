@@ -21,14 +21,23 @@ const WeeklyBarChart = ({ dayTotals }) => {
   }, [dayTotals]);
 
   const chartConfig = {
-    backgroundColor: '#111',
-    backgroundGradientFrom: '#1a1a1a',
-    backgroundGradientTo: '#111',
+    backgroundColor: '#161618',
+    backgroundGradientFrom: '#161618',
+    backgroundGradientTo: '#161618',
     decimalPlaces: 0,
     color: (opacity = 1) => `rgba(154, 194, 60, ${opacity})`,
-    labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-    barPercentage: 0.6,
-    style: { borderRadius: 16 },
+    labelColor: (opacity = 1) => `rgba(180, 180, 180, ${opacity})`,
+    barPercentage: 0.65,
+    paddingRight: 16,
+    paddingTop: 28,
+    propsForBackgroundLines: {
+      strokeDasharray: '',
+      stroke: '#2a2a2e',
+      strokeWidth: 1,
+    },
+    propsForHorizontalLabels: {
+      textAnchor: 'start',
+    },
   };
 
   return (
@@ -36,13 +45,13 @@ const WeeklyBarChart = ({ dayTotals }) => {
       <NativeText style={styles.title}>Spending per day this week</NativeText>
       <BarChart
         data={chartData}
-        width={screenWidth - 48}
+        width={screenWidth - 32}
         height={240}
-        chartConfig={chartConfig}
+        chartConfig={{...chartConfig, fillShadowGradient: 'rgba(154, 194, 60, 1)', fillShadowGradientOpacity: 1,}}
         style={styles.chart}
         showValuesOnTopOfBars
-        fromZero
-        yAxisSuffix=""
+        showBarTops={false}
+        // yAxisSuffix=""
       />
     </View>
   );

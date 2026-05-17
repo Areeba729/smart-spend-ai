@@ -2,19 +2,23 @@ import { StyleSheet } from 'react-native';
 
 export default StyleSheet.create({
   container: {
-    backgroundColor: '#111',
+    backgroundColor: '#161618',
     borderRadius: 16,
-    padding: 16,
+    paddingTop: 16,
     marginTop: 16,
+    borderWidth: 1,
+    borderColor: '#2a2a2e',
+    overflow: 'hidden',
   },
   title: {
-    color: '#777',
-    fontSize: 13,
-    marginBottom: 12,
+    color: '#e0e0e0',
+    fontSize: 14,
+    fontWeight: '600',
+    marginBottom: 8,
+    letterSpacing: 0.3,
+    paddingHorizontal: 16,
   },
   chart: {
-    borderRadius: 16,
-    marginVertical: 8,
-    alignSelf: 'center',
+    alignSelf: 'flex-start',
   },
 });
