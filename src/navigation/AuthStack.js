@@ -14,6 +14,7 @@ import BudgetGoalScreen from '../screens/AuthStack/BudgetGoalScreen/BudgetGoalSc
 import Settings from '../screens/AuthStack/Settings/Settings';
 import Notifications from '../screens/AuthStack/Notifications/Notifications';
 import HelpAndSupport from '../screens/AuthStack/HelpAndSupport/HelpAndSupport';
+import PrivacySecurity from '../screens/AuthStack/PrivacySecurity/PrivacySecurity';
 import ReportPreview from '../screens/AuthStack/ReportPreview/ReportPreview';
 import ReceiptScannerScreen from '../screens/AuthStack/ReceiptScanner/ReceiptScannerScreen';
 import AIAdvice from '../screens/AuthStack/AIAdvice/AIAdvice';
@@ -40,6 +41,7 @@ function AuthStack() {
     Settings,
     Notifications,
     HelpAndSupport,
+    PrivacySecurity,
     ReportPreview,
     ReceiptScannerScreen,
     AIAdvice,

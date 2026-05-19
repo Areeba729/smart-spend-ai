@@ -3,6 +3,7 @@ import {
   ActivityIndicator,
   Animated,
   FlatList,
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
   Text,
@@ -10,6 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import SimpleHeader from '../../../components/SimpleHeader/SimpleHeader';
 import { getExpensesFromFirestore } from '../../../hooks/ExpenseFunction';
 import { Theme } from '../../../libs';
@@ -75,6 +77,8 @@ const TypingBubble = () => {
 };
 
 const AIAdvice = ({ navigation }) => {
+  const insets = useSafeAreaInsets();
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [messages, setMessages] = useState([
     { id: '1', text: 'Hi! What would you like help with?', sender: 'ai' },
   ]);
@@ -111,6 +115,25 @@ const AIAdvice = ({ navigation }) => {
       }
     };
     fetchExpenses();
+  }, []);
+
+  useEffect(() => {
+    const showEvent =
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+    const hideEvent =
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
+
+    const showSub = Keyboard.addListener(showEvent, event => {
+      setKeyboardHeight(event?.endCoordinates?.height ?? 0);
+    });
+    const hideSub = Keyboard.addListener(hideEvent, () => {
+      setKeyboardHeight(0);
+    });
+
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
   }, []);
 
   const sendMessage = async () => {
@@ -177,53 +200,78 @@ const AIAdvice = ({ navigation }) => {
     </View>
   );
 
+  const scrollToEnd = () => {
+    flatListRef.current?.scrollToEnd({ animated: true });
+  };
+
+  const isKeyboardOpen = keyboardHeight > 0;
+  const inputBottomPadding = isKeyboardOpen ? 8 : Math.max(insets.bottom, 12);
+  const androidInputLift =
+    Platform.OS === 'android' ? keyboardHeight : 0;
+
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 20}
-    >
+    <View style={styles.container}>
       <SimpleHeader
         title="AI Advice"
         onBackPress={() =>
           navigation && navigation.goBack && navigation.goBack()
         }
       />
-      {fetchingExpenses ? (
-        <View style={styles.expensesLoader}>
-          <ActivityIndicator size="large" color={Theme.colors.secondary} />
-        </View>
-      ) : (
-        <FlatList
-          ref={flatListRef}
-          data={messages}
-          renderItem={renderItem}
-          keyExtractor={item => item.id}
-          contentContainerStyle={[styles.chatArea, { paddingBottom: 80 }]}
-          onContentSizeChange={() =>
-            flatListRef.current?.scrollToEnd({ animated: true })
-          }
-          ListFooterComponent={loading ? <TypingBubble /> : null}
-        />
-      )}
-      <View style={styles.inputRow}>
-        <TextInput
-          style={styles.input}
-          value={input}
-          onChangeText={setInput}
-          placeholder="Type your message..."
-          placeholderTextColor={Theme.colors.lighttextcolor}
-          editable={!loading && !fetchingExpenses}
-        />
-        <TouchableOpacity
-          style={styles.sendBtn}
-          onPress={sendMessage}
-          disabled={loading || fetchingExpenses}
+      <KeyboardAvoidingView
+        style={styles.chatList}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? insets.top + 72 : 0}
+      >
+        {fetchingExpenses ? (
+          <View style={styles.expensesLoader}>
+            <ActivityIndicator size="large" color={Theme.colors.secondary} />
+          </View>
+        ) : (
+          <FlatList
+            ref={flatListRef}
+            style={styles.chatList}
+            data={messages}
+            renderItem={renderItem}
+            keyExtractor={item => item.id}
+            contentContainerStyle={styles.chatArea}
+            keyboardShouldPersistTaps="handled"
+            keyboardDismissMode="interactive"
+            onContentSizeChange={scrollToEnd}
+            onLayout={scrollToEnd}
+            ListFooterComponent={loading ? <TypingBubble /> : null}
+          />
+        )}
+        <View
+          style={[
+            styles.inputRow,
+            {
+              marginBottom: androidInputLift,
+              paddingBottom: inputBottomPadding,
+            },
+          ]}
         >
-          <Text style={styles.sendBtnText}>Send</Text>
-        </TouchableOpacity>
-      </View>
-    </KeyboardAvoidingView>
+          <TextInput
+            style={styles.input}
+            value={input}
+            onChangeText={setInput}
+            placeholder="Type your message..."
+            placeholderTextColor={Theme.colors.lighttextcolor}
+            editable={!loading && !fetchingExpenses}
+            onFocus={() => {
+              scrollToEnd();
+              setTimeout(scrollToEnd, 150);
+            }}
+          />
+          <TouchableOpacity
+            style={styles.sendBtn}
+            onPress={sendMessage}
+            disabled={loading || fetchingExpenses}
+          >
+            <Text style={styles.sendBtnText}>Send</Text>
+          </TouchableOpacity>
+        </View>
+      </KeyboardAvoidingView>
+    </View>
   );
 };
 

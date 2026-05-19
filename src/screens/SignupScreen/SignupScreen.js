@@ -93,7 +93,11 @@ const SignupScreen = ({ navigation }) => {
             <Text style={styles.backButtonText}>←</Text>
           </TouchableOpacity>
           <View style={styles.logoContainer}>
-            <Image source={images.logo} style={styles.logo} />
+            <Image
+              source={images.logo}
+              style={styles.logo}
+              resizeMode="contain"
+            />
           </View>
         </View>
         <View style={styles.header}>
@@ -113,13 +117,13 @@ const SignupScreen = ({ navigation }) => {
           <SignupForm onSubmit={handleSignup} onLoadingChange={setLoading} />
 
           <View style={styles.socialSection}>
-            <View style={styles.dividerContainer}>
+            {/* <View style={styles.dividerContainer}>
               <View style={styles.dividerLine} />
               <Text style={styles.dividerText}>OR SIGN UP WITH</Text>
               <View style={styles.dividerLine} />
-            </View>
+            </View> */}
 
-            <View style={styles.socialButtons}>
+            {/* <View style={styles.socialButtons}>
               <SocialButton
                 icon={<SvgXml xml={Google} width={20} height={20} />}
                 onPress={() => {}}
@@ -132,7 +136,7 @@ const SignupScreen = ({ navigation }) => {
                   styles={styles}
                 />
               )}
-            </View>
+            </View> */}
           </View>
 
           <View style={styles.footer}>

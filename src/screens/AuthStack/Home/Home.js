@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  useRef,
+} from 'react';
 import {
   View,
   ScrollView,
@@ -22,8 +28,19 @@ import { calendarIcon } from '../../../assets/icons';
 import { Theme } from '../../../libs';
 import { useUserGreeting } from '../../../libs/getUserGreetings';
 import { selectUser } from '../../../redux/slices/userSlice';
+import { useProfileImage } from '../../../hooks/useProfileImage';
 import BudgetModal from '../../../components/BudgetModal';
-import { getExpensesFromFirestore } from '../../../hooks/ExpenseFunction';
+import {
+  getExpensesFromFirestore,
+  getCategorizedExpensesFromFirestore,
+} from '../../../hooks/ExpenseFunction';
+import budgetRiskEngine from '../../../ai/budgetRiskEngine';
+import BudgetRiskAlertCard from '../../../components/HomeComponents/BudgetRiskAlertCard/BudgetRiskAlertCard';
+import BudgetRiskAlertModal from '../../../components/HomeComponents/BudgetRiskAlertModal/BudgetRiskAlertModal';
+import {
+  isBudgetAlertSnoozedForToday,
+  snoozeBudgetAlertForToday,
+} from '../../../utils/budgetAlertStorage';
 import { fetchUserEvents } from '../../../hooks/fetchUserEvents';
 import { checkMonthAndCreateSnapshot } from '../../../utils/checkMonthAndCreateSnapshot';
 
@@ -56,6 +73,12 @@ const Home = ({ navigation }) => {
   const [showBudgetModal, setShowBudgetModal] = useState(false);
   const [newBudget, setNewBudget] = useState('');
   const [lastMonthSummary, setLastMonthSummary] = useState({});
+  const [categoryBreakdown, setCategoryBreakdown] = useState({});
+  const [showBudgetRiskModal, setShowBudgetRiskModal] = useState(false);
+  const [alertSnoozeReady, setAlertSnoozeReady] = useState(false);
+  const [alertSnoozedToday, setAlertSnoozedToday] = useState(false);
+
+  const hasShownBudgetAlertModalRef = useRef(false);
 
   // Budget dates
   const [startDate, setStartDate] = useState(null);
@@ -69,6 +92,21 @@ const Home = ({ navigation }) => {
   const [selectedDate, setSelectedDate] = useState(
     new Date().setHours(0, 0, 0, 0),
   );
+
+  const { profileImageUrl, refreshProfileImage } = useProfileImage();
+
+  useFocusEffect(
+    useCallback(() => {
+      refreshProfileImage();
+    }, [refreshProfileImage]),
+  );
+
+  const displayName = name || user?.fullName || 'User';
+  const profileInitial = displayName.charAt(0).toUpperCase();
+  const headerProfileImageUrl =
+    typeof profileImageUrl === 'string' && profileImageUrl.trim().length > 0
+      ? profileImageUrl
+      : null;
 
   // ----------------------
   // Helper Functions
@@ -90,7 +128,10 @@ const Home = ({ navigation }) => {
 
   const getCurrentMonthKey = () => {
     const now = new Date();
-    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(
+      2,
+      '0',
+    )}`;
   };
 
   const getCurrentMonthDateRange = () => {
@@ -154,6 +195,85 @@ const Home = ({ navigation }) => {
 
   const remainingDays = useMemo(() => getRemainingDays(), [endDate]);
   const isBudgetAtRisk = remainingBudget < dailyLimit * remainingDays;
+
+  const refreshCategoryBreakdown = useCallback(async () => {
+    if (!startDate || !endDate) return;
+    try {
+      const categorized = await getCategorizedExpensesFromFirestore({
+        startDate,
+        endDate,
+      });
+      const totals = {};
+      ['Food', 'Transport', 'Shopping', 'Medical', 'Others'].forEach(name => {
+        totals[name] = (categorized[name] || []).reduce(
+          (sum, expense) => sum + (parseFloat(expense.amount) || 0),
+          0,
+        );
+      });
+      setCategoryBreakdown(totals);
+    } catch (error) {
+      console.error('Error loading category breakdown:', error);
+    }
+  }, [startDate, endDate]);
+
+  const budgetRiskAnalysis = useMemo(() => {
+    if (!monthlyBudget || monthlyBudget <= 0 || !startDate || !endDate) {
+      return null;
+    }
+    return budgetRiskEngine.analyze({
+      totalSpent,
+      totalBudget: monthlyBudget,
+      categoryBreakdown,
+      startDate,
+      endDate,
+      remainingBudget,
+    });
+  }, [
+    totalSpent,
+    monthlyBudget,
+    categoryBreakdown,
+    startDate,
+    endDate,
+    remainingBudget,
+  ]);
+
+  useEffect(() => {
+    let mounted = true;
+    isBudgetAlertSnoozedForToday().then(snoozed => {
+      if (mounted) {
+        setAlertSnoozedToday(snoozed);
+        setAlertSnoozeReady(true);
+      }
+    });
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (
+      !alertSnoozeReady ||
+      loading ||
+      !budgetRiskAnalysis?.isBudgetRisk ||
+      alertSnoozedToday ||
+      hasShownBudgetAlertModalRef.current
+    ) {
+      return;
+    }
+
+    hasShownBudgetAlertModalRef.current = true;
+    setShowBudgetRiskModal(true);
+  }, [alertSnoozeReady, loading, budgetRiskAnalysis, alertSnoozedToday]);
+
+  const handleDismissBudgetRiskModal = () => {
+    setShowBudgetRiskModal(false);
+  };
+
+  const handleSnoozeBudgetRiskModal = async () => {
+    await snoozeBudgetAlertForToday();
+    setAlertSnoozedToday(true);
+    setShowBudgetRiskModal(false);
+  };
 
   // ----------------------
   // Fetch Expenses
@@ -329,10 +449,10 @@ const Home = ({ navigation }) => {
         console.log('❌ No Firebase Auth user found');
         return;
       }
-      setLoadingSummary(true)
+      setLoadingSummary(true);
       const doc = await checkMonthAndCreateSnapshot(firebaseUser.uid);
       setLastMonthSummary(doc);
-      setLoadingSummary(false)
+      setLoadingSummary(false);
     };
 
     initialize();
@@ -348,6 +468,7 @@ const Home = ({ navigation }) => {
   useEffect(() => {
     if (startDate && endDate) {
       fetchExpenses();
+      refreshCategoryBreakdown();
       loadEvents();
     }
   }, [startDate, endDate]);
@@ -356,15 +477,27 @@ const Home = ({ navigation }) => {
     useCallback(() => {
       if (startDate && endDate) {
         fetchExpenses();
+        refreshCategoryBreakdown();
         loadEvents();
       }
-    }, [startDate, endDate]),
+    }, [startDate, endDate, refreshCategoryBreakdown]),
   );
+
+  useEffect(() => {
+    if (startDate && endDate) {
+      refreshCategoryBreakdown();
+    }
+  }, [totalSpent, refreshCategoryBreakdown]);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
     try {
-      await Promise.all([fetchExpenses(), loadEvents(), fetchUserDates()]);
+      await Promise.all([
+        fetchExpenses(),
+        refreshCategoryBreakdown(),
+        loadEvents(),
+        fetchUserDates(),
+      ]);
     } catch (error) {
       console.error(error);
     } finally {
@@ -457,9 +590,10 @@ const Home = ({ navigation }) => {
         backgroundColor={Theme.colors.secondary}
       />
       <HomeHeader
-        initial={name.charAt(0).toUpperCase()}
+        initial={profileInitial}
         greeting={greeting}
-        userName={name}
+        userName={displayName}
+        profileImageUrl={headerProfileImageUrl}
         onNotificationPress={() => navigation.navigate('Notifications')}
       />
 
@@ -524,6 +658,10 @@ const Home = ({ navigation }) => {
               onPress={handleRemainingPress}
             />
           </View>
+
+          {budgetRiskAnalysis?.isBudgetRisk && (
+            <BudgetRiskAlertCard analysis={budgetRiskAnalysis} />
+          )}
 
           {/* Today's Expenses */}
           <View style={styles.sectionHeader}>
@@ -617,6 +755,13 @@ const Home = ({ navigation }) => {
           setNewBudget('');
         }}
         loading={false}
+      />
+
+      <BudgetRiskAlertModal
+        visible={showBudgetRiskModal}
+        analysis={budgetRiskAnalysis}
+        onDismiss={handleDismissBudgetRiskModal}
+        onSnoozeToday={handleSnoozeBudgetRiskModal}
       />
 
       {/* Scan Receipt Modal */}

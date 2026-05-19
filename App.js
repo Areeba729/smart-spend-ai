@@ -175,7 +175,7 @@ export default function App() {
         type: 'info',
         text1: remoteMessage.notification?.title || 'Notification',
         text2: remoteMessage.notification?.body || '',
-      })
+      });
     });
 
     // App opened from background

@@ -1,72 +1,94 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  TextInput,
-  ScrollView,
-} from 'react-native';
-import styles from './style';
-import { Theme } from '../../../libs';
+import { Linking, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import SimpleHeader from '../../../components/SimpleHeader/SimpleHeader';
+import {
+  APP_NAME,
+  APP_SUPPORT_EMAIL,
+  APP_VERSION,
+  HELP_ABOUT_TEXT,
+  HELP_FEEDBACK_FAQ,
+} from '../../../libs/constants';
+import styles from './style';
 
-const HelpAndSupport = () => {
+const HelpAndSupport = ({ navigation }) => {
+  const openSupportEmail = (subject) => {
+    Linking.openURL(
+      `mailto:${APP_SUPPORT_EMAIL}?subject=${encodeURIComponent(subject)}`,
+    );
+  };
+
   return (
     <View style={styles.container}>
-      {/* Header */}
-      <SimpleHeader title="Help & Support" />
+      <SimpleHeader
+        title="Help & Feedback"
+        onBackPress={() => navigation.goBack()}
+      />
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
+        <Text style={styles.intro}>
+          Find answers to common questions or reach out to our team with
+          feedback and bug reports.
+        </Text>
 
-      <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Search Section */}
-        <View style={styles.searchSection}>
-          <Text style={styles.title}>How can we help you?</Text>
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Search for help..."
-            placeholderTextColor={Theme.colors.gray}
-          />
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>ABOUT</Text>
+          <View style={styles.aboutCard}>
+            <Text style={styles.aboutTitle}>{APP_NAME}</Text>
+            <Text style={styles.aboutBody}>{HELP_ABOUT_TEXT}</Text>
+          </View>
         </View>
 
-        {/* Contact Options */}
-        <View style={styles.contactOptionsContainer}>
-          <TouchableOpacity style={styles.contactOptionButton}>
-            <Text style={styles.contactOptionText}>Contact Support</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.contactOptionButton}>
-            <Text style={styles.contactOptionText}>Report a Bug</Text>
-          </TouchableOpacity>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>FREQUENTLY ASKED</Text>
+          {HELP_FEEDBACK_FAQ.map(item => (
+            <View key={item.question} style={styles.faqCard}>
+              <Text style={styles.faqQuestion}>{item.question}</Text>
+              <Text style={styles.faqAnswer}>{item.body}</Text>
+            </View>
+          ))}
         </View>
 
-        {/* FAQ Section */}
-        <View style={styles.faqSection}>
-          <Text style={styles.sectionTitle}>Frequently Asked Questions</Text>
-          <TouchableOpacity style={styles.faqItem}>
-            <Text style={styles.faqQuestion}>
-              How do I sync my bank account?
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>CONTACT US</Text>
+          <TouchableOpacity
+            style={styles.contactCard}
+            onPress={() => openSupportEmail(`${APP_NAME} Support`)}
+          >
+            <Text style={styles.contactLabel}>Contact Support</Text>
+            <Text style={styles.contactHint}>
+              Billing, account, or general questions
             </Text>
+            <Text style={styles.contactValue}>{APP_SUPPORT_EMAIL}</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.faqItem}>
-            <Text style={styles.faqQuestion}>Can I export my data to CSV?</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.faqItem}>
-            <Text style={styles.faqQuestion}>
-              How do I change currency to PKR?
+
+          <TouchableOpacity
+            style={styles.contactCard}
+            onPress={() => openSupportEmail(`${APP_NAME} Bug Report`)}
+          >
+            <Text style={styles.contactLabel}>Report a Bug</Text>
+            <Text style={styles.contactHint}>
+              Describe what happened and steps to reproduce
             </Text>
+            <Text style={styles.contactValue}>Send feedback →</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.contactCard}
+            onPress={() => openSupportEmail(`${APP_NAME} Feature Request`)}
+          >
+            <Text style={styles.contactLabel}>Share Feedback</Text>
+            <Text style={styles.contactHint}>
+              Suggest improvements or new features
+            </Text>
+            <Text style={styles.contactValue}>Send feedback →</Text>
           </TouchableOpacity>
         </View>
 
-        {/* Links Section */}
-        <View style={styles.linksSection}>
-          <TouchableOpacity style={styles.linkItem}>
-            <Text style={styles.linkText}>About App</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.linkItem}>
-            <Text style={styles.linkText}>Privacy Policy</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.linkItem}>
-            <Text style={styles.linkText}>Terms of Service</Text>
-          </TouchableOpacity>
-        </View>
+        <Text style={styles.version}>
+          {APP_NAME} · Version {APP_VERSION}
+        </Text>
       </ScrollView>
     </View>
   );

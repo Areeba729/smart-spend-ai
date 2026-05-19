@@ -1,22 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import {
-  View,
-  ScrollView,
-  TouchableOpacity,
-  Alert,
-  ToastAndroid,
-} from 'react-native';
 import firestore from '@react-native-firebase/firestore';
+import React, { useEffect, useState } from 'react';
+import { Alert, ScrollView, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 
-import { styles } from './style';
-import NativeText from '../../../components/NativeText/NativeText';
+import Toast from 'react-native-toast-message';
 import BudgetSlider from '../../../components/BudgetSlider/BudgetSlider';
-import RecommendationCard from '../../../components/RecommendationCard/RecommendationCard';
-import ImpactCard from '../../../components/ImpactCard/ImpactCard';
+import NativeText from '../../../components/NativeText/NativeText';
 import SimpleHeader from '../../../components/SimpleHeader/SimpleHeader';
 import { selectUser } from '../../../redux/slices/userSlice';
-import Toast from 'react-native-toast-message';
+import { styles } from './style';
 
 const EditBudget = ({ navigation }) => {
   const user = useSelector(selectUser);
@@ -36,7 +28,9 @@ const EditBudget = ({ navigation }) => {
           const data = userDoc.data();
           const budgets = data.budgets || {};
           const now = new Date();
-          const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+          const currentMonth = `${now.getFullYear()}-${String(
+            now.getMonth() + 1,
+          ).padStart(2, '0')}`;
           setMonthlyBudget(Number(budgets[currentMonth]) || 0);
         }
       } catch (error) {
@@ -63,7 +57,9 @@ const EditBudget = ({ navigation }) => {
         budgets = data.budgets || {};
       }
       const now = new Date();
-      const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+      const currentMonth = `${now.getFullYear()}-${String(
+        now.getMonth() + 1,
+      ).padStart(2, '0')}`;
       budgets[currentMonth] = Number(monthlyBudget);
       await docRef.update({ budgets });
 

@@ -33,11 +33,13 @@ export function useProfileImage() {
     try {
       const url = await getProfileImageUrlFromFirestore(uid);
       setProfileImageUrl(url);
-      if (url) dispatch(updateUser({ profileImageUrl: url }));
+      if (url && user) {
+        dispatch(updateUser({ profileImageUrl: url }));
+      }
     } catch (e) {
-      setError(e.message);
+      setError(e?.message ?? 'Failed to load profile image');
     }
-  }, [uid, dispatch]);
+  }, [uid, dispatch, user]);
 
   const pickAndUploadProfileImage = useCallback(async () => {
     if (!uid) {

@@ -112,18 +112,18 @@ export const styles = StyleSheet.create({
   remainingValue: {
     color: Theme.colors.secondary,
   },
-progressContainer: {
-  height: 8,
-  backgroundColor: '#2c2c2e',
-  borderRadius: 4,
-  overflow: 'hidden',
-},
+  progressContainer: {
+    height: 8,
+    backgroundColor: '#2c2c2e',
+    borderRadius: 4,
+    overflow: 'hidden',
+  },
 
-progressFill: {
-  height: '100%',
-  backgroundColor: Theme.colors.secondary, // or any color
-  width: '0%',
-},
+  progressFill: {
+    height: '100%',
+    backgroundColor: Theme.colors.secondary, // or any color
+    width: '0%',
+  },
   progressText: {
     fontSize: moderateScale(12),
     color: '#A0A0A0',

@@ -5,7 +5,6 @@ import { Theme } from '../../libs';
 import NativeText from '../NativeText/NativeText';
 import {
   homeIcon,
-  homeIconFilled,
   budgetIcon,
   reportsIcon,
   profileIcon,
@@ -16,7 +15,7 @@ import { SvgXml } from 'react-native-svg';
 
 const { colors } = Theme;
 
-const BottomTabs = ({ activeTab, onTabPress }) => {
+const BottomTabs = ({ activeTab, onTabPress, onPlusPress }) => {
   const tabs = [
     {
       name: 'Home',
@@ -56,7 +55,7 @@ const BottomTabs = ({ activeTab, onTabPress }) => {
             <TouchableOpacity
               key="plus"
               style={styles.plusButtonContainer}
-              onPress={() => onTabPress(tab.name)}
+              onPress={onPlusPress}
             >
               <View style={styles.plusButton}>
                 <SvgXml xml={plusIcon} />

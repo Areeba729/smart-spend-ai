@@ -19,10 +19,16 @@ const SimpleHeader = ({
         barStyle="light-content" // white text
       />
 
-      <View style={[styles.container, { backgroundColor: Theme.colors.primary }]}>
+      <View
+        style={[styles.container, { backgroundColor: Theme.colors.primary }]}
+      >
         <View style={styles.header}>
           {showBack ? (
-            <TouchableOpacity hitSlop={20} style={styles.backButton} onPress={onBackPress}>
+            <TouchableOpacity
+              hitSlop={20}
+              style={styles.backButton}
+              onPress={onBackPress}
+            >
               <SvgXml xml={BackArrowIcon} />
             </TouchableOpacity>
           ) : (

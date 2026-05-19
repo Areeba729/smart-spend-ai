@@ -55,8 +55,22 @@ const toDateString = date => {
   return `${year}-${month}-${day}`;
 };
 
-const buildMarkedDates = eventsList =>
-  eventsList.reduce((acc, event, index) => {
+const CALENDAR_THEME = {
+  backgroundColor: Theme.colors.black,
+  calendarBackground: '#1C1C1E',
+  textSectionTitleColor: '#A0A0A0',
+  selectedDayBackgroundColor: Theme.colors.secondary,
+  selectedDayTextColor: '#000',
+  todayTextColor: Theme.colors.secondary,
+  dayTextColor: Theme.colors.white,
+  textDisabledColor: '#555',
+  monthTextColor: Theme.colors.white,
+  arrowColor: Theme.colors.secondary,
+  dotColor: Theme.colors.secondary,
+};
+
+const buildMarkedDates = (eventsList, selectedDateStr = '') => {
+  const marks = eventsList.reduce((acc, event, index) => {
     if (!event?.start) return acc;
 
     const d = parseEventDate(event.start);
@@ -75,6 +89,24 @@ const buildMarkedDates = eventsList =>
 
     return acc;
   }, {});
+
+  if (selectedDateStr) {
+    const selectedDots = (marks[selectedDateStr]?.dots ?? []).map(dot => ({
+      ...dot,
+      color: Theme.colors.white,
+    }));
+
+    marks[selectedDateStr] = {
+      ...marks[selectedDateStr],
+      dots: selectedDots,
+      selected: true,
+      selectedColor: Theme.colors.secondary,
+      selectedTextColor: '#000',
+    };
+  }
+
+  return marks;
+};
 
 /* ================= COMPONENT ================= */
 
@@ -222,15 +254,21 @@ export default function MyCalendar({
 
   /* ================= UI ================= */
 
+  const todayString = toDateString(new Date());
+  const calendarCurrent = selectedDate || todayString;
+
   return (
     <View>
-      {/* CALENDAR */}
-      <Calendar
-        style={styles.calendar}
-        markingType="multi-dot"
-        onDayPress={day => openModalForDate(day.dateString)}
-        markedDates={buildMarkedDates(events)}
-      />
+      <View style={styles.dateSelector}>
+        <Calendar
+          style={styles.calendar}
+          markingType="multi-dot"
+          current={calendarCurrent}
+          onDayPress={day => openModalForDate(day.dateString)}
+          markedDates={buildMarkedDates(events, selectedDate || calendarCurrent)}
+          theme={CALENDAR_THEME}
+        />
+      </View>
       {/* MODAL */}
       <Modal
         visible={modalVisible}
@@ -361,7 +399,13 @@ export default function MyCalendar({
 /* ================= STYLES ================= */
 
 const styles = StyleSheet.create({
+  dateSelector: {
+    marginBottom: scale(12),
+    borderRadius: scale(20),
+    overflow: 'hidden',
+  },
   calendar: {
+    borderRadius: scale(20),
     paddingBottom: scale(8),
   },
   eventsHeader: {

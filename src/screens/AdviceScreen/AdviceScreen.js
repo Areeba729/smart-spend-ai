@@ -9,30 +9,29 @@ const AdviceScreen = ({ route, navigation }) => {
   const { categories } = route.params;
 
   const advice = useMemo(() => {
-  const today = new Date();
-  const year = today.getFullYear();
-  const month = today.getMonth();
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const todayDate = today.getDate();
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = today.getMonth();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const todayDate = today.getDate();
 
-  return categories.map(category => {
-    const remaining = category.remaining || 0;
+    return categories.map(category => {
+      const remaining = category.remaining || 0;
 
-    // days left in month including today
-    const daysLeft = daysInMonth - todayDate + 1;
+      // days left in month including today
+      const daysLeft = daysInMonth - todayDate + 1;
 
-    const dailyBudget = daysLeft > 0
-      ? Math.round(remaining / daysLeft)
-      : remaining;
+      const dailyBudget =
+        daysLeft > 0 ? Math.round(remaining / daysLeft) : remaining;
 
-    return {
-      title: category.title,
-      advice: `You have PKR ${remaining.toLocaleString()} remaining for ${
-        category.title
-      } this month. To stay on track, you should spend no more than PKR ${dailyBudget.toLocaleString()} per day for the remaining ${daysLeft} days of this month.`,
-    };
-  });
-}, [categories]);
+      return {
+        title: category.title,
+        advice: `You have PKR ${remaining.toLocaleString()} remaining for ${
+          category.title
+        } this month. To stay on track, you should spend no more than PKR ${dailyBudget.toLocaleString()} per day for the remaining ${daysLeft} days of this month.`,
+      };
+    });
+  }, [categories]);
 
   return (
     <View style={styles.container}>
@@ -41,7 +40,10 @@ const AdviceScreen = ({ route, navigation }) => {
         showBack
         onBackPress={() => navigation.goBack()}
       />
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
         {advice.map((item, index) => (
           <View key={index} style={styles.adviceCard}>
             <NativeText style={styles.title}>{item.title}</NativeText>

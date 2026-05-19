@@ -243,6 +243,7 @@
 
 import React, { useState, useCallback } from 'react';
 import {
+  ActivityIndicator,
   Image,
   Modal,
   ScrollView,
@@ -256,6 +257,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
 import SimpleHeader from '../../../components/SimpleHeader/SimpleHeader';
 import { logout, selectUser } from '../../../redux/slices/userSlice';
+import { persistedStore } from '../../../redux/store';
 import { useProfileImage } from '../../../hooks/useProfileImage';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
@@ -270,6 +272,7 @@ const Profile = ({ navigation }) => {
   const [emailInput, setEmailInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isPasswordVisible, setPasswordVisible] = useState(false);
 
   const user = useSelector(selectUser);
@@ -282,13 +285,25 @@ const Profile = ({ navigation }) => {
     }, [refreshProfileImage]),
   );
 
-  // Logout
-  const handleLogout = () => {
-    dispatch(logout());
+  const handleLogout = async () => {
+    if (isLoggingOut) return;
+
+    setIsLoggingOut(true);
     setLogoutModalVisible(false);
+
+    try {
+      await auth().signOut();
+      dispatch(logout());
+      await persistedStore.purge();
+    } catch (error) {
+      console.log('Logout Error:', error);
+      Alert.alert('Logout Failed', 'Something went wrong. Please try again.');
+      setIsLoggingOut(false);
+    }
   };
 
   const handleCancelLogout = () => {
+    if (isLoggingOut) return;
     setLogoutModalVisible(false);
   };
 
@@ -361,6 +376,12 @@ const Profile = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+      {isLoggingOut && (
+        <View style={styles.logoutOverlay}>
+          <ActivityIndicator size="large" color={Theme.colors.secondary} />
+          <Text style={styles.loggingOutText}>Logging out...</Text>
+        </View>
+      )}
       <SimpleHeader title="Profile" />
 
       <ScrollView
@@ -471,7 +492,7 @@ const Profile = ({ navigation }) => {
       <Modal
         transparent
         animationType="slide"
-        visible={isLogoutModalVisible}
+        visible={isLogoutModalVisible && !isLoggingOut}
         onRequestClose={handleCancelLogout}
       >
         <View style={styles.modalContainer}>
@@ -485,14 +506,23 @@ const Profile = ({ navigation }) => {
               <TouchableOpacity
                 style={styles.cancelButton}
                 onPress={handleCancelLogout}
+                disabled={isLoggingOut}
               >
                 <Text style={styles.cancelButtonText}>Cancel</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={styles.logoutButton}
+                style={[
+                  styles.logoutButton,
+                  isLoggingOut && styles.buttonDisabled,
+                ]}
                 onPress={handleLogout}
+                disabled={isLoggingOut}
               >
-                <Text style={styles.logoutButtonText}>Yes, Logout</Text>
+                {isLoggingOut ? (
+                  <ActivityIndicator color={Theme.colors.white} size="small" />
+                ) : (
+                  <Text style={styles.logoutButtonText}>Yes, Logout</Text>
+                )}
               </TouchableOpacity>
             </View>
           </View>

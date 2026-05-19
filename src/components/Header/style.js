@@ -33,6 +33,14 @@ const styles = StyleSheet.create({
     marginRight: moderateScale(12),
   },
 
+  profileImage: {
+    width: moderateScale(44),
+    height: moderateScale(44),
+    borderRadius: moderateScale(22),
+    marginRight: moderateScale(12),
+    backgroundColor: Theme.colors.grey,
+  },
+
   profileInitial: {
     fontSize: moderateScale(18),
     color: Theme.colors.black,

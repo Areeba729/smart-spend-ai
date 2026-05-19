@@ -70,7 +70,10 @@ export async function getProfileImageUrlFromFirestore(uid) {
   if (!uid) return null;
   const doc = await firestore().collection(USERS_COLLECTION).doc(uid).get();
   if (!doc.exists) return null;
-  return doc.data()[PROFILE_FIELD] ?? null;
+  const data = doc.data();
+  if (!data) return null;
+  const url = data[PROFILE_FIELD];
+  return typeof url === 'string' && url.trim().length > 0 ? url : null;
 }
 
 /**

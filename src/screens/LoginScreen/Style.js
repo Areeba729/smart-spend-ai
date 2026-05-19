@@ -98,7 +98,7 @@ const styles = colors =>
     footer: {
       flexDirection: 'row',
       justifyContent: 'center',
-      marginTop: moderateScale(40),
+      marginTop: moderateScale(120),
       marginBottom: moderateScale(20),
     },
     footerText: {

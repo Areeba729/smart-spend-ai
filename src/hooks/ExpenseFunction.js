@@ -88,7 +88,9 @@ export const getExpensesFromFirestore = async () => {
       ...expense,
       id:
         expense.id ||
-        `legacy-${index}-${getExpenseDateKey(expense.date)}-${expense.amount}-${expense.title}`,
+        `legacy-${index}-${getExpenseDateKey(expense.date)}-${expense.amount}-${
+          expense.title
+        }`,
     }));
   } catch (error) {
     console.error('Error retrieving expenses:', error.message);
@@ -96,7 +98,16 @@ export const getExpensesFromFirestore = async () => {
   }
 };
 
-export const getCategorizedExpensesFromFirestore = async () => {
+const CATEGORY_KEYS = ['Food', 'Transport', 'Shopping', 'Medical', 'Others'];
+
+const matchesCategory = (expense, categoryKey) =>
+  (expense.category || '').trim().toLowerCase() ===
+  categoryKey.toLowerCase();
+
+export const getCategorizedExpensesFromFirestore = async ({
+  startDate,
+  endDate,
+} = {}) => {
   try {
     // Get current user from Firebase Authentication
     const user = auth().currentUser;
@@ -115,24 +126,34 @@ export const getCategorizedExpensesFromFirestore = async () => {
 
     if (!doc.exists) {
       console.log('No expenses found for this user');
-      return {
-        Food: [],
-        Transport: [],
-        Shopping: [],
-        Medical: [],
-      };
+      return CATEGORY_KEYS.reduce((acc, key) => {
+        acc[key] = [];
+        return acc;
+      }, {});
     }
 
     // Extract expenses from the document
-    const expenses = doc.data().expenses || [];
+    let expenses = doc.data().expenses || [];
 
-    // Categorize expenses
-    const categorizedExpenses = {
-      Food: expenses.filter(expense => expense.category === 'Food'),
-      Transport: expenses.filter(expense => expense.category === 'Transport'),
-      Shopping: expenses.filter(expense => expense.category === 'Shopping'),
-      Medical: expenses.filter(expense => expense.category === 'Medical'),
-    };
+    if (startDate && endDate) {
+      const rangeStart = new Date(startDate);
+      rangeStart.setHours(0, 0, 0, 0);
+      const rangeEnd = new Date(endDate);
+      rangeEnd.setHours(23, 59, 59, 999);
+
+      expenses = expenses.filter(expense => {
+        const expenseDate = parseExpenseDate(expense.date);
+        return (
+          expenseDate && expenseDate >= rangeStart && expenseDate <= rangeEnd
+        );
+      });
+    }
+
+    // Categorize expenses (case-insensitive; matches AddExpenseForm values)
+    const categorizedExpenses = CATEGORY_KEYS.reduce((acc, key) => {
+      acc[key] = expenses.filter(expense => matchesCategory(expense, key));
+      return acc;
+    }, {});
 
     console.log(
       'Categorized expenses retrieved successfully:',
@@ -142,12 +163,10 @@ export const getCategorizedExpensesFromFirestore = async () => {
     return categorizedExpenses;
   } catch (error) {
     console.error('Error retrieving categorized expenses:', error.message);
-    return {
-      Food: [],
-      Transport: [],
-      Shopping: [],
-      Medical: [],
-    };
+    return CATEGORY_KEYS.reduce((acc, key) => {
+      acc[key] = [];
+      return acc;
+    }, {});
   }
 };
 

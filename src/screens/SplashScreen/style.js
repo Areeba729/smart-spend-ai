@@ -22,6 +22,9 @@ const getStyles = colors =>
       width: moderateScale(120),
       height: moderateScale(120),
       marginBottom: moderateScale(16),
+      borderRadius: moderateScale(30),
+      justifyContent: 'center',
+      alignItems: 'center',
     },
     logoText: {
       color: Theme.colors.secondary,

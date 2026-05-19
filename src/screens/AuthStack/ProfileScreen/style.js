@@ -217,6 +217,22 @@ const styles = StyleSheet.create({
     color: '#93C523',
     fontWeight: 'bold',
   },
+  logoutOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    zIndex: 999,
+    backgroundColor: Theme.colors.black,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loggingOutText: {
+    marginTop: moderateScale(16),
+    fontSize: moderateScale(16),
+    color: Theme.colors.white,
+    fontWeight: '600',
+  },
+  buttonDisabled: {
+    opacity: 0.6,
+  },
   modalContainer: {
     flex: 1,
     justifyContent: 'center',

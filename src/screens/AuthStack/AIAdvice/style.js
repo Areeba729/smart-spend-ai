@@ -9,7 +9,10 @@ const styles = StyleSheet.create({
   },
   chatArea: {
     padding: 16,
-    paddingBottom: 80,
+    paddingBottom: 16,
+  },
+  chatList: {
+    flex: 1,
   },
   bubble: {
     maxWidth: '80%',
@@ -37,11 +40,7 @@ const styles = StyleSheet.create({
     padding: 12,
     borderTopWidth: 1,
     borderColor: Theme.colors.border,
-    backgroundColor: Theme.colors.white,
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
+    // backgroundColor: Theme.colors.white,
   },
   input: {
     flex: 1,

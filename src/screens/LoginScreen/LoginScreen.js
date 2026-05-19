@@ -105,13 +105,13 @@ const LoginScreen = ({ navigation }) => {
           />
 
           <View style={styles.socialSection}>
-            <View style={styles.dividerContainer}>
+            {/* <View style={styles.dividerContainer}>
               <View style={styles.dividerLine} />
               <Text style={styles.dividerText}>Or continue with</Text>
               <View style={styles.dividerLine} />
-            </View>
+            </View> */}
 
-            <View style={styles.socialButtons}>
+            {/* <View style={styles.socialButtons}>
               <SocialButton
                 icon={<SvgXml xml={Google} width={20} height={20} />}
                 onPress={() => {}}
@@ -124,12 +124,14 @@ const LoginScreen = ({ navigation }) => {
                   styles={styles}
                 />
               )}
-            </View>
+            </View> */}
           </View>
 
           <View style={styles.footer}>
             <Text style={styles.footerText}>Don't have an account? </Text>
-            <TouchableOpacity onPress={() => navigation.navigate('SignupScreen')}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('SignupScreen')}
+            >
               <Text style={styles.signupText}>Sign Up</Text>
             </TouchableOpacity>
           </View>

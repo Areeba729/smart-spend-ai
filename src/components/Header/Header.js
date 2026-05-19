@@ -1,6 +1,6 @@
 // components/HomeHeader.js
 import React from 'react';
-import { View, TouchableOpacity } from 'react-native';
+import { Image, View, TouchableOpacity } from 'react-native';
 import NativeText from '../NativeText/NativeText';
 import styles from './style';
 
@@ -8,14 +8,26 @@ const HomeHeader = ({
   initial = 'A',
   greeting = 'Good Morning',
   userName = 'Alex',
+  profileImageUrl,
   onNotificationPress,
 }) => {
+  const imageUri =
+    typeof profileImageUrl === 'string' ? profileImageUrl.trim() : '';
+  const showProfileImage = imageUri.length > 0;
+
   return (
     <View style={styles.header}>
       <View style={styles.headerLeft}>
-        <View style={styles.profilePic}>
-          <NativeText style={styles.profileInitial}>{initial}</NativeText>
-        </View>
+        {showProfileImage ? (
+          <Image
+            source={{ uri: imageUri }}
+            style={styles.profileImage}
+          />
+        ) : (
+          <View style={styles.profilePic}>
+            <NativeText style={styles.profileInitial}>{initial}</NativeText>
+          </View>
+        )}
 
         <View>
           <NativeText style={styles.greeting}>{greeting}</NativeText>

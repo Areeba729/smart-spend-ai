@@ -69,11 +69,8 @@ const ReceiptScannerScreen = ({ navigation }) => {
       const { title, amount, date, category, note, currency } =
         await scanReceiptWithMindee(photo.path);
 
-      navigation.navigate('TabNavigator', {
-        screen: 'AddExpense',
-        params: {
-          prefillData: { title: title, amount, date, note, category, currency },
-        },
+      navigation.navigate('AddExpense', {
+        prefillData: { title: title, amount, date, note, category, currency },
       });
     } catch (error) {
       console.log('Receipt scan error:', error);
@@ -83,8 +80,7 @@ const ReceiptScannerScreen = ({ navigation }) => {
         [
           {
             text: 'OK',
-            onPress: () =>
-              navigation.navigate('TabNavigator', { screen: 'AddExpense' }),
+            onPress: () => navigation.navigate('AddExpense'),
           },
         ],
       );

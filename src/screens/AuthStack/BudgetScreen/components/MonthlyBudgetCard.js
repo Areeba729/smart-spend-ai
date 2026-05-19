@@ -6,7 +6,7 @@ import NativeText from '../../../../components/NativeText/NativeText';
 import { styles } from '../style';
 
 const MonthlyBudgetCard = ({ monthlyBudget, totalSpent }) => {
-  const remainingBudget = monthlyBudget - totalSpent;
+  const remainingBudget = Math.max(0, monthlyBudget - totalSpent);
 
   const spentPercentage = monthlyBudget
     ? Math.min((totalSpent / monthlyBudget) * 100, 100)

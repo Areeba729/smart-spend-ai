@@ -19,6 +19,8 @@ const styles = StyleSheet.create({
 
   calendarContainer: {
     marginBottom: scale(12),
+    borderRadius: moderateScale(20),
+    overflow: 'hidden',
   },
   eventCard: {
     flexDirection: 'row',

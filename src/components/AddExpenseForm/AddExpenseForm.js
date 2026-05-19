@@ -279,7 +279,7 @@ const AddExpenseForm = ({ onSubmit, prefillData, editExpense }) => {
               if (isEditing) {
                 navigation.goBack();
               } else {
-                navigation.navigate('Home');
+                navigation.navigate('TabNavigator', { screen: 'Home' });
               }
             }}
             title={isEditing ? 'Updated Successfully' : 'Added Successfully'}

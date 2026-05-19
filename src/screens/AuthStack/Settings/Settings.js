@@ -10,7 +10,10 @@ const Settings = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <SimpleHeader title="Settings" />
+      <SimpleHeader
+        title="Settings"
+        onBackPress={() => navigation.goBack()}
+      />
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
@@ -24,7 +27,7 @@ const Settings = ({ navigation }) => {
             <Text style={styles.label}>Currency</Text>
             <View style={styles.rightContent}>
               <Text style={styles.value}>PKR</Text>
-              <Text style={styles.arrow}>›</Text>
+              {/* <Text style={styles.arrow}>›</Text> */}
             </View>
           </TouchableOpacity>
 
@@ -33,16 +36,16 @@ const Settings = ({ navigation }) => {
             <Text style={styles.label}>Language</Text>
             <View style={styles.rightContent}>
               <Text style={styles.value}>English</Text>
-              <Text style={styles.arrow}>›</Text>
+              {/* <Text style={styles.arrow}>›</Text> */}
             </View>
           </TouchableOpacity>
-
+          {/* 
           <Toggle
             label="Dark Mode"
             value={darkMode}
             onValueChange={setDarkMode}
             icon="🌙"
-          />
+          /> */}
         </View>
 
         <View style={styles.section}>
@@ -70,13 +73,19 @@ const Settings = ({ navigation }) => {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>SECURITY & SUPPORT</Text>
 
-          <TouchableOpacity style={styles.settingItem}>
+          <TouchableOpacity
+            style={styles.settingItem}
+            onPress={() => navigation.navigate('PrivacySecurity')}
+          >
             <Text style={styles.icon}>🔒</Text>
             <Text style={styles.label}>Privacy & Security</Text>
             <Text style={styles.arrow}>›</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.settingItem}>
+          <TouchableOpacity
+            style={styles.settingItem}
+            onPress={() => navigation.navigate('HelpAndSupport')}
+          >
             <Text style={styles.icon}>💬</Text>
             <Text style={styles.label}>Help & Feedback</Text>
             <Text style={styles.arrow}>›</Text>

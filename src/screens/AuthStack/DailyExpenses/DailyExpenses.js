@@ -95,9 +95,14 @@ const DailyExpenses = ({ navigation }) => {
       });
     });
 
+    const selectedDots = (marks[selectedDate]?.dots ?? []).map(dot => ({
+      ...dot,
+      color: Theme.colors.white,
+    }));
+
     marks[selectedDate] = {
       ...marks[selectedDate],
-      dots: marks[selectedDate]?.dots ?? [],
+      dots: selectedDots,
       selected: true,
       selectedColor: Theme.colors.secondary,
       selectedTextColor: '#000',

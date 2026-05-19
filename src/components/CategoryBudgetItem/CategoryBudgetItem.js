@@ -14,7 +14,8 @@ const CategoryBudgetItem = ({
   onEditPress,
   onPress,
 }) => {
-  const percentageUsed = Math.round((spent / totalLimit) * 100);
+  const percentageUsed =
+    totalLimit > 0 ? Math.round((spent / totalLimit) * 100) : 0;
   const isOverbudget = spent > totalLimit;
   const remaining = totalLimit - spent;
 
@@ -38,9 +39,9 @@ const CategoryBudgetItem = ({
               : `${percentageUsed}% of budget used`}
           </NativeText>
         </View>
-        <TouchableOpacity style={styles.editButton} onPress={onEditPress}>
+        {/* <TouchableOpacity style={styles.editButton} onPress={onEditPress}>
           <SvgXml xml={editIcon} width={18} height={18} color="#A0A0A0" />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
 
       <View style={styles.progressContainer}>
